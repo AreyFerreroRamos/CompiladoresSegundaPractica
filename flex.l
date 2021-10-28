@@ -12,6 +12,7 @@ Exemple 7: ID := DIGIT
   #include <string.h>
   #include <stdbool.h> 
   #include "bison.tab.h"
+  #include "functions.h"
 
   extern FILE *yyin;
 %}
@@ -21,12 +22,17 @@ Exemple 7: ID := DIGIT
 
 lletra	[a-zA-Z]
 digit	[0-9]
-alfanum [[:alnum:]]
 
 %%
 
+(true|false)	{
+			debug("%s\n",yytext);
+			yylval.boolea = strcmp("true",yytext) ? false : true;
+			return BOOLEAN;
+		}
 
-{lletra}({lletra}|{digit})*	{
+{lletra}({lletra}|{digit}|_({lletra}|{digit}))*	{
+					debug("%s\n",yytext);
 					yylval.ident.lexema = (char *)malloc(sizeof(char)*yyleng);
 					strncpy(yylval.ident.lexema,yytext,yyleng);
 					yylval.ident.lenght = yyleng;
@@ -36,30 +42,32 @@ alfanum [[:alnum:]]
 
 
 ":="	{
+		debug("%s\n",yytext);
 		return ASSIGN;
 	}	
 
 {digit}({digit})* 	{
+				debug("%s\n",yytext);
 				yylval.enter = atoi(yytext);
 				return INTEGER;
 			}
 	
 {digit}({digit})*\.{digit}({digit})*(e(-)?{digit}({digit})*)?	{
+									debug("%s\n",yytext);
 									yylval.real = atof(yytext);
 									return FLOAT;						
 								}
 
-\"(.|[[:blank:]])*\"	{
+\"(.)*\"	{
+				debug("%s\n",yytext);
 				yylval.cadena = yytext;
 				return STRING;
 			}
 
-(true|false)	{
-			yylval.boolea = strcmp("true",yytext) ? true : false;
-			return BOOLEAN;
-		}
+(#(.)*|#=(.|\n)*=#) {debug("COMMENT: %s\n",yytext);}
 
-.	{}
+
+.	{yylval.cadena = yytext; return(RESIDUE); }
 
 
 %%
@@ -93,4 +101,8 @@ int end_analisi_lexic()
 		error = EXIT_FAILURE;
 	}
 	return error;
+}
+
+void debug(char* text,char* var){
+	printf(text,var);
 }

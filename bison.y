@@ -28,7 +28,7 @@
 %token <no_definit> ASSIGN
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING
+%token <cadena> STRING RESIDUE
 %token <boolea> BOOLEAN
 %token <ident> ID
 
@@ -37,24 +37,25 @@
 
 %%
 
+arxiu : expressio | arxiu expressio 
 
 expressio :	ID	{
-				fprintf(yyout,"ID: %s en la linea:  %d. La longitud es: %d",$1.lexema, $1.line, $1.lenght);			  		
+				fprintf(yyout,"ID: %s en la linea:  %d. La longitud es: %d ",$1.lexema, $1.line, $1.lenght);			  		
 	 		}
 	|	ASSIGN	{
-				fprintf(yyout,"ASSIGN: %s\n",$1.no_definit);
+				fprintf(yyout,"ASSIGN: %s",$1);
 			}
 	|	INTEGER {
-				fprintf(yyout,"INTEGER: %d\n",$1.enter);
+				fprintf(yyout,"INTEGER: %d",$1);
 			}
 	|	FLOAT	{
-				fprintf(yyout,"FLOAT: %.2f\n",$1.real);
+				fprintf(yyout,"FLOAT: %.8f",$1);
 			}
 	|	STRING	{
-				fprintf(yyout,"STRING: %s\n",$1.cadena);
+				fprintf(yyout,"STRING: %s",$1);
 			}
 	|	BOOLEAN	{
-				fprintf(yyout,"BOOLEA: %b\n",$1.boolea);
+				fprintf(yyout,"BOOLEA: %d",$1);
 			}
 
 
@@ -105,3 +106,5 @@ void yyerror(char *explanation)
 {
 	fprintf(stderr,"Error: %s ,in line %d \n",explanation,yylineno);
 }
+
+

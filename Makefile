@@ -3,7 +3,7 @@
 #
 #                           Compiladors I 
 #             
-#			 Jordi Castellà Roca
+#			 Jordi Castellï¿½ Roca
 #
 #                            Makefile
 #            
@@ -24,7 +24,7 @@ SRCY = bison.tab.c
 BIN = executable
 LFLAGS = -n 
 YFLAGS = -d -v
-OTHERS = bison.tab.h bison.output
+OTHERS = bison.tab.h bison.output sortida.txt
 
 ######################################################################
 

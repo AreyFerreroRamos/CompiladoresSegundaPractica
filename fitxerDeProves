@@ -1,0 +1,36 @@
+id2
+id1
+identificador
+dsafaewsf
+a_a
+aa_aa
+1
+2
+05
+45
+10000000
+12.34
+05.34
+12.3e2
+1.23e-3
+true
+false
+""
+"aaaaa"
+"a a a a a a"
+" a a a a a"
+" aaaaaa  aaaaaaaaa a"
+"     "
+" "
+"       "
+#COMENTARIO
+#=COMENTARIO
+DE VARIAS 
+LINEAS=#
+
+#PRUEBAS ERRONEAS
+#5id
+a__a
+a_
+a_a_
+_a_
