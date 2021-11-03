@@ -25,23 +25,30 @@
 	void *no_definit;
 }
 
-%token <no_definit> ASSIGN
+%token <no_definit> ASSIGN OP_ARITMETIC OP_RELACIONAL OP_BOOL 
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING RESIDUE
+%token <cadena> STRING
 %token <boolea> BOOLEAN
 %token <ident> ID
 
-%start arxiu
+%start llista_de_sentencies
 
 %%
 
-arxiu : arxiu expressio | expressio 
+llista_de_sentencies : llista_de_sentencies sentencia | sentencia
 
-expressio :	ASSIGN	{
-				fprintf(yyout,"ASSIGN: %s",$1);
-			}
-	|	INTEGER {
+sentencia : assignacio | expressio_aritmetica | expressio_booleana 
+
+assignacio : ID ASSIGN expressio_aritmetica | ID ASSIGN expressio_booleana
+
+expressio_aritmetica : expressio_aritmetica OP_ARITMETIC literal | literal
+
+expressio_booleana : expressio_booleana OP_BOOL condicional | condicional
+
+condicional : INTEGER OP_RELACIONAL INTEGER | FLOAT OP_RELACIONAL FLOAT
+
+literal :	INTEGER {
 				fprintf(yyout,"INTEGER: %d",$1);
 			}
 	|	FLOAT	{
@@ -50,11 +57,5 @@ expressio :	ASSIGN	{
 	|	STRING	{
 				fprintf(yyout,"STRING: %s",$1);
 			}
-	|	BOOLEAN	{
-				fprintf(yyout,"BOOLEA: %d",$1);
-			}
-	|	ID	{
-				fprintf(yyout,"ID: %s en la linea:  %d. La longitud es: %d ",$1.lexema, $1.line, $1.lenght);			  		
-	 		}
 
 %%

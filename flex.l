@@ -15,6 +15,7 @@
   #include "functions.h"
 
   extern FILE *yyin;
+  extern void yyerror(char *);
 %}
 
 %option yylineno
@@ -25,6 +26,23 @@ digit	[0-9]
 
 
 %%
+
+
+(\+|\-|\*|\/|\%|\^) {
+						debug("%s\n",yytext);
+						return OP_ARITMETIC;
+					}
+
+(">"|">="|"=="|"<="|"<"|"!=") 	{
+									debug("%s\n",yytext);
+									return OP_RELACIONAL;
+								}
+
+(!|&&|"||") {
+				debug("%s\n",yytext);
+				return OP_BOOL;
+			}
+
 
 
 ":="	{
@@ -69,10 +87,8 @@ digit	[0-9]
 							return ID;
 						}
 
-.	{
-		yylval.cadena = yytext;
-		return RESIDUE;
-	}
+
+.	{}
 
 
 %%

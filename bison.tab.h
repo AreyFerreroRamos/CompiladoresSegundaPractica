@@ -40,12 +40,14 @@
       know about them.  */
    enum yytokentype {
      ASSIGN = 258,
-     INTEGER = 259,
-     FLOAT = 260,
-     STRING = 261,
-     RESIDUE = 262,
-     BOOLEAN = 263,
-     ID = 264
+     OP_ARITMETIC = 259,
+     OP_RELACIONAL = 260,
+     OP_BOOL = 261,
+     INTEGER = 262,
+     FLOAT = 263,
+     STRING = 264,
+     BOOLEAN = 265,
+     ID = 266
    };
 #endif
 
@@ -72,7 +74,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 76 "bison.tab.h"
+#line 78 "bison.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
