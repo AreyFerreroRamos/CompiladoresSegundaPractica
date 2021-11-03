@@ -32,11 +32,9 @@
 %token <boolea> BOOLEAN
 %token <ident> ID
 
-%type <no_definit> expressio
-
+%start arxiu
 
 %%
-
 
 arxiu : arxiu expressio | expressio 
 
@@ -59,53 +57,4 @@ expressio :	ASSIGN	{
 				fprintf(yyout,"ID: %s en la linea:  %d. La longitud es: %d ",$1.lexema, $1.line, $1.lenght);			  		
 	 		}
 
-
 %%
-
-
-int init_analisi_sintactic (char* filename)
-{
-	int error = EXIT_SUCCESS;
-
-	yyout = fopen(filename,"w");
-
-	if (yyout == NULL) {
-		error = EXIT_FAILURE;
-	}
-	return error;
-}
-
-int analisi_semantic()
-{
-	int error;
-
-	if (yyparse() == 0) {
-		error =  EXIT_SUCCESS;
-	}
-	else {
-		error =  EXIT_FAILURE;
-	}
-	return error;
-}
-
-int end_analisi_sintactic()
-{
-	int error;
-
-	error = fclose(yyout);
-
-	if (error == 0) {
- 		error = EXIT_SUCCESS;
-	}
-	else {
-		error = EXIT_FAILURE;	
-	}
-	return error;
-}
-
-void yyerror(char *explanation)
-{
-	fprintf(stderr,"Error: %s ,in line %d \n", explanation, yylineno);
-}
-
-

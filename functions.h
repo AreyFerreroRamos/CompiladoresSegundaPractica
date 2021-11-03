@@ -1,11 +1,11 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-extern int init_analisi_lexic(char *);
-extern int init_analisi_sintactic(char *);
-extern int analisi_semantic();
-extern int end_analisi_lexic();
-extern int end_analisi_sintactic();
-extern void debug(char *, char *);
+int init_analisi_lexic(char *);
+int init_analisi_sintactic(char *);
+int analisi_semantic();
+int end_analisi_lexic();
+int end_analisi_sintactic();
+void debug(char *, char *);
 
 #endif

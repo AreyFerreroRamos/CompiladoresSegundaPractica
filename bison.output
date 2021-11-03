@@ -1,0 +1,135 @@
+Terminals unused in grammar
+
+   RESIDUE
+
+
+Grammar
+
+    0 $accept: arxiu $end
+
+    1 arxiu: arxiu expressio
+    2      | expressio
+
+    3 expressio: ID
+    4          | ASSIGN
+    5          | INTEGER
+    6          | FLOAT
+    7          | STRING
+    8          | BOOLEAN
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+ASSIGN (258) 4
+INTEGER (259) 5
+FLOAT (260) 6
+STRING (261) 7
+RESIDUE (262)
+BOOLEAN (263) 8
+ID (264) 3
+
+
+Nonterminals, with rules where they appear
+
+$accept (10)
+    on left: 0
+arxiu (11)
+    on left: 1 2, on right: 0 1
+expressio (12)
+    on left: 3 4 5 6 7 8, on right: 1 2
+
+
+state 0
+
+    0 $accept: . arxiu $end
+
+    ASSIGN   shift, and go to state 1
+    INTEGER  shift, and go to state 2
+    FLOAT    shift, and go to state 3
+    STRING   shift, and go to state 4
+    BOOLEAN  shift, and go to state 5
+    ID       shift, and go to state 6
+
+    arxiu      go to state 7
+    expressio  go to state 8
+
+
+state 1
+
+    4 expressio: ASSIGN .
+
+    $default  reduce using rule 4 (expressio)
+
+
+state 2
+
+    5 expressio: INTEGER .
+
+    $default  reduce using rule 5 (expressio)
+
+
+state 3
+
+    6 expressio: FLOAT .
+
+    $default  reduce using rule 6 (expressio)
+
+
+state 4
+
+    7 expressio: STRING .
+
+    $default  reduce using rule 7 (expressio)
+
+
+state 5
+
+    8 expressio: BOOLEAN .
+
+    $default  reduce using rule 8 (expressio)
+
+
+state 6
+
+    3 expressio: ID .
+
+    $default  reduce using rule 3 (expressio)
+
+
+state 7
+
+    0 $accept: arxiu . $end
+    1 arxiu: arxiu . expressio
+
+    $end     shift, and go to state 9
+    ASSIGN   shift, and go to state 1
+    INTEGER  shift, and go to state 2
+    FLOAT    shift, and go to state 3
+    STRING   shift, and go to state 4
+    BOOLEAN  shift, and go to state 5
+    ID       shift, and go to state 6
+
+    expressio  go to state 10
+
+
+state 8
+
+    2 arxiu: expressio .
+
+    $default  reduce using rule 2 (arxiu)
+
+
+state 9
+
+    0 $accept: arxiu $end .
+
+    $default  accept
+
+
+state 10
+
+    1 arxiu: arxiu expressio .
+
+    $default  reduce using rule 1 (arxiu)

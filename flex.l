@@ -76,38 +76,3 @@ digit	[0-9]
 
 
 %%
-
-
-int init_analisi_lexic(char *file_name)
-{
-	int error;
-
-	yyin=fopen(file_name,"r");
-
-	if (yyin == NULL) {
-		error = EXIT_FAILURE;
-	} 
-	else {
-		error = EXIT_SUCCESS;
-	}
-	return error;
-}
-
-int end_analisi_lexic()
-{
-	int error;
-
-	error = fclose(yyin);
-
-	if (error == 0){
-		error = EXIT_SUCCESS;
-	}
-	else {
-		error = EXIT_FAILURE;
-	}
-	return error;
-}
-
-void debug(char* text, char* var){
-	printf(text, var);
-}
