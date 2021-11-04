@@ -30,19 +30,19 @@ digit	[0-9]
 
 \^ {
 		debug("%s\n",yytext);
-		yylval.no_definit = yytext;
+		yylval.cadena = "^";
 		return OP_ARIT_P1;
 	}
 
 (\*|\/|\%) {
 				debug("%s\n",yytext);
-				yylval.no_definit = yytext;
+				yylval.cadena = strcmp(yytext,"*") == 0 ? "*":strcmp(yytext,"/") == 0 ? "/":"%";
 				return OP_ARIT_P2;
 			}
 
 (\+|\-) {
 			debug("%s\n",yytext);
-			yylval.no_definit = yytext;
+			yylval.cadena = strcmp(yytext,"+") == 0 ? "+":"-";
 			return OP_ARIT_P3;
 		}
 
@@ -93,6 +93,7 @@ digit	[0-9]
 
 {lletra}({lletra}|{digit}|_({lletra}|{digit}))*	{
 							debug("%s\n",yytext);
+							debug("length: %s\n",iota(yyleng));
 							yylval.ident.lexema = (char *)malloc(sizeof(char)*yyleng);
 							strncpy(yylval.ident.lexema,yytext,yyleng);
 							yylval.ident.lenght = yyleng;

@@ -97,6 +97,11 @@ void debug(char *text, char *var)
     printf(text, var);
 }
 
+void simpleDebug(char *text)
+{
+    printf(text);
+}
+
 int doOperationAritmeticP3(value_info v1, char *operand, value_info v2, value_info *finish_val)
 {
     if (strcmp(v1.type, "Int32") == 0 && strcmp(v2.type, "Int32") == 0)
@@ -104,8 +109,10 @@ int doOperationAritmeticP3(value_info v1, char *operand, value_info v2, value_in
 
         finish_val->type = "Int32";
         int resInt;
+        debug("operand: %s\n", operand);
         if (intOperations(atoi(v1.value), atoi(v2.value), operand, &resInt))
         {
+
             sprintf(finish_val->value, "%d", resInt);
         }
         else
@@ -131,25 +138,32 @@ int doOperationAritmeticP3(value_info v1, char *operand, value_info v2, value_in
 
 int canTypeDoOperationP3(char *type)
 {
-    return !(strcmp(type, "Bool") == 0 || strcmp(type, "String") == 0 || strcmp(type, "Ident"));
+    return (strcmp(type, "Int32") == 0 || strcmp(type, "Float64") == 0);
 }
 
 int intOperations(int num1, int num2, char *operand, int *res)
 {
+    debug("num1: %s\n", iota(num1));
+    debug("num2: %s\n", iota(num2));
+    debug("operand: %s\n", operand);
     if (strcmp(operand, "+") == 0)
     {
+        simpleDebug("Estoy en suma\n");
         *res = num1 + num2;
     }
     else if (strcmp(operand, "-") == 0)
     {
+        simpleDebug("Estoy en resta\n");
         *res = num1 - num2;
     }
     else if (strcmp(operand, "*") == 0)
     {
+        simpleDebug("Estoy en producto\n");
         *res = num1 * num2;
     }
     else if (strcmp(operand, "/") == 0)
     {
+        simpleDebug("Estoy en division\n");
         if (num2 != 0)
         {
             *res = num1 / num2;
@@ -182,4 +196,18 @@ float floatOperations(float num1, float num2, char *operand, float *res)
         return 0;
     }
     return 1;
+}
+
+char *iota(int num)
+{
+    char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+    sprintf(string, "%i", num);
+    return string;
+}
+
+char *fota(float num)
+{
+    char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+    sprintf(string, "%f", num);
+    return string;
 }
