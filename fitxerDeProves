@@ -1,15 +1,1 @@
-1+1
-3.6e2 + 0.4
-enter
-float
-enter := 1 +1
-float := 3.6e2 + 0.4
-
-
-#PRUEBAS ERRONEAS
-#5id
-#a__a
-#a_
-#a_a_
-#_a_
-#int a, b
+2 + 3 * 1

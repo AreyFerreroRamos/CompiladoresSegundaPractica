@@ -28,10 +28,23 @@ digit	[0-9]
 %%
 
 
-(\+|\-|\*|\/|\%|\^) {
-						debug("%s\n",yytext);
-						return OP_ARITMETIC;
-					}
+\^ {
+		debug("%s\n",yytext);
+		yylval.no_definit = yytext;
+		return OP_ARIT_P1;
+	}
+
+(\*|\/|\%) {
+				debug("%s\n",yytext);
+				yylval.no_definit = yytext;
+				return OP_ARIT_P2;
+			}
+
+(\+|\-) {
+			debug("%s\n",yytext);
+			yylval.no_definit = yytext;
+			return OP_ARIT_P3;
+		}
 
 (">"|">="|"=="|"<="|"<"|"!=") 	{
 									debug("%s\n",yytext);
@@ -86,7 +99,6 @@ digit	[0-9]
 							yylval.ident.line = yylineno;
 							return ID;
 						}
-
 
 .	{}
 

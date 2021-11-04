@@ -2,7 +2,7 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <stdbool.h>
-  #include "functions.h"
+  #include <string.h>
 
   #define YYLMAX 100
 
@@ -11,6 +11,11 @@
   extern int yylex();
   extern void yyerror(char *);
 %}
+
+%code requires {
+  #include "functions.h"
+  #include "tipus.h"
+}
 
 %union {
 	struct {
@@ -22,40 +27,66 @@
 	float real;
 	char *cadena;
 	bool boolea;
+	value_info operand;
 	void *no_definit;
 }
 
-%token <no_definit> ASSIGN OP_ARITMETIC OP_RELACIONAL OP_BOOL 
+%token <no_definit> ASSIGN OP_RELACIONAL OP_BOOL OP_ARIT_P1 OP_ARIT_P2 OP_ARIT_P3
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING
+%token <cadena> STRING 
 %token <boolea> BOOLEAN
 %token <ident> ID
 
-%start llista_de_sentencies
+%type <operand> literal lista_sumas
+
+%start lista_de_sentencias
 
 %%
 
-llista_de_sentencies : llista_de_sentencies sentencia | sentencia
+lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 
-sentencia : assignacio | expressio_aritmetica | expressio_booleana 
+sentencia : asignacion | lista_sumas
 
-assignacio : ID ASSIGN expressio_aritmetica | ID ASSIGN expressio_booleana
+asignacion : ID ASSIGN lista_sumas  {}
 
-expressio_aritmetica : expressio_aritmetica OP_ARITMETIC literal | literal
+lista_sumas : lista_sumas OP_ARIT_P3 literal 	{ 	
+													if(canTypeDoOperationP3($3.type))
+													{
+														if(!doOperationAritmeticP3($1,$2,$3,&$$)){
+															yyerror("Something wrong with operation");
+														}
+													}
+													else
+													{
+														char * error;
+														sprintf(error,"Cannot do operation with type %s",$1.type);
+														yyerror(error);
+													} 
+												}	
+			| literal 	{ 	
+							if(canTypeDoOperationP3($1.type))
+							{
+								$$.value=$1.value;
+								$$.type=$1.type;
+							}
+							else
+							{
+								char * error;
+								sprintf(error,"Cannot do operation with type %s",$1.type);
+								yyerror(error);
+							} 
+						}
 
-expressio_booleana : expressio_booleana OP_BOOL condicional | condicional
-
-condicional : INTEGER OP_RELACIONAL INTEGER | FLOAT OP_RELACIONAL FLOAT
-
-literal :	INTEGER {
-				fprintf(yyout,"INTEGER: %d",$1);
-			}
-	|	FLOAT	{
-				fprintf(yyout,"FLOAT: %.8f",$1);
-			}
-	|	STRING	{
-				fprintf(yyout,"STRING: %s",$1);
-			}
+literal :	INTEGER { 	sprintf($$.value, "%d", $1);
+						$$.type="Int32";}
+	| FLOAT	{sprintf($$.value, "%f", $1);
+						$$.type="Float64";}
+	| STRING	{sprintf($$.value, "%s", $1);
+						$$.type="String";}
+	| BOOLEAN {sprintf($$.value, "%d", $1);
+						$$.type="Bool";}
+	| ID {sprintf($$.value, "%d", $1);
+						$$.type="Ident";}
 
 %%
