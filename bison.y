@@ -40,43 +40,37 @@
 
 %type <operand> literal lista_sumas
 
-%start lista_de_sentencias
+%start programa
+
 
 %%
 
+
+programa : lista_de_sentencias
+
 lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 
-sentencia : asignacion | lista_sumas
+sentencia : asignacion | expresion_aritmetica 
 
-asignacion : ID ASSIGN lista_sumas  {	debug("id:%s\n",$1.lexema);
-										debug("valor:%s\n",$3.value);
-										fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, $3.value);}
+asignacion : ID ASSIGN lista_sumas	{	
+	   					debug("id:%s\n",$1.lexema);
+						debug("valor:%s\n",$3.value);
+						fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, $3.value);
+					}
 
-lista_sumas : lista_sumas OP_ARIT_P3 literal 	{
-													if(canTypeDoOperationP3($3.type))
-													{
-														debug("operand: %s\n", $2);
-														$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-														if(!doOperationAritmeticP3($1,$2,$3,&$$)){
-															yyerror("Something wrong with operation");
-														}
-														debug("valor: %s\n",$$.value);
+expresion_aritmetica : lista_sumas
 
-													}
-													else
-													{
-														char * error;
-														error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-														sprintf(error,"Cannot do operation with type %s",$1.type);
-														yyerror(error);
-													} 
-												}	
-			| literal 	{ 	
-							if(canTypeDoOperationP3($1.type))
+lista_sumas : lista_sumas OP_ARIT_P3 literal	{
+							if(canTypeDoOperationP3($3.type))
 							{
+								debug("operand: %s\n", $2);
 								$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-								$$.value=$1.value;
-								$$.type=$1.type;
+								if(!doOperationAritmeticP3($1,$2,$3,&$$))
+								{
+									yyerror("Something wrong with operation");
+								}
+								debug("valor: %s\n",$$.value);
+
 							}
 							else
 							{
@@ -85,28 +79,44 @@ lista_sumas : lista_sumas OP_ARIT_P3 literal 	{
 								sprintf(error,"Cannot do operation with type %s",$1.type);
 								yyerror(error);
 							} 
+						}	
+			| literal	{ 	
+						if(canTypeDoOperationP3($1.type))
+						{
+							$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+							$$.value=$1.value;
+							$$.type=$1.type;
 						}
-
-literal :	INTEGER { 	
-						$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-						sprintf($$.value, "%d", $1);
-						$$.type="Int32";
+						else
+						{
+							char * error;
+							error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+							sprintf(error,"Cannot do operation with type %s",$1.type);
+							yyerror(error);
+						} 
 					}
-	| FLOAT	{
+
+literal : INTEGER	{ 	
+				$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+				sprintf($$.value, "%d", $1);
+				$$.type="Int32";
+			}
+	| FLOAT		{
 				sprintf($$.value, "%f", $1);
 				$$.type="Float64";
 			}
 	| STRING	{
-					sprintf($$.value, "%s", $1);
-					$$.type="String";
-				}
-	| BOOLEAN 	{	
-					sprintf($$.value, "%d", $1);
-					$$.type="Bool";
-				}
-	| ID 	{
-				sprintf($$.value, "%d", $1);
-				$$.type="Ident";
+				sprintf($$.value, "%s", $1);
+				$$.type="String";
 			}
+	| BOOLEAN	{	
+				sprintf($$.value, "%d", $1);
+				$$.type="Bool";
+			}
+	| ID	{
+			sprintf($$.value, "%d", $1);
+			$$.type="Ident";
+		}
+
 
 %%

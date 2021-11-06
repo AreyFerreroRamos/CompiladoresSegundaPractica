@@ -3,7 +3,7 @@
 #
 #                           Compiladors I 
 #             
-#			 Jordi Castell� Roca
+#			 Jordi Castella Roca
 #
 #                            Makefile
 #            

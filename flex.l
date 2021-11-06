@@ -9,8 +9,8 @@
 %{
   #include <stdio.h>
   #include <stdlib.h>
-  #include <string.h>
-  #include <stdbool.h> 
+  #include <stdbool.h>
+  #include <string.h> 
   #include "bison.tab.h"
   #include "functions.h"
 
@@ -28,35 +28,33 @@ digit	[0-9]
 %%
 
 
-\^ {
+\^	{
 		debug("%s\n",yytext);
 		yylval.cadena = "^";
 		return OP_ARIT_P1;
 	}
 
-(\*|\/|\%) {
-				debug("%s\n",yytext);
-				yylval.cadena = strcmp(yytext,"*") == 0 ? "*":strcmp(yytext,"/") == 0 ? "/":"%";
-				return OP_ARIT_P2;
-			}
-
-(\+|\-) {
+(\*|\/|\%)	{
 			debug("%s\n",yytext);
-			yylval.cadena = strcmp(yytext,"+") == 0 ? "+":"-";
-			return OP_ARIT_P3;
+			yylval.cadena = strcmp(yytext,"*") == 0 ? "*" : strcmp(yytext,"/") == 0 ? "/" : "%";
+			return OP_ARIT_P2;
 		}
 
-(">"|">="|"=="|"<="|"<"|"!=") 	{
-									debug("%s\n",yytext);
-									return OP_RELACIONAL;
-								}
+(\+|\-)	{
+		debug("%s\n",yytext);
+		yylval.cadena = strcmp(yytext,"+") == 0 ? "+" : "-";
+		return OP_ARIT_P3;
+	}
 
-(!|&&|"||") {
-				debug("%s\n",yytext);
-				return OP_BOOL;
-			}
+(">"|">="|"=="|"<="|"<"|"!=")	{
+					debug("%s\n",yytext);
+					return OP_RELACIONAL;
+				}
 
-
+(!|&&|"||")	{
+			debug("%s\n",yytext);
+			return OP_BOOL;
+		}
 
 ":="	{
 		debug("%s\n",yytext);
@@ -83,7 +81,7 @@ digit	[0-9]
 
 (true|false)	{
 			debug("%s\n",yytext);
-			yylval.boolea = strcmp("true",yytext) ? false : true;
+			yylval.boolea = strcmp(yytext,"true") ? false : true;
 			return BOOLEAN;
 		}
 

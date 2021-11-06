@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include "functions.h"
 
 extern int yyparse();
@@ -112,7 +112,6 @@ int doOperationAritmeticP3(value_info v1, char *operand, value_info v2, value_in
         debug("operand: %s\n", operand);
         if (intOperations(atoi(v1.value), atoi(v2.value), operand, &resInt))
         {
-
             sprintf(finish_val->value, "%d", resInt);
         }
         else
@@ -168,7 +167,9 @@ int intOperations(int num1, int num2, char *operand, int *res)
         {
             *res = num1 / num2;
         }
-        return 0;
+	else {
+	    return 0;
+	}
     }
     return 1;
 }
@@ -193,7 +194,10 @@ float floatOperations(float num1, float num2, char *operand, float *res)
         {
             *res = num1 / num2;
         }
-        return 0;
+	else 
+	{
+            return 0;
+	}
     }
     return 1;
 }
