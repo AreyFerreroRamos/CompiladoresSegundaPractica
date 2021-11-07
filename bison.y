@@ -76,7 +76,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 literal	{
 							{
 								char * error;
 								error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-								sprintf(error,"Cannot do operation with type %s",$1.type);
+								sprintf(error,"Cannot do operation with type %s",$3.type);
 								yyerror(error);
 							} 
 						}	
