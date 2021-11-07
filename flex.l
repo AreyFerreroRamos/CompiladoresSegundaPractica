@@ -28,6 +28,49 @@ digit	[0-9]
 %%
 
 
+({digit})+	{
+			debug("%s\n",yytext);
+			yylval.enter = atoi(yytext);
+			return INTEGER;
+		}
+	
+({digit})+\.({digit})+(e(-)?({digit})+)?	{
+							debug("%s\n",yytext);
+							yylval.real = atof(yytext);
+							return FLOAT;						
+						}
+
+\"(.)*\"	{
+			debug("%s\n",yytext);
+			yylval.cadena = yytext;
+			return STRING;
+		}
+
+(true|false)	{
+			debug("%s\n",yytext);
+			yylval.boolea = strcmp(yytext,"true") ? false : true;
+			return BOOLEAN;
+		}
+
+(#(.)*|#=(.|\n)*=#) 	{
+				debug("COMMENT: %s\n",yytext);
+			}
+
+{lletra}({lletra}|{digit}|_({lletra}|{digit}))*	{
+							debug("%s\n",yytext);
+							debug("length: %s\n",iota(yyleng));
+							yylval.ident.lexema = (char *)malloc(sizeof(char)*yyleng);
+							strncpy(yylval.ident.lexema,yytext,yyleng);
+							yylval.ident.lenght = yyleng;
+							yylval.ident.line = yylineno;
+							return ID;
+						}
+
+":="	{
+		debug("%s\n",yytext);
+		return ASSIGN;
+	}
+
 \^	{
 		debug("%s\n",yytext);
 		yylval.cadena = "^";
@@ -55,49 +98,6 @@ digit	[0-9]
 			debug("%s\n",yytext);
 			return OP_BOOL;
 		}
-
-":="	{
-		debug("%s\n",yytext);
-		return ASSIGN;
-	}	
-
-{digit}({digit})*	{
-				debug("%s\n",yytext);
-				yylval.enter = atoi(yytext);
-				return INTEGER;
-			}
-	
-{digit}({digit})*\.{digit}({digit})*(e(-)?{digit}({digit})*)?	{
-									debug("%s\n",yytext);
-									yylval.real = atof(yytext);
-									return FLOAT;						
-								}
-
-\"(.)*\"	{
-			debug("%s\n",yytext);
-			yylval.cadena = yytext;
-			return STRING;
-		}
-
-(true|false)	{
-			debug("%s\n",yytext);
-			yylval.boolea = strcmp(yytext,"true") ? false : true;
-			return BOOLEAN;
-		}
-
-(#(.)*|#=(.|\n)*=#) 	{
-				debug("COMMENT: %s\n",yytext);
-			}
-
-{lletra}({lletra}|{digit}|_({lletra}|{digit}))*	{
-							debug("%s\n",yytext);
-							debug("length: %s\n",iota(yyleng));
-							yylval.ident.lexema = (char *)malloc(sizeof(char)*yyleng);
-							strncpy(yylval.ident.lexema,yytext,yyleng);
-							yylval.ident.lenght = yyleng;
-							yylval.ident.line = yylineno;
-							return ID;
-						}
 
 .	{}
 
