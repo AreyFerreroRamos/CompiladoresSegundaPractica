@@ -15,5 +15,6 @@ int intOperations(int num1, int num2, char *operand, int *res);
 float floatOperations(float num1, float num2, char *operand, float *res);
 char *iota(int num);
 char *fota(float num);
+char *strncpyWithSentinel(int length, char *toCopy);
 
 #endif

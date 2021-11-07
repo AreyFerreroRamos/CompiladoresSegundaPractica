@@ -58,9 +58,7 @@ digit	[0-9]
 
 {lletra}({lletra}|{digit}|_({lletra}|{digit}))*	{
 							debug("%s\n",yytext);
-							debug("length: %s\n",iota(yyleng));
-							yylval.ident.lexema = (char *)malloc(sizeof(char)*yyleng);
-							strncpy(yylval.ident.lexema,yytext,yyleng);
+							yylval.ident.lexema = strncpyWithSentinel(yyleng,yytext);
 							yylval.ident.lenght = yyleng;
 							yylval.ident.line = yylineno;
 							return ID;
@@ -73,29 +71,31 @@ digit	[0-9]
 
 \^	{
 		debug("%s\n",yytext);
-		yylval.cadena = "^";
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 		return OP_ARIT_P1;
 	}
 
 (\*|\/|\%)	{
 			debug("%s\n",yytext);
-			yylval.cadena = strcmp(yytext,"*") == 0 ? "*" : strcmp(yytext,"/") == 0 ? "/" : "%";
+			yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 			return OP_ARIT_P2;
 		}
 
 (\+|\-)	{
 		debug("%s\n",yytext);
-		yylval.cadena = strcmp(yytext,"+") == 0 ? "+" : "-";
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 		return OP_ARIT_P3;
 	}
 
 (">"|">="|"=="|"<="|"<"|"!=")	{
 					debug("%s\n",yytext);
+					yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 					return OP_RELACIONAL;
 				}
 
 (!|&&|"||")	{
 			debug("%s\n",yytext);
+			yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 			return OP_BOOL;
 		}
 

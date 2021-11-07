@@ -31,10 +31,10 @@
 	void *no_definit;
 }
 
-%token <no_definit> ASSIGN OP_RELACIONAL OP_BOOL 
+%token <no_definit> ASSIGN  
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 OP_ARIT_P3
+%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 OP_ARIT_P3 OP_RELACIONAL OP_BOOL
 %token <boolea> BOOLEAN
 %token <ident> ID
 

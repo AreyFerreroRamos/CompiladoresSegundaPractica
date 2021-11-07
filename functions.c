@@ -167,9 +167,10 @@ int intOperations(int num1, int num2, char *operand, int *res)
         {
             *res = num1 / num2;
         }
-	else {
-	    return 0;
-	}
+        else
+        {
+            return 0;
+        }
     }
     return 1;
 }
@@ -194,10 +195,10 @@ float floatOperations(float num1, float num2, char *operand, float *res)
         {
             *res = num1 / num2;
         }
-	else 
-	{
+        else
+        {
             return 0;
-	}
+        }
     }
     return 1;
 }
@@ -214,4 +215,12 @@ char *fota(float num)
     char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
     sprintf(string, "%f", num);
     return string;
+}
+
+char *strncpyWithSentinel(int length, char *toCopy)
+{
+    char *aux = (char *)malloc(sizeof(char) * (length + 1));
+    strncpy(aux, toCopy, length);
+    aux[length] = '\0';
+    return aux;
 }
