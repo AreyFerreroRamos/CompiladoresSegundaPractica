@@ -29,7 +29,7 @@ OTHERS = bison.tab.h bison.output sortida.txt
 ######################################################################
 
 all : $(SRCY) $(SRCL)
-	$(CC) -o $(BIN) $(SRCL) $(SRCY) $(SRC)
+	$(CC) -o $(BIN) $(SRCL) $(SRCY) $(SRC) -lm
 
 $(SRCL) : $(ELEX)	
 	$(LEX) $(LFLAGS) $<

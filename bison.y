@@ -38,7 +38,7 @@
 %token <boolea> BOOLEAN
 %token <ident> ID
 
-%type <operand> literal lista_sumas
+%type <operand> lista_sumas lista_productos lista_potencias literal
 
 %start programa
 
@@ -60,28 +60,27 @@ asignacion : ID ASSIGN lista_sumas	{
 
 expresion_aritmetica : lista_sumas
 
-lista_sumas : lista_sumas OP_ARIT_P3 literal	{
-							if(canTypeDoOperationP3($3.type))
-							{
-								debug("operand: %s\n", $2);
-								$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-								if(!doOperationAritmeticP3($1,$2,$3,&$$))
+lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
+								if(canDoOperationAritmetic($1.type, $3.type, $2))
 								{
-									yyerror("Something wrong with operation");
+									debug("operand: %s\n", $2);
+									$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+									if(!doOperationAritmetic($1,$2,$3,&$$))
+									{
+										yyerror("Something wrong with operation");
+									}
+									debug("Valor: %s\n",$$.value);
 								}
-								debug("valor: %s\n",$$.value);
-
-							}
-							else
-							{
-								char * error;
-								error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-								sprintf(error,"Cannot do operation with type %s",$3.type);
-								yyerror(error);
-							} 
-						}	
-			| literal	{ 	
-						if(canTypeDoOperationP3($1.type))
+								else
+								{	
+									char * error;
+									error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+									sprintf(error, "Cannot do operation with %s", $3.value);
+									yyerror(error);
+								}
+							}	
+		| lista_productos	{ 	
+						if(canDoOperationType($1.type))
 						{
 							$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
 							$$.value=$1.value;
@@ -91,10 +90,80 @@ lista_sumas : lista_sumas OP_ARIT_P3 literal	{
 						{
 							char * error;
 							error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-							sprintf(error,"Cannot do operation with type %s",$1.type);
+							sprintf(error, "Cannot do operation with %s", $1.value);
 							yyerror(error);
-						} 
+						}
 					}
+
+lista_productos : lista_productos OP_ARIT_P2 lista_potencias 	{
+									if (canDoOperationAritmetic($1.type, $3.type, $2))
+									{
+										debug("operand: %s\n", $2);
+										$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+										if (!doOperationAritmetic($1, $2, $3, &$$))
+										{
+											yyerror("Something wrong with operation.");
+										}
+										debug("Valor: %s\n", $$.value);
+									}
+									else
+									{
+										char * error;
+										error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+										sprintf(error, "Cannot do operation with %s", $3.value);
+										yyerror(error);
+									}
+	       							}		
+		| lista_potencias	{
+						if (canDoOperationType($1.type))
+						{
+							$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+							$$.value = $1.value;
+							$$.type = $1.type;
+						}
+						else
+						{
+							char * error;
+							error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+							sprintf(error, "Cannot do operation with %s", $1.value);
+							yyerror(error);
+						}
+					}
+
+lista_potencias : lista_potencias OP_ARIT_P1 literal	{
+								if (canDoOperationAritmetic($1.type, $3.type, $2))
+								{
+									debug("operand: %s\n", $2);
+									$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+									if (!doOperationAritmetic($1, $2, $3, &$$))
+									{
+										yyerror("Something wrong with operation.");
+									}
+									debug("Valor: %s\n", $$.value);
+								}
+								else
+								{
+									char * error;
+									error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+									sprintf(error, "Cannot do operation with %s", $3.value);
+									yyerror(error);
+								}
+							}
+		| literal	{
+					if (canDoOperationType($1.type))
+					{
+						$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+						$$.value = $1.value;
+						$$.type = $1.type;
+					}
+					else
+					{
+						char * error;
+						error = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+						sprintf(error, "Cannot do operation with %s", $1.value);
+						yyerror(error);
+					}
+				}
 
 literal : INTEGER	{ 	
 				$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
