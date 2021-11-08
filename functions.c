@@ -135,19 +135,19 @@ int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info
 	return 1;
 }
 
-int canDoOperationType(char *type)
+int isNumberType(char *type)
 {
-	return (strcmp(type, "Int32") == 0 || strcmp(type, "Float64") == 0);
+	return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
 }
 
 int canDoOperationAritmetic(char *type1, char *type2, char *operand)
 {
 
-	if (strcmp(operand, "%") == 0) 
+	if (strcmp(operand, "%") == 0)
 	{
 		return (strcmp(type1, "Int32") == 0 && strcmp(type2, "Int32") == 0);
 	}
-	else 
+	else
 	{
 		return (strcmp(type2, "Int32") == 0 || strcmp(type2, "Float64") == 0);
 	}
@@ -158,22 +158,22 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	debug("num1: %s\n", iota(num1));
 	debug("num2: %s\n", iota(num2));
 	debug("operand: %s\n", operand);
-	if (strcmp(operand, "+") == 0)
+	if (strcmp(operand, OP_ARIT_SUMA) == 0)
 	{
 		simpleDebug("Estoy en suma\n");
 		*res = num1 + num2;
 	}
-	else if (strcmp(operand, "-") == 0)
+	else if (strcmp(operand, OP_ARIT_RESTA) == 0)
 	{
 		simpleDebug("Estoy en resta\n");
 		*res = num1 - num2;
 	}
-	else if (strcmp(operand, "*") == 0)
+	else if (strcmp(operand, OP_ARIT_MULT) == 0)
 	{
 		simpleDebug("Estoy en producto\n");
 		*res = num1 * num2;
 	}
-	else if (strcmp(operand, "/") == 0)
+	else if (strcmp(operand, OP_ARIT_DIV) == 0)
 	{
 		simpleDebug("Estoy en division\n");
 		if (num2 != 0)
@@ -185,7 +185,7 @@ int intOperations(int num1, int num2, char *operand, int *res)
 			return 0;
 		}
 	}
-	else if (strcmp(operand, "%") == 0)
+	else if (strcmp(operand, OP_ARIT_MOD) == 0)
 	{
 		simpleDebug("Estoy en modulo\n");
 		if (num2 != 0)
@@ -197,29 +197,29 @@ int intOperations(int num1, int num2, char *operand, int *res)
 			return 0;
 		}
 	}
-	else if (strcmp(operand, "^") == 0)
+	else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
 	{
 		simpleDebug("Estoy en la potencia\n");
-		*res = (int) pow((double) num1, (double) num2);
+		*res = (int)pow((double)num1, (double)num2);
 	}
 	return 1;
 }
 
 float floatOperations(float num1, float num2, char *operand, float *res)
 {
-	if (strcmp(operand, "+") == 0)
+	if (strcmp(operand, OP_ARIT_SUMA) == 0)
 	{
 		*res = num1 + num2;
 	}
-	else if (strcmp(operand, "-") == 0)
+	else if (strcmp(operand, OP_ARIT_RESTA) == 0)
 	{
 		*res = num1 - num2;
 	}
-	else if (strcmp(operand, "*") == 0)
+	else if (strcmp(operand, OP_ARIT_MULT) == 0)
 	{
-		*res = num1 * num2;	
+		*res = num1 * num2;
 	}
-	else if (strcmp(operand, "/") == 0)
+	else if (strcmp(operand, OP_ARIT_DIV) == 0)
 	{
 		if (num2 != 0)
 		{
@@ -230,9 +230,9 @@ float floatOperations(float num1, float num2, char *operand, float *res)
 			return 0;
 		}
 	}
-	else if (strcmp(operand, "^") == 0)
+	else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
 	{
-		*res = (float) pow((double) num1, (double) num2);
+		*res = (float)pow((double)num1, (double)num2);
 	}
 	return 1;
 }
@@ -257,4 +257,81 @@ char *strncpyWithSentinel(int length, char *toCopy)
 	strncpy(aux, toCopy, length);
 	aux[length] = '\0';
 	return aux;
+}
+
+value_info createValueInfo(int length, char *value, char *type)
+{
+	value_info aux;
+	aux.value = (char *)malloc(sizeof(char) * length);
+	sprintf(aux.value, "%s", value);
+	aux.type = (char *)malloc(sizeof(char) * strlen(type));
+	aux.type = type;
+	return aux;
+}
+
+int isSameType(char *type1, char *type2)
+{
+	return strcmp(type1, type2) == 0;
+}
+
+int doRelationalOperation(float num1, char *op, float num2)
+{
+	debug("%s\n", fota(num1));
+	debug("%s\n", op);
+	debug("%s\n", fota(num2));
+	if (strcmp(op, OP_REL_HIGH) == 0)
+	{
+		simpleDebug("Estoy en >\n");
+		return num1 > num2;
+	}
+	if (strcmp(op, OP_REL_HE) == 0)
+	{
+		simpleDebug("Estoy en >=\n");
+		return num1 >= num2;
+	}
+	if (strcmp(op, OP_REL_LESS) == 0)
+	{
+		simpleDebug("Estoy en <\n");
+		return num1 < num2;
+	}
+	if (strcmp(op, OP_REL_LE) == 0)
+	{
+		simpleDebug("Estoy en <=\n");
+		return num1 <= num2;
+	}
+	if (strcmp(op, OP_REL_EQUAL) == 0)
+	{
+		simpleDebug("Estoy en ==\n");
+		return num1 == num2;
+	}
+	if (strcmp(op, OP_REL_DIFF) == 0)
+	{
+		simpleDebug("Estoy en !=\n");
+		return num1 != num2;
+	}
+}
+
+char *allocateSpaceForMessage()
+{
+	char *message;
+	message = (char *)malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+	return message;
+}
+
+int negateBoolean(int boolean)
+{
+	if (boolean == 0)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+int isTrue(int boolean)
+{
+	return boolean == 1;
+}
+int isFalse(int boolean)
+{
+	return boolean == 0;
 }
