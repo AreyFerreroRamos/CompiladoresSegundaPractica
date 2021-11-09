@@ -10,7 +10,7 @@
 #define BOOLEAN_T "Boolean"
 #define STRING_T "String"
 
-#define IDENT "Ident"
+#define IDENT_T "Ident"
 
 #define OP_ARIT_SUMA "+"
 #define OP_ARIT_RESTA "-"

@@ -183,14 +183,7 @@ expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base {
 														}
 
 
-expresion_booleana_base : ID 	{
-									//Se deberia crear con la info en symtab
-									$$ = createValueInfo(strlen($1.lexema),$1.lexema,IDENT);
-								} 
-					| BOOLEAN	{
-									$$ = createValueInfo(1,iota($1),BOOLEAN_T);
-								} 
-					| literal OP_RELACIONAL literal {
+expresion_booleana_base : literal OP_RELACIONAL literal {
 														if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type)){
 															int res = doRelationalOperation(atof($1.value),$2,atof($3.value));
 															$$ = createValueInfo(1,iota(res),BOOLEAN_T);
@@ -200,6 +193,20 @@ expresion_booleana_base : ID 	{
 															yyerror(error);
 														}
 													}
+					| literal {
+						if(isSameType($1.type,IDENT_T))
+						{
+							//Se deberia crear con la info en symtab
+							$$ = createValueInfo(strlen($1.value),$1.value,$1.type);
+						}
+						else if (isSameType($1.type,BOOLEAN_T)){
+							$$ = createValueInfo(1,$1.value,$1.type);
+						}else{
+							char * error = allocateSpaceForMessage();
+							sprintf(error,"%s is not valid for boolean expression",$1.value);
+							yyerror(error);
+						}
+					}
 
 literal : INTEGER	{ 	
 						$$ = createValueInfo(INT_MAX_LENGTH_STR,iota($1),INT32_T);
@@ -215,7 +222,7 @@ literal : INTEGER	{
 					}
 		| ID	{
 						//Se deberia crear con la info en symtab
-						$$ = createValueInfo(strlen($1.lexema),$1.lexema,IDENT);
+						$$ = createValueInfo(strlen($1.lexema),$1.lexema,IDENT_T);
 				}
 
 
