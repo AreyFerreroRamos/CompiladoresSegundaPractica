@@ -254,8 +254,16 @@ literal : INTEGER	{
 									}	
 								}
 	| PARENTESIS_ABIERTO expresion_booleana PARENTESIS_CERRADO	{
-
-
+										if (isSameType($2.type, BOOLEAN_T))
+										{
+											$$ = createValueInfo(1, $2.value, BOOLEAN_T);
+										}
+										else
+										{
+											char * error = allocateSpaceForMessage();
+											sprintf(error, "Cannot do operation with %s", $2.value);
+											yyerror(error);
+										}
 									}
 
 
