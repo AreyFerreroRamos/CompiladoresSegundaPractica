@@ -99,11 +99,23 @@ digit	[0-9]
 			return OP_BOOL;
 		}
 
-"!" {
+"!"	{
 		//debug("%s\n",yytext);
 		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 		return NEGACION;
-}
+	}
+
+"("	{
+		//debug("%s\n",yytext);
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
+		return PARENTESIS_ABIERTO;
+	}
+
+")"	{
+		//debug("%s\n",yytext);
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
+		return PARENTESIS_CERRADO;
+	}
 
 .	{}
 

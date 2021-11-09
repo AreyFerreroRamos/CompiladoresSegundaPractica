@@ -34,7 +34,7 @@
 %token <no_definit> ASSIGN  
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION
+%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO
 %token <boolea> BOOLEAN
 %token <ident> ID
 
@@ -231,6 +231,22 @@ literal : INTEGER	{
 			//Se deberia crear con la info en symtab
 			$$ = createValueInfo(strlen($1.lexema),$1.lexema,IDENT);
 		}
+	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
+									if (isNumberType($2.type))
+									{
+										$$ = createValueInfo(FLOAT_MAX_LENGTH_STR, $2.value, $2.type);
+									}
+									else 
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error, "Cannot do operation with %s", $2.value);
+										yyerror(error);	
+									}	
+								}
+	| PARENTESIS_ABIERTO expresion_booleana PARENTESIS_CERRADO	{
+
+
+									}
 
 
 %%
