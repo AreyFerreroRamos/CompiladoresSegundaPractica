@@ -10,7 +10,6 @@ int end_analisi_sintactic();
 void debug(char *, char *);
 void simpleDebug(char *);
 int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info *finish_val);
-int canDoOperationAritmetic(char *type1, char *type2, char *operand);
 int isNumberType(char *type);
 int intOperations(int num1, int num2, char *operand, int *res);
 float floatOperations(float num1, float num2, char *operand, float *res);

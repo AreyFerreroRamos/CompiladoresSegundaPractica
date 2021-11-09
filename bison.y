@@ -101,7 +101,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 					}
 
 lista_productos : lista_productos OP_ARIT_P2 lista_potencias 	{
-									if (canDoOperationAritmetic($1.type, $3.type, $2))
+									if (isNumberType($3.type))
 									{
 										debug("operand: %s\n", $2);
 										$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
@@ -132,7 +132,7 @@ lista_productos : lista_productos OP_ARIT_P2 lista_potencias 	{
 					}
 
 lista_potencias : lista_potencias OP_ARIT_P1 literal	{
-								if (canDoOperationAritmetic($1.type, $3.type, $2))
+								if (isNumberType($3.type))
 								{
 									debug("operand: %s\n", $2);
 									$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
@@ -195,10 +195,13 @@ expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 							}
 
 expresion_booleana_base : literal OP_RELACIONAL literal {
-														if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type)){
+														if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type))
+														{
 															int res = doRelationalOperation(atof($1.value),$2,atof($3.value));
 															$$ = createValueInfo(1,iota(res),BOOLEAN_T);
-														}else{
+														}
+														else
+														{
 															char * error = allocateSpaceForMessage();
 															sprintf(error,"Cannot do comparation %s %s %s",$1.value,$2,$3.value);
 															yyerror(error);
@@ -210,9 +213,12 @@ expresion_booleana_base : literal OP_RELACIONAL literal {
 							//Se deberia crear con la info en symtab
 							$$ = createValueInfo(strlen($1.value),$1.value,$1.type);
 						}
-						else if (isSameType($1.type,BOOLEAN_T)){
+						else if (isSameType($1.type,BOOLEAN_T))
+						{
 							$$ = createValueInfo(1,$1.value,$1.type);
-						}else{
+						}
+						else
+						{
 							char * error = allocateSpaceForMessage();
 							sprintf(error,"%s is not valid for boolean expression",$1.value);
 							yyerror(error);

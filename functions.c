@@ -121,11 +121,18 @@ int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info
 	}
 	else
 	{
-		finish_val->type = "Float64";
-		float resFloat;
-		if (floatOperations(atof(v1.value), atof(v2.value), operand, &resFloat))
+		if (strcmp(operand, "%") == 1)
 		{
-			sprintf(finish_val->value, "%f", resFloat);
+			finish_val->type = "Float64";
+			float resFloat;
+			if (floatOperations(atof(v1.value), atof(v2.value), operand, &resFloat))
+			{
+				sprintf(finish_val->value, "%f", resFloat);
+			}
+			else
+			{
+				return 0;
+			}
 		}
 		else
 		{
@@ -138,19 +145,6 @@ int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info
 int isNumberType(char *type)
 {
 	return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
-}
-
-int canDoOperationAritmetic(char *type1, char *type2, char *operand)
-{
-
-	if (strcmp(operand, "%") == 0)
-	{
-		return (strcmp(type1, "Int32") == 0 && strcmp(type2, "Int32") == 0);
-	}
-	else
-	{
-		return (strcmp(type2, "Int32") == 0 || strcmp(type2, "Float64") == 0);
-	}
 }
 
 int intOperations(int num1, int num2, char *operand, int *res)
