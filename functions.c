@@ -109,7 +109,7 @@ int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info
 	{
 		finish_val->type = "Int32";
 		int resInt;
-		debug("operand: %s\n", operand);
+		//debug("operand: %s\n", operand);
 		if (intOperations(atoi(v1.value), atoi(v2.value), operand, &resInt))
 		{
 			sprintf(finish_val->value, "%d", resInt);
@@ -160,22 +160,22 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	debug("operand: %s\n", operand);
 	if (strcmp(operand, OP_ARIT_SUMA) == 0)
 	{
-		simpleDebug("Estoy en suma\n");
+		//simpleDebug("Estoy en suma\n");
 		*res = num1 + num2;
 	}
 	else if (strcmp(operand, OP_ARIT_RESTA) == 0)
 	{
-		simpleDebug("Estoy en resta\n");
+		//simpleDebug("Estoy en resta\n");
 		*res = num1 - num2;
 	}
 	else if (strcmp(operand, OP_ARIT_MULT) == 0)
 	{
-		simpleDebug("Estoy en producto\n");
+		//simpleDebug("Estoy en producto\n");
 		*res = num1 * num2;
 	}
 	else if (strcmp(operand, OP_ARIT_DIV) == 0)
 	{
-		simpleDebug("Estoy en division\n");
+		//simpleDebug("Estoy en division\n");
 		if (num2 != 0)
 		{
 			*res = num1 / num2;
@@ -187,7 +187,7 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	}
 	else if (strcmp(operand, OP_ARIT_MOD) == 0)
 	{
-		simpleDebug("Estoy en modulo\n");
+		//simpleDebug("Estoy en modulo\n");
 		if (num2 != 0)
 		{
 			*res = num1 % num2;
@@ -199,7 +199,7 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	}
 	else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
 	{
-		simpleDebug("Estoy en la potencia\n");
+		//simpleDebug("Estoy en la potencia\n");
 		*res = (int)pow((double)num1, (double)num2);
 	}
 	return 1;
