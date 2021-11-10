@@ -28,17 +28,19 @@
 	char *cadena;
 	bool boolea;
 	value_info operand;
+	sym_value_type sym_value_type;
 	void *no_definit;
 }
 
 %token <no_definit> ASSIGN  
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA
+%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA
 %token <boolea> BOOLEAN
 %token <ident> ID
 
 %type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal
+%type <cadena> op_arit_p2 concatenacion
 
 %start programa
 
@@ -57,14 +59,63 @@ sentencia : asignacion
 					fprintf(yyout, "La expresion booleana es %s",boolValue);
 				}
 
-asignacion : ID ASSIGN expresion_aritmetica	{	
-		   					debug("id:%s\n",$1.lexema);
-							debug("valor:%s\n",$3.value);
-							fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, $3.value);
-						}
+concatenacion : concatenacion ASTERISCO STRING 	{
+													char * var = allocateSpaceForMessage(STR_MAX_LENGTH);
+													//SUPONIENDO QUE STRING NO ESTA VACIO
+													strncpy(var,&$3[1],strlen($3)-2);
+													$$ = allocateSpaceForMessage(STR_MAX_LENGTH);
+													strcat($$,$1);
+													strcat($$,var);
+												}
+				| STRING 	{
+								char * var = allocateSpaceForMessage(STR_MAX_LENGTH);
+								//SUPONIENDO QUE STRING NO ESTA VACIO
+								strncpy(var,&$1[1],strlen($1)-2);
+								$$ = strdup(var);
+							}
+				| ID	{
+			//Se deberia crear con la info en symtab
+			sym_value_type entry;
+			int response =  sym_lookup($1.lexema, &entry);
+			if(response==SYMTAB_OK){
+				$$ = strdup(entry.value);
+			}else{
+				char * error = allocateSpaceForMessage();
+				sprintf(error, "The id %s is not initialized", $1.lexema);
+				yyerror(error);	
+			}
+			
+		}
+
+asignacion : ID ASSIGN expresion_aritmetica	{	sym_value_type entry;
+												entry.value = $3.value;
+												entry.type = $3.type;
+												entry.size = strlen($3.value);
+												if(sym_enter($1.lexema, &entry)!=SYMTAB_OK){
+													yyerror("Error al guardar en symtab.");
+												}
+												fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
+											}
 	| ID ASSIGN expresion_booleana	{
-						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3.value);
-					}
+										sym_value_type entry;
+										entry.value = $3.value;
+										entry.type = $3.type;
+										entry.size = 1;
+										if(sym_enter($1.lexema, &entry)!=SYMTAB_OK){
+											yyerror("Error al guardar en symtab.");
+										}
+										fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3.value);
+									}
+	| ID ASSIGN concatenacion	{
+										sym_value_type entry;
+										entry.value = $3;
+										entry.type = STRING_T;
+										entry.size = strlen($3);
+										if(sym_enter($1.lexema, &entry)!=SYMTAB_OK){
+											yyerror("Error al guardar en symtab.");
+										}
+										fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3);
+									}
 
 expresion_aritmetica : lista_sumas
 
@@ -99,7 +150,14 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 						}
 					}
 
-lista_productos : lista_productos OP_ARIT_P2 lista_potencias 	{
+op_arit_p2: OP_ARIT_P2	{
+							$$ = strdup($1);
+						} 
+			| ASTERISCO	{
+							$$ = strdup($1);
+						}			
+
+lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 									if (isNumberType($3.type))
 									{
 										debug("operand: %s\n", $2);
@@ -237,15 +295,21 @@ literal : INTEGER	{
 	| FLOAT		{
 				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,fota($1),FLOAT64_T);
 			}
-	| STRING	{
-				$$ = createValueInfo(strlen($1),$1,STRING_T);
-			}
 	| BOOLEAN	{	
 				$$ = createValueInfo(1,iota($1),BOOLEAN_T);
 			}
 	| ID	{
 			//Se deberia crear con la info en symtab
-			$$ = createValueInfo(strlen($1.lexema),$1.lexema,IDENT_T);
+			sym_value_type entry;
+			int response =  sym_lookup($1.lexema, &entry);
+			if(response==SYMTAB_OK){
+				$$ = createValueInfo(strlen((char*)entry.value),(char*)entry.value,(char*)entry.type);
+			}else{
+				char * error = allocateSpaceForMessage();
+				sprintf(error, "The id %s is not initialized", $1.lexema);
+				yyerror(error);	
+			}
+			
 		}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
 									if (isNumberType($2.type))

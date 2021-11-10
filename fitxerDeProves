@@ -1,1 +1,4 @@
+variable := "Hola"
+variable2 := variable * ", nou"
+variable3 := variable2 * " mon."
 variable := ! true && false || 2 == 2

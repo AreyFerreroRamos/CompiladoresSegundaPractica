@@ -81,11 +81,17 @@ digit	[0-9]
 		return OP_ARIT_P1;
 	}
 
-("*"|"/"|"%")	{
+("/"|"%")	{
 			//debug("%s\n",yytext);
 			yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 			return OP_ARIT_P2;
 		}
+
+"*" {
+		//debug("%s\n",yytext);
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
+		return ASTERISCO;
+	}
 
 ("+"|"-")	{
 		//debug("%s\n",yytext);

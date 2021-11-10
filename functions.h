@@ -1,6 +1,7 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 #include "tipus.h"
+#include "symtab.h"
 
 int init_analisi_lexic(char *);
 int init_analisi_sintactic(char *);
