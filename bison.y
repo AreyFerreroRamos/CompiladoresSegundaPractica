@@ -34,7 +34,7 @@
 %token <no_definit> ASSIGN  
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO
+%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA
 %token <boolea> BOOLEAN
 %token <ident> ID
 
@@ -78,7 +78,6 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 										yyerror("Something wrong with operation");
 									}
 									debug("valor: %s\n",$$.value);
-
 								}
 								else
 								{
@@ -273,6 +272,25 @@ literal : INTEGER	{
 											yyerror(error);
 										}
 									}
+	| DIV PARENTESIS_ABIERTO lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
+												if ((isNumberType($3.type)) && (isNumberType($5.value)))
+												{
+													$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
+													if(!doOperationAritmetic($3,"/",$5,&$$))
+													{
+														yyerror("Something wrong with operation");
+													}
+												}
+												else
+												{
+													char * error = allocateSpaceForMessage();
+													sprintf(error,"Cannot do operation with type %s",$3.type);
+													yyerror(error);
+												} 
+											}
+	| LENGTH PARENTESIS_ABIERTO STRING PARENTESIS_CERRADO	{
+									$$ = createValueInfo(INT_MAX_LENGTH_STR, (char *) strlen($3.value), INT32_T);
+								}
 
 
 %%

@@ -34,17 +34,11 @@ digit	[0-9]
 			return INTEGER;
 		}
 	
-({digit})+\.({digit})+(e(-)?({digit})+)?	{
+({digit})+"."({digit})+(e(-)?({digit})+)?	{
 							//debug("%s\n",yytext);
 							yylval.real = atof(yytext);
 							return FLOAT;						
 						}
-
-\"(.)*\"	{
-			//debug("%s\n",yytext);
-			yylval.cadena = yytext;
-			return STRING;
-		}
 
 (true|false)	{
 			//debug("%s\n",yytext);
@@ -69,19 +63,19 @@ digit	[0-9]
 		return ASSIGN;
 	}
 
-\^	{
+"^"	{
 		//debug("%s\n",yytext);
 		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 		return OP_ARIT_P1;
 	}
 
-(\*|\/|\%)	{
+("*"|"/"|"%")	{
 			//debug("%s\n",yytext);
 			yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 			return OP_ARIT_P2;
 		}
 
-(\+|\-)	{
+("+"|"-")	{
 		//debug("%s\n",yytext);
 		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 		return OP_ARIT_P3;
@@ -116,6 +110,30 @@ digit	[0-9]
 		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 		return PARENTESIS_CERRADO;
 	}
+
+div	{
+		debug("%s\n",yytext);
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
+		return DIV;
+	}
+
+length	{
+		debug("%s\n",yytext);
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
+		return LENGTH;
+	}
+
+,	{
+		debug("%s\n",yytext);
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
+		return COMA;
+	}
+
+\"(.)*\"	{
+			//debug("%s\n",yytext);
+			yylval.cadena = yytext;
+			return STRING;
+		}
 
 .	{}
 
