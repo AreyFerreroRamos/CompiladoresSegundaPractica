@@ -60,10 +60,10 @@ sentencia : asignacion
 asignacion : ID ASSIGN expresion_aritmetica	{	
 		   					debug("id:%s\n",$1.lexema);
 							debug("valor:%s\n",$3.value);
-							fprintf(yyout, "ID: %s pren per valor: %s",$1.lexema, $3.value);
+							fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, $3.value);
 						}
 	| ID ASSIGN expresion_booleana	{
-
+						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3.value);
 					}
 
 expresion_aritmetica : lista_sumas
@@ -165,6 +165,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal	{
 expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 										if(strcmp($2,OP_BOOL_AND)==0)
 										{
+											debug("operand: %s\n", $2);
 											if( isFalse(atoi($1.value)) || isFalse(atoi($3.value)))
 											{
 												$$ = createValueInfo(1,iota(0),BOOLEAN_T);
@@ -173,9 +174,11 @@ expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 											{
 												$$ = createValueInfo(1,iota(1),BOOLEAN_T);
 											}
+											debug("Valor: %s\n", $$.value);
 										}
 										else
 										{
+											debug("operand: %s\n", $2);
 											if( isTrue(atoi($1.value)) || isTrue(atoi($3.value)))
 											{
 												$$ = createValueInfo(1,iota(1),BOOLEAN_T);
@@ -184,14 +187,17 @@ expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 											{
 												$$ = createValueInfo(1,iota(0),BOOLEAN_T);
 											}
+											debug("Valor: %s\n", $$.value);
 										}
 									}
 		| expresion_booleana_base	{ 
 							$$ = createValueInfo(1,$1.value,BOOLEAN_T);
 						}
 		| NEGACION expresion_booleana_base	{
+								simpleDebug("Segon control d'errors\n");
 								int res = negateBoolean(atoi($2.value));
 								$$ = createValueInfo(1,iota(res),BOOLEAN_T);
+								debug("Valor: %s\n", $$.value);
 							}
 
 expresion_booleana_base : literal OP_RELACIONAL literal {
@@ -256,7 +262,9 @@ literal : INTEGER	{
 	| PARENTESIS_ABIERTO expresion_booleana PARENTESIS_CERRADO	{
 										if (isSameType($2.type, BOOLEAN_T))
 										{
+											simpleDebug("Primer control d'errors\n");
 											$$ = createValueInfo(1, $2.value, BOOLEAN_T);
+											debug("Valor: %s\n", $$.value);
 										}
 										else
 										{
