@@ -189,15 +189,16 @@ expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 											debug("Valor: %s\n", $$.value);
 										}
 									}
-		| expresion_booleana_base	{ 
-							$$ = createValueInfo(1,$1.value,BOOLEAN_T);
-						}
+		
 		| NEGACION expresion_booleana_base	{
-								simpleDebug("Segon control d'errors\n");
-								int res = negateBoolean(atoi($2.value));
-								$$ = createValueInfo(1,iota(res),BOOLEAN_T);
-								debug("Valor: %s\n", $$.value);
-							}
+												simpleDebug("Segon control d'errors\n");
+												int res = negateBoolean(atoi($2.value));
+												$$ = createValueInfo(1,iota(res),BOOLEAN_T);
+												debug("Valor: %s\n", $$.value);
+											}
+		| expresion_booleana_base	{ 
+										$$ = createValueInfo(1,$1.value,BOOLEAN_T);
+									}
 
 expresion_booleana_base : literal OP_RELACIONAL literal {
 														if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type))
@@ -272,11 +273,11 @@ literal : INTEGER	{
 											yyerror(error);
 										}
 									}
-	| DIV PARENTESIS_ABIERTO lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
-												if ((isNumberType($3.type)) && (isNumberType($5.value)))
+	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
+												if ((isNumberType($2.type)) && (isNumberType($4.value)))
 												{
 													$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-													if(!doOperationAritmetic($3,"/",$5,&$$))
+													if(!doOperationAritmetic($2,"/",$4,&$$))
 													{
 														yyerror("Something wrong with operation");
 													}
@@ -284,12 +285,12 @@ literal : INTEGER	{
 												else
 												{
 													char * error = allocateSpaceForMessage();
-													sprintf(error,"Cannot do operation with type %s",$3.type);
+													sprintf(error,"Cannot do operation with type %s",$2.type);
 													yyerror(error);
 												} 
 											}
-	| LENGTH PARENTESIS_ABIERTO STRING PARENTESIS_CERRADO	{
-									$$ = createValueInfo(INT_MAX_LENGTH_STR, (char *) strlen($3.value), INT32_T);
+	| LENGTH STRING PARENTESIS_CERRADO	{
+									$$ = createValueInfo(INT_MAX_LENGTH_STR, iota(strlen($2)-2), INT32_T);
 								}
 
 

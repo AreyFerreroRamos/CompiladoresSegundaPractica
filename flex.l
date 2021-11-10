@@ -50,6 +50,18 @@ digit	[0-9]
 				//debug("COMMENT: %s\n",yytext);
 			}
 
+"div("	{
+		//debug("%s\n",yytext);
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
+		return DIV;
+	}
+
+"length("	{
+		//debug("%s\n",yytext);
+		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
+		return LENGTH;
+	}
+
 {lletra}({lletra}|{digit}|_({lletra}|{digit}))*	{
 							//debug("%s\n",yytext);
 							yylval.ident.lexema = strncpyWithSentinel(yyleng,yytext);
@@ -111,27 +123,16 @@ digit	[0-9]
 		return PARENTESIS_CERRADO;
 	}
 
-div	{
-		debug("%s\n",yytext);
-		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
-		return DIV;
-	}
-
-length	{
-		debug("%s\n",yytext);
-		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
-		return LENGTH;
-	}
 
 ,	{
-		debug("%s\n",yytext);
+		//debug("%s\n",yytext);
 		yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 		return COMA;
 	}
 
 \"(.)*\"	{
-			//debug("%s\n",yytext);
-			yylval.cadena = yytext;
+			debug("%s\n",yytext);
+			yylval.cadena = strncpyWithSentinel(yyleng,yytext);
 			return STRING;
 		}
 
