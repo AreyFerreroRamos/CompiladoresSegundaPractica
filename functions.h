@@ -24,5 +24,6 @@ char *allocateSpaceForMessage();
 int negateBoolean(int boolean);
 int isTrue(int boolean);
 int isFalse(int boolean);
+char *getIdName(char *idWithAssign);
 
 #endif

@@ -1,4 +1,5 @@
-variable := "Hola"
-variable2 := variable * ", nou"
-variable3 := variable2 * " mon."
-variable := ! true && false || 2 == 2
+(3*5+(2.0-1))/2 # 8
+var1 = div(8,4) # var1 = 2
+var2 = "\"Hola\""  # var2 = "\"Hola\""   
+var3 = var2 * " mundo" # var3 = "Hola mundo"
+

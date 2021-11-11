@@ -110,19 +110,19 @@ int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info
 	{
 		finish_val->type = "Int32";
 		int resInt;
-		//debug("operand: %s\n", operand);
 		if (intOperations(atoi(v1.value), atoi(v2.value), operand, &resInt))
 		{
-			sprintf(finish_val->value, "%d", resInt);
+			finish_val->value = iota(resInt);
 		}
 		else
 		{
+			simpleDebug("int");
 			return 0;
 		}
 	}
 	else
 	{
-		if (strcmp(operand, "%") == 1)
+		if (strcmp(operand, "%") != 0)
 		{
 			finish_val->type = "Float64";
 			float resFloat;
@@ -150,9 +150,6 @@ int isNumberType(char *type)
 
 int intOperations(int num1, int num2, char *operand, int *res)
 {
-	debug("num1: %s\n", iota(num1));
-	debug("num2: %s\n", iota(num2));
-	debug("operand: %s\n", operand);
 	if (strcmp(operand, OP_ARIT_SUMA) == 0)
 	{
 		//simpleDebug("Estoy en suma\n");
@@ -167,6 +164,7 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	{
 		//simpleDebug("Estoy en producto\n");
 		*res = num1 * num2;
+		printf("%i\n", *res);
 	}
 	else if (strcmp(operand, OP_ARIT_DIV) == 0)
 	{
@@ -326,7 +324,24 @@ int isTrue(int boolean)
 {
 	return boolean == 1;
 }
+
 int isFalse(int boolean)
 {
 	return boolean == 0;
+}
+
+char *getIdName(char *idWithAssign)
+{
+	int sentinel;
+	for (int i = 0; i < strlen(idWithAssign); i++)
+	{
+		if (idWithAssign[i] == ' ' || idWithAssign[i] == '\t' || idWithAssign[i] == '=')
+		{
+			sentinel = i;
+			break;
+		}
+	}
+	char *var = allocateSpaceForMessage(STR_MAX_LENGTH);
+	strncpy(var, idWithAssign, sentinel);
+	return var;
 }
