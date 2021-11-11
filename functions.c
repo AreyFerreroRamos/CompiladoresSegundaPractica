@@ -91,6 +91,7 @@ int end_analisi_lexic()
 void yyerror(char *explanation)
 {
 	fprintf(stderr, "Error: %s ,in line %d \n", explanation, yylineno);
+	exit(EXIT_FAILURE);
 }
 
 void debug(char *text, char *var)
@@ -308,7 +309,7 @@ int doRelationalOperation(float num1, char *op, float num2)
 char *allocateSpaceForMessage()
 {
 	char *message;
-	message = (char *)malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+	message = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
 	return message;
 }
 
