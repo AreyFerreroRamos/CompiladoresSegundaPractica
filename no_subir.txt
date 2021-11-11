@@ -1,5 +1,0 @@
-lista_productos
-
-lista_productos : lista_productos OP_ARIT_P2 lista_potencias {fprintf(yyout,"%s ",$2);} | lista_potencias
-
-lista_potencias : lista_potencias OP_ARIT_P1 literal {fprintf(yyout,"%s ",$2);} | literal
