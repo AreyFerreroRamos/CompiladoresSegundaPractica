@@ -60,62 +60,67 @@ sentencia : asignacion
 				}
 
 concatenacion : concatenacion ASTERISCO STRING 	{
-													char * var = allocateSpaceForMessage(STR_MAX_LENGTH);
-													//SUPONIENDO QUE STRING NO ESTA VACIO
-													strncpy(var,&$3[1],strlen($3)-2);
-													$$ = allocateSpaceForMessage(STR_MAX_LENGTH);
-													strcat($$,$1);
-													strcat($$,var);
-												}
-				| STRING 	{
-								char * var = allocateSpaceForMessage(STR_MAX_LENGTH);
-								//SUPONIENDO QUE STRING NO ESTA VACIO
-								strncpy(var,&$1[1],strlen($1)-2);
-								$$ = strdup(var);
-							}
-				| ID	{
-			//Se deberia crear con la info en symtab
-			sym_value_type entry;
-			int response =  sym_lookup($1.lexema, &entry);
-			if(response==SYMTAB_OK){
-				$$ = strdup(entry.value);
-			}else{
-				char * error = allocateSpaceForMessage();
-				sprintf(error, "The id %s is not initialized", $1.lexema);
-				yyerror(error);	
+							char * var = allocateSpaceForMessage(STR_MAX_LENGTH);
+							//SUPONIENDO QUE STRING NO ESTA VACIO
+							strncpy(var,&$3[1],strlen($3)-2);
+							$$ = allocateSpaceForMessage(STR_MAX_LENGTH);
+							strcat($$,$1);
+							strcat($$,var);
+						}
+		| STRING 	{
+					char * var = allocateSpaceForMessage(STR_MAX_LENGTH);
+					//SUPONIENDO QUE STRING NO ESTA VACIO
+					strncpy(var,&$1[1],strlen($1)-2);
+					$$ = strdup(var);
+				}
+		| ID	{
+				//Se deberia crear con la info en symtab
+				sym_value_type entry;
+				int response =  sym_lookup($1.lexema, &entry);
+				if(response==SYMTAB_OK)
+				{
+					$$ = strdup(entry.value);
+				}
+				else
+				{
+					char * error = allocateSpaceForMessage();
+					sprintf(error, "The id %s is not initialized", $1.lexema);
+					yyerror(error);	
+				}
 			}
-			
-		}
 
 asignacion : ID ASSIGN expresion_aritmetica	{	sym_value_type entry;
-												entry.value = $3.value;
-												entry.type = $3.type;
-												entry.size = strlen($3.value);
-												if(sym_enter($1.lexema, &entry)!=SYMTAB_OK){
-													yyerror("Error al guardar en symtab.");
-												}
-												fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
-											}
+							entry.value = $3.value;
+							entry.type = $3.type;
+							entry.size = strlen($3.value);
+							if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
+							{
+								yyerror("Error al guardar en symtab.");
+							}
+							fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
+						}
 	| ID ASSIGN expresion_booleana	{
-										sym_value_type entry;
-										entry.value = $3.value;
-										entry.type = $3.type;
-										entry.size = 1;
-										if(sym_enter($1.lexema, &entry)!=SYMTAB_OK){
-											yyerror("Error al guardar en symtab.");
-										}
-										fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3.value);
-									}
+						sym_value_type entry;
+						entry.value = $3.value;
+						entry.type = $3.type;
+						entry.size = 1;
+						if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
+						{
+							yyerror("Error al guardar en symtab.");
+						}
+						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3.value);
+					}
 	| ID ASSIGN concatenacion	{
-										sym_value_type entry;
-										entry.value = $3;
-										entry.type = STRING_T;
-										entry.size = strlen($3);
-										if(sym_enter($1.lexema, &entry)!=SYMTAB_OK){
-											yyerror("Error al guardar en symtab.");
-										}
-										fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3);
-									}
+						sym_value_type entry;
+						entry.value = $3;
+						entry.type = STRING_T;
+						entry.size = strlen($3);
+						if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
+						{
+							yyerror("Error al guardar en symtab.");
+						}
+						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3);
+					}
 
 expresion_aritmetica : lista_sumas
 
@@ -151,11 +156,11 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 					}
 
 op_arit_p2: OP_ARIT_P2	{
-							$$ = strdup($1);
-						} 
-			| ASTERISCO	{
-							$$ = strdup($1);
-						}			
+				$$ = strdup($1);
+			} 
+	| ASTERISCO	{
+				$$ = strdup($1);
+			}			
 
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 									if (isNumberType($3.type))
@@ -247,47 +252,46 @@ expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 											debug("Valor: %s\n", $$.value);
 										}
 									}
-		
 		| NEGACION expresion_booleana_base	{
-												simpleDebug("Segon control d'errors\n");
-												int res = negateBoolean(atoi($2.value));
-												$$ = createValueInfo(1,iota(res),BOOLEAN_T);
-												debug("Valor: %s\n", $$.value);
-											}
+								simpleDebug("Segon control d'errors\n");
+								int res = negateBoolean(atoi($2.value));
+								$$ = createValueInfo(1,iota(res),BOOLEAN_T);
+								debug("Valor: %s\n", $$.value);
+							}
 		| expresion_booleana_base	{ 
-										$$ = createValueInfo(1,$1.value,BOOLEAN_T);
-									}
+							$$ = createValueInfo(1,$1.value,BOOLEAN_T);
+						}
 
 expresion_booleana_base : literal OP_RELACIONAL literal {
-														if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type))
-														{
-															int res = doRelationalOperation(atof($1.value),$2,atof($3.value));
-															$$ = createValueInfo(1,iota(res),BOOLEAN_T);
-														}
-														else
-														{
-															char * error = allocateSpaceForMessage();
-															sprintf(error,"Cannot do comparation %s %s %s",$1.value,$2,$3.value);
-															yyerror(error);
-														}
-													}
-					| literal {
-						if(isSameType($1.type,IDENT_T))
-						{
-							//Se deberia crear con la info en symtab
-							$$ = createValueInfo(strlen($1.value),$1.value,$1.type);
-						}
-						else if (isSameType($1.type,BOOLEAN_T))
-						{
-							$$ = createValueInfo(1,$1.value,$1.type);
-						}
-						else
-						{
-							char * error = allocateSpaceForMessage();
-							sprintf(error,"%s is not valid for boolean expression",$1.value);
-							yyerror(error);
-						}
-					}
+								if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type))
+								{
+									int res = doRelationalOperation(atof($1.value),$2,atof($3.value));
+									$$ = createValueInfo(1,iota(res),BOOLEAN_T);
+								}
+								else
+								{
+									char * error = allocateSpaceForMessage();
+									sprintf(error,"Cannot do comparation %s %s %s",$1.value,$2,$3.value);
+									yyerror(error);
+								}
+							}
+					| literal	{
+								if(isSameType($1.type,IDENT_T))
+								{
+									//Se deberia crear con la info en symtab
+									$$ = createValueInfo(strlen($1.value),$1.value,$1.type);
+								}
+								else if (isSameType($1.type,BOOLEAN_T))
+								{
+									$$ = createValueInfo(1,$1.value,$1.type);
+								}
+								else
+								{
+									char * error = allocateSpaceForMessage();
+									sprintf(error,"%s is not valid for boolean expression",$1.value);
+									yyerror(error);
+								}
+							}
 
 literal : INTEGER	{ 	
 				$$ = createValueInfo(INT_MAX_LENGTH_STR,iota($1),INT32_T);
@@ -302,14 +306,16 @@ literal : INTEGER	{
 			//Se deberia crear con la info en symtab
 			sym_value_type entry;
 			int response =  sym_lookup($1.lexema, &entry);
-			if(response==SYMTAB_OK){
+			if(response==SYMTAB_OK)
+			{
 				$$ = createValueInfo(strlen((char*)entry.value),(char*)entry.value,(char*)entry.type);
-			}else{
+			}
+			else
+			{
 				char * error = allocateSpaceForMessage();
 				sprintf(error, "The id %s is not initialized", $1.lexema);
 				yyerror(error);	
 			}
-			
 		}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
 									if (isNumberType($2.type))
@@ -338,24 +344,24 @@ literal : INTEGER	{
 										}
 									}
 	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
-												if ((isNumberType($2.type)) && (isNumberType($4.value)))
-												{
-													$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-													if(!doOperationAritmetic($2,"/",$4,&$$))
-													{
-														yyerror("Something wrong with operation");
-													}
-												}
-												else
-												{
-													char * error = allocateSpaceForMessage();
-													sprintf(error,"Cannot do operation with type %s",$2.type);
-													yyerror(error);
-												} 
-											}
-	| LENGTH STRING PARENTESIS_CERRADO	{
-									$$ = createValueInfo(INT_MAX_LENGTH_STR, iota(strlen($2)-2), INT32_T);
+									if ((isNumberType($2.type)) && (isNumberType($4.value)))
+									{
+										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
+										if(!doOperationAritmetic($2,"/",$4,&$$))
+										{
+											yyerror("Something wrong with operation");
+										}
+									}
+									else
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error,"Cannot do operation with type %s",$2.type);
+										yyerror(error);
+									} 
 								}
+	| LENGTH STRING PARENTESIS_CERRADO	{
+							$$ = createValueInfo(INT_MAX_LENGTH_STR, iota(strlen($2)-2), INT32_T);
+						}
 
 
 %%
