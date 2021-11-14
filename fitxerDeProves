@@ -1,5 +1,7 @@
 (3*5+(2.0-1))/2 # 8
 var1 = div(8,4) # var1 = 2
-var2 = "\"Hola\""  # var2 = "\"Hola\""   
-var3 = var2 * " mundo" # var3 = "Hola mundo"
+var2 = ""  # var2 = ""   
+var3 = var2 * "Hola " * "mundo" # var3 = "Hola mundo"
+var4 = 5 *5 + (8+2)/4 + 6.5
+var5 = ( true && false) || 5>2
 

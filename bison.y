@@ -57,22 +57,18 @@ sentencia : asignacion
 								fprintf(yyout, "El resultado es %s",$1.value);
 							} 
 	| expresion_booleana 	{
-								char * boolValue = isTrue(atoi($1.value)) ? "true" : "false";
+								char * boolValue = atoi($1.value) ? "true" : "false";
 								fprintf(yyout, "La expresion booleana es %s",boolValue);
 							}
 
 concatenacion : concatenacion ASTERISCO STRING 	{
 							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
 							char * var = allocateSpaceForMessage(strlen($1));
-							//SUPONIENDO QUE STRING NO ESTA VACIO
 							strlcpy(var,&$1[0],strlen($1));
-							printf("var:%s\n",var);
 							strcat($$,var);
 							free(var);
-							printf("string:%s\n",$3);
 							var = allocateSpaceForMessage(strlen($3));
 							strlcpy(var,&$3[1],strlen($3));
-							printf("var:%s\n",var);
 							strcat($$,var);
 						}
 		| STRING 	{
@@ -118,7 +114,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 								if(isNumberType($3.type))
 								{
 									$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-									if(!doOperationAritmetic($1,$2,$3,&$$))
+									if(!doAritmeticOperation($1,$2,$3,&$$))
 									{
 										yyerror("Something wrong with operation 1");
 									}
@@ -154,7 +150,7 @@ lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 									if (isNumberType($3.type))
 									{
 										$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-										if (!doOperationAritmetic($1, $2, $3, &$$))
+										if (!doAritmeticOperation($1, $2, $3, &$$))
 										{
 											yyerror("Something wrong with operation.");
 										}
@@ -183,7 +179,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 								if (isNumberType($3.type))
 								{
 									$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-									if (!doOperationAritmetic($1, $2, $3, &$$))
+									if (!doAritmeticOperation($1, $2, $3, &$$))
 									{
 										yyerror("Something wrong with operation.");
 									}
@@ -211,7 +207,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 										if(strcmp($2,OP_BOOL_AND)==0)
 										{
-											if( isFalse(atoi($1.value)) || isFalse(atoi($3.value)))
+											if( !atoi($1.value) || !atoi($3.value))
 											{
 												$$ = createValueInfo(1,iota(0),BOOLEAN_T);
 											}
@@ -222,7 +218,7 @@ expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 										}
 										else
 										{
-											if( isTrue(atoi($1.value)) || isTrue(atoi($3.value)))
+											if( atoi($1.value) || atoi($3.value))
 											{
 												$$ = createValueInfo(1,iota(1),BOOLEAN_T);
 											}
@@ -294,7 +290,7 @@ literal_aritmetic : INTEGER	{
 									if ((isNumberType($2.type)) && (isNumberType($4.type)))
 									{
 										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-										if(!doOperationAritmetic($2,"/",$4,&$$))
+										if(!doAritmeticOperation($2,"/",$4,&$$))
 										{
 											yyerror("Something wrong with operation 2");
 										}

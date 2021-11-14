@@ -9,6 +9,25 @@ extern FILE *yyin;
 extern FILE *yyout;
 extern int yylineno;
 
+//FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR
+
+int init_analisi_lexic(char *file_name)
+{
+	int error;
+
+	yyin = fopen(file_name, "r");
+
+	if (yyin == NULL)
+	{
+		error = EXIT_FAILURE;
+	}
+	else
+	{
+		error = EXIT_SUCCESS;
+	}
+	return error;
+}
+
 int init_analisi_sintactic(char *filename)
 {
 	int error = EXIT_SUCCESS;
@@ -37,40 +56,6 @@ int analisi_semantic()
 	return error;
 }
 
-int end_analisi_sintactic()
-{
-	int error;
-
-	error = fclose(yyout);
-
-	if (error == 0)
-	{
-		error = EXIT_SUCCESS;
-	}
-	else
-	{
-		error = EXIT_FAILURE;
-	}
-	return error;
-}
-
-int init_analisi_lexic(char *file_name)
-{
-	int error;
-
-	yyin = fopen(file_name, "r");
-
-	if (yyin == NULL)
-	{
-		error = EXIT_FAILURE;
-	}
-	else
-	{
-		error = EXIT_SUCCESS;
-	}
-	return error;
-}
-
 int end_analisi_lexic()
 {
 	int error;
@@ -88,23 +73,130 @@ int end_analisi_lexic()
 	return error;
 }
 
+int end_analisi_sintactic()
+{
+	int error;
+
+	error = fclose(yyout);
+
+	if (error == 0)
+	{
+		error = EXIT_SUCCESS;
+	}
+	else
+	{
+		error = EXIT_FAILURE;
+	}
+	return error;
+}
+
+//UTILS
+
 void yyerror(char *explanation)
 {
 	fprintf(stderr, "Error: %s ,in line %d \n", explanation, yylineno);
 	exit(EXIT_FAILURE);
 }
 
-void debug(char *text, char *var)
+void debug(char *text, char *var, int typeFile)
 {
-	printf(text, var);
+	//flex
+	if (typeFile == 0)
+	{
+		//printf(text, var);
+	}
+	//bison
+	else
+	{
+		//printf(text, var);
+	}
 }
 
-void simpleDebug(char *text)
+void simpleDebug(char *text, int typeFile)
 {
-	printf(text);
+	//flex
+	if (typeFile == 0)
+	{
+		//printf(text);
+	}
+	//bison
+	else
+	{
+		//printf(text);
+	}
 }
 
-int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info *finish_val)
+char *iota(int num)
+{
+	char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	sprintf(string, "%i", num);
+	return string;
+}
+
+char *fota(float num)
+{
+	char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	sprintf(string, "%f", num);
+	return string;
+}
+
+char *allocateSpaceForMessage()
+{
+	char *message;
+	message = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	return message;
+}
+
+int negateBoolean(int boolean)
+{
+	if (boolean == 0)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+value_info createValueInfo(int length, char *value, char *type)
+{
+	value_info aux;
+	aux.value = (char *)malloc(sizeof(char) * length);
+	sprintf(aux.value, "%s", value);
+	aux.type = (char *)malloc(sizeof(char) * strlen(type));
+	aux.type = type;
+	return aux;
+}
+
+char *getIdName(char *idWithAssign)
+{
+	int sentinel;
+	for (int i = 0; i < strlen(idWithAssign); i++)
+	{
+		if (idWithAssign[i] == ' ' || idWithAssign[i] == '\t' || idWithAssign[i] == '=')
+		{
+			sentinel = i;
+			break;
+		}
+	}
+	char *var = allocateSpaceForMessage(STR_MAX_LENGTH);
+	strncpy(var, idWithAssign, sentinel);
+	return var;
+}
+
+//CONTROLS
+
+int isSameType(char *type1, char *type2)
+{
+	return strcmp(type1, type2) == 0;
+}
+
+int isNumberType(char *type)
+{
+	return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
+}
+
+//OPERATIONS
+
+int doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val)
 {
 	if (strcmp(v1.type, "Int32") == 0 && strcmp(v2.type, "Int32") == 0)
 	{
@@ -116,7 +208,7 @@ int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info
 		}
 		else
 		{
-			simpleDebug("int");
+			simpleDebug("int", 1);
 			return 0;
 		}
 	}
@@ -143,32 +235,63 @@ int doOperationAritmetic(value_info v1, char *operand, value_info v2, value_info
 	return 1;
 }
 
-int isNumberType(char *type)
+int doRelationalOperation(float num1, char *op, float num2)
 {
-	return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
+	debug("%s\n", fota(num1), 1);
+	debug("%s\n", op, 1);
+	debug("%s\n", fota(num2), 1);
+	if (strcmp(op, OP_REL_HIGH) == 0)
+	{
+		simpleDebug("Estoy en >\n", 1);
+		return num1 > num2;
+	}
+	if (strcmp(op, OP_REL_HE) == 0)
+	{
+		simpleDebug("Estoy en >=\n", 1);
+		return num1 >= num2;
+	}
+	if (strcmp(op, OP_REL_LESS) == 0)
+	{
+		simpleDebug("Estoy en <\n", 1);
+		return num1 < num2;
+	}
+	if (strcmp(op, OP_REL_LE) == 0)
+	{
+		simpleDebug("Estoy en <=\n", 1);
+		return num1 <= num2;
+	}
+	if (strcmp(op, OP_REL_EQUAL) == 0)
+	{
+		simpleDebug("Estoy en ==\n", 1);
+		return num1 == num2;
+	}
+	if (strcmp(op, OP_REL_DIFF) == 0)
+	{
+		simpleDebug("Estoy en !=\n", 1);
+		return num1 != num2;
+	}
 }
 
 int intOperations(int num1, int num2, char *operand, int *res)
 {
 	if (strcmp(operand, OP_ARIT_SUMA) == 0)
 	{
-		//simpleDebug("Estoy en suma\n");
+		simpleDebug("Estoy en suma\n", 1);
 		*res = num1 + num2;
 	}
 	else if (strcmp(operand, OP_ARIT_RESTA) == 0)
 	{
-		//simpleDebug("Estoy en resta\n");
+		simpleDebug("Estoy en resta\n", 1);
 		*res = num1 - num2;
 	}
 	else if (strcmp(operand, OP_ARIT_MULT) == 0)
 	{
-		//simpleDebug("Estoy en producto\n");
+		simpleDebug("Estoy en producto\n", 1);
 		*res = num1 * num2;
-		printf("%i\n", *res);
 	}
 	else if (strcmp(operand, OP_ARIT_DIV) == 0)
 	{
-		//simpleDebug("Estoy en division\n");
+		simpleDebug("Estoy en division\n", 1);
 		if (num2 != 0)
 		{
 			*res = num1 / num2;
@@ -180,7 +303,7 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	}
 	else if (strcmp(operand, OP_ARIT_MOD) == 0)
 	{
-		//simpleDebug("Estoy en modulo\n");
+		simpleDebug("Estoy en modulo\n", 1);
 		if (num2 != 0)
 		{
 			*res = num1 % num2;
@@ -192,13 +315,13 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	}
 	else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
 	{
-		//simpleDebug("Estoy en la potencia\n");
+		simpleDebug("Estoy en la potencia\n", 1);
 		*res = (int)pow((double)num1, (double)num2);
 	}
 	return 1;
 }
 
-float floatOperations(float num1, float num2, char *operand, float *res)
+int floatOperations(float num1, float num2, char *operand, float *res)
 {
 	if (strcmp(operand, OP_ARIT_SUMA) == 0)
 	{
@@ -228,120 +351,4 @@ float floatOperations(float num1, float num2, char *operand, float *res)
 		*res = (float)pow((double)num1, (double)num2);
 	}
 	return 1;
-}
-
-char *iota(int num)
-{
-	char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
-	sprintf(string, "%i", num);
-	return string;
-}
-
-char *fota(float num)
-{
-	char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
-	sprintf(string, "%f", num);
-	return string;
-}
-
-char *strncpyWithSentinel(int length, char *toCopy)
-{
-	char *aux = (char *)malloc(sizeof(char) * (length + 1));
-	strncpy(aux, toCopy, length);
-	aux[length] = '\0';
-	return aux;
-}
-
-value_info createValueInfo(int length, char *value, char *type)
-{
-	value_info aux;
-	aux.value = (char *)malloc(sizeof(char) * length);
-	sprintf(aux.value, "%s", value);
-	aux.type = (char *)malloc(sizeof(char) * strlen(type));
-	aux.type = type;
-	return aux;
-}
-
-int isSameType(char *type1, char *type2)
-{
-	return strcmp(type1, type2) == 0;
-}
-
-int doRelationalOperation(float num1, char *op, float num2)
-{
-	debug("%s\n", fota(num1));
-	debug("%s\n", op);
-	debug("%s\n", fota(num2));
-	if (strcmp(op, OP_REL_HIGH) == 0)
-	{
-		simpleDebug("Estoy en >\n");
-		return num1 > num2;
-	}
-	if (strcmp(op, OP_REL_HE) == 0)
-	{
-		simpleDebug("Estoy en >=\n");
-		return num1 >= num2;
-	}
-	if (strcmp(op, OP_REL_LESS) == 0)
-	{
-		simpleDebug("Estoy en <\n");
-		return num1 < num2;
-	}
-	if (strcmp(op, OP_REL_LE) == 0)
-	{
-		simpleDebug("Estoy en <=\n");
-		return num1 <= num2;
-	}
-	if (strcmp(op, OP_REL_EQUAL) == 0)
-	{
-		simpleDebug("Estoy en ==\n");
-		return num1 == num2;
-	}
-	if (strcmp(op, OP_REL_DIFF) == 0)
-	{
-		simpleDebug("Estoy en !=\n");
-		return num1 != num2;
-	}
-}
-
-char *allocateSpaceForMessage()
-{
-	char *message;
-	message = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
-	return message;
-}
-
-int negateBoolean(int boolean)
-{
-	if (boolean == 0)
-	{
-		return 1;
-	}
-	return 0;
-}
-
-int isTrue(int boolean)
-{
-	return boolean == 1;
-}
-
-int isFalse(int boolean)
-{
-	return boolean == 0;
-}
-
-char *getIdName(char *idWithAssign)
-{
-	int sentinel;
-	for (int i = 0; i < strlen(idWithAssign); i++)
-	{
-		if (idWithAssign[i] == ' ' || idWithAssign[i] == '\t' || idWithAssign[i] == '=')
-		{
-			sentinel = i;
-			break;
-		}
-	}
-	char *var = allocateSpaceForMessage(STR_MAX_LENGTH);
-	strncpy(var, idWithAssign, sentinel);
-	return var;
 }
