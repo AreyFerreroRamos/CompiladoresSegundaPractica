@@ -35,9 +35,9 @@
 %token <no_definit> ASSIGN
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA
+%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA CORCHETE_ABIERTO CORCHETE_CERRADO
 %token <boolea> BOOLEAN
-%token <ident> IDWITHASSIGN
+%token <ident> ID
 
 %type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal_aritmetic literal_boolea
 %type <cadena> op_arit_p2 concatenacion
@@ -75,38 +75,42 @@ concatenacion : concatenacion ASTERISCO STRING 	{
 					$$ = strdup($1);
 				}
 
-asignacion : IDWITHASSIGN expresion_aritmetica	{	sym_value_type entry;
-							entry.value = $2.value;
-							entry.type = $2.type;
-							entry.size = strlen($2.value);
+asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
+							entry.value = $3.value;
+							entry.type = $3.type;
+							entry.size = strlen($3.value);
 							if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 							{
 								yyerror("Error al guardar en symtab.");
 							}
 							fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
 						}
-	| IDWITHASSIGN expresion_booleana	{
+	| ID ASSIGN expresion_booleana	{
 						sym_value_type entry;
-						entry.value = $2.value;
-						entry.type = $2.type;
+						entry.value = $3.value;
+						entry.type = $3.type;
 						entry.size = 1;
 						if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 						{
 							yyerror("Error al guardar en symtab.");
 						}
-						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $2.value);
+						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3.value);
 					}
-	| IDWITHASSIGN concatenacion	{
+	| ID ASSIGN concatenacion	{
 						sym_value_type entry;
-						entry.value = $2;
+						entry.value = $3;
 						entry.type = STRING_T;
-						entry.size = strlen($2);
+						entry.size = strlen($3);
 						if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 						{
 							yyerror("Error al guardar en symtab.");
 						}
-						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $2);
+						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3);
 					}
+
+id : ID | lista_indices CORCHETE_CERRADO
+
+lista_indices : ID CORCHETE_ABIERTO lista_sumas | lista_indices COMA lista_sumas
 
 expresion_aritmetica : lista_sumas
 

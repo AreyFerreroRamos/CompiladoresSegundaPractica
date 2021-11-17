@@ -103,7 +103,7 @@ void debug(char *text, char *var, int typeFile)
 	//flex
 	if (typeFile == 0)
 	{
-		//printf(text, var);
+		printf(text, var);
 	}
 	//bison
 	else
