@@ -90,13 +90,13 @@ int end_analisi_sintactic()
 	return error;
 }
 
-//UTILS
-
 void yyerror(char *explanation)
 {
 	fprintf(stderr, "Error: %s ,in line %d \n", explanation, yylineno);
 	exit(EXIT_FAILURE);
 }
+
+// UTILS
 
 void debug(char *text, char *var, int typeFile)
 {
