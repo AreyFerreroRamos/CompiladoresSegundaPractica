@@ -20,6 +20,9 @@ typedef struct sym_value_type {
 	void * type;
 	void * value;
 	int size;
+	int num_dim;
+	int * dims;
+	void * elements;
 } sym_value_type;
 
 /* Uncomment the following define if bindings should point to rather than   */

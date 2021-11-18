@@ -52,11 +52,15 @@ int negateBoolean(int boolean);
  **/
 value_info createValueInfo(int length, char *value, char *type);
 
+tensor_info createTensorInfo(int dim, int calcIndex, char *lexema);
+
 /**
  * Dado un string que contiene el id, posibles espacios y el símbolo "="
  * devuelve otro string con solo la parte del id
  ***/
 char *getIdName(char *idWithAssign);
+
+int getDim(char * key, int num_dims);
 
 //CONTROLS
 

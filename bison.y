@@ -7,6 +7,7 @@
   #define YYLMAX 100
 
   extern FILE *yyout;
+  extern int yylex();
   extern void yyerror(char *);
 %}
 
@@ -26,6 +27,7 @@
 	char *cadena;
 	bool boolea;
 	value_info operand;
+	tensor_info tensor_info;
 	sym_value_type sym_value_type;
 	void *no_definit;
 }
@@ -37,7 +39,8 @@
 %token <boolea> BOOLEAN
 %token <ident> ID ID_ARIT
 
-%type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal_aritmetic literal_boolea
+%type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal_aritmetic literal_boolea id_arit
+%type <tensor_info> id lista_indices lista_indices_arit
 %type <cadena> op_arit_p2 concatenacion
 
 %start programa
@@ -63,6 +66,8 @@ asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
 							entry.value = $3.value;
 							entry.type = $3.type;
 							entry.size = strlen($3.value);
+							entry.num_dim = 0;
+							entry.dims = NULL;
 							if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 							{
 								yyerror("Error al guardar en symtab.");
@@ -74,6 +79,8 @@ asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
 						entry.value = $3.value;
 						entry.type = $3.type;
 						entry.size = 1;
+						entry.num_dim = 0;
+						entry.dims = NULL;
 						if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 						{
 							yyerror("Error al guardar en symtab.");
@@ -85,6 +92,8 @@ asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
 						entry.value = $3;
 						entry.type = STRING_T;
 						entry.size = strlen($3);
+						entry.num_dim = 0;
+						entry.dims = NULL;
 						if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 						{
 							yyerror("Error al guardar en symtab.");
@@ -92,19 +101,54 @@ asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
 						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3);
 					}
 
-id : ID | lista_indices CORCHETE_CERRADO
+id : lista_indices CORCHETE_CERRADO	{
+						$$ = createTensorInfo($1.dim, $1.calcIndex, $1.lexema);
+					}
+   | ID	{
+		$$ = createTensorInfo(0, 0, $1.lexema);	
+	}
 
-lista_indices : ID CORCHETE_ABIERTO lista_sumas | lista_indices COMA lista_sumas
-
+lista_indices : ID CORCHETE_ABIERTO lista_sumas	{
+	      						if (isSameType($3.type, INT32_T)) 
+							{
+								$$ = createTensorInfo(2, atoi($3.value), $1.lexema);
+							}
+							else
+							{
+								char * error = allocateSpaceForMessage();
+								sprintf(error,"Index %s is not Int32",$3.type);
+								yyerror(error);
+							}	
+	     					} 
+	      | lista_indices COMA lista_sumas	{
+							if (isSameType($3.type, INT32_T)) 
+							{
+								int dim = getDim($1.lexema, $1.dim);
+								if (dim != -1) 
+								{
+									$$ = createTensorInfo($1.dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);
+								}
+								else 
+								{
+									yyerror("Array out of bound.");
+								}
+							}
+							else
+							{
+								char * error = allocateSpaceForMessage();
+								sprintf(error,"Index %s is not Int32",$3.type);
+								yyerror(error);
+							}
+						}
 
 concatenacion : concatenacion ASTERISCO STRING 	{
 							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
 							char * var = allocateSpaceForMessage(strlen($1));
-							strlcpy(var,&$1[0],strlen($1));
+							strlcpy(var,$1[0],strlen($1));
 							strcat($$,var);
 							free(var);
 							var = allocateSpaceForMessage(strlen($3));
-							strlcpy(var,&$3[1],strlen($3));
+							strlcpy(var,$3[1],strlen($3));
 							strcat($$,var);
 						}
 		| STRING 	{
@@ -213,9 +257,9 @@ literal_aritmetic : INTEGER	{
 	| FLOAT		{
 					$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,fota($1),FLOAT64_T);
 				}
-	| id_arit {
-
-	}
+	| id_arit 	{
+				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,$1.value,$1.type);
+			}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
 									if (isNumberType($2.type))
 									{
@@ -249,9 +293,59 @@ literal_aritmetic : INTEGER	{
 						}
 
 
-id_arit : ID_ARIT | lista_indices_arit CORCHETE_CERRADO
+id_arit : ID_ARIT	{
+				sym_value_type res;
+				sym_lookup($1.lexema,&res);
+				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,res.value,res.type);	
+       			}	
+	| lista_indices_arit CORCHETE_CERRADO	{
+							sym_value_type res;
+							sym_lookup($1.lexema, &res);
+							if (isSameType(res.type, INT32_T))
+							{
+								$$.value = iota((int) res.elements[$1.calcIndex]);
+							}
+							else
+							{
+								$$.value = fota((float *) res.elements[$1.calcIndex]);
+							}
+							$$.type = res.type;
+						}
 
-lista_indices_arit : ID_ARIT CORCHETE_ABIERTO lista_sumas | lista_indices_arit COMA lista_sumas
+lista_indices_arit : ID_ARIT CORCHETE_ABIERTO lista_sumas	{
+		   							if (isSameType($3.type, INT32_T)) 
+									{
+										$$ = createTensorInfo(2, atoi($3.value), $1.lexema);
+									}
+									else
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error,"Index %s is not Int32",$3.type);
+										yyerror(error);
+									}
+								}
+		   | lista_indices_arit COMA lista_sumas	{
+									if (isSameType($3.type, INT32_T)) 
+									{
+										int dim = getDim($1.lexema, $1.dim);
+										if (dim != -1) 
+										{
+											$$ = createTensorInfo($1.dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);
+										}
+										else 
+										{
+											yyerror("Array out of bound.");
+										}
+									}
+									else
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error,"Index %s is not Int32",$3.type);
+										yyerror(error);
+									}					
+								}
+
+
 
 expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 										if(strcmp($2,OP_BOOL_AND)==0)

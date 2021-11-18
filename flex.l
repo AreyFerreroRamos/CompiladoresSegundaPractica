@@ -160,15 +160,12 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 				if(response==SYMTAB_OK)
 				{
 					value_info v = createValueInfo(strlen((char*)entry.value),(char*)entry.value,(char*)entry.type);
-					if(isSameType(v.type,INT32_T))
+					if(isSameType(v.type,INT32_T) || isSameType(v.type,FLOAT64_T))
 					{
-						yylval.enter = atoi(v.value);
-						return INTEGER;
-					}
-					else if(isSameType(v.type,FLOAT64_T))
-					{
-						yylval.real = atof(v.value);
-						return FLOAT;
+						yylval.ident.lexema = strdup(v.value);
+						yylval.ident.lenght = strlen(v.value);
+						yylval.ident.line = yylineno;
+						return ID_ARIT;
 					}
 					else if(isSameType(v.type,STRING_T))
 					{

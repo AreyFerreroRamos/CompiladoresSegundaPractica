@@ -31,8 +31,16 @@
 
 typedef struct
 {
-    char *type;
-    char *value;
+	char *type;
+	char *value;
 } value_info;
+
+typedef struct
+{
+	int dim;
+	int calcIndex;
+	char *lexema;
+} tensor_info;
+
 
 #endif

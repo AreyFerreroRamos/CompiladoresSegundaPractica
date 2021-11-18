@@ -159,10 +159,17 @@ int negateBoolean(int boolean)
 value_info createValueInfo(int length, char *value, char *type)
 {
 	value_info aux;
-	aux.value = (char *)malloc(sizeof(char) * length);
-	sprintf(aux.value, "%s", value);
-	aux.type = (char *)malloc(sizeof(char) * strlen(type));
-	aux.type = type;
+	aux.value = strdup(value);
+	aux.type = strdup(type);
+	return aux;
+}
+
+tensor_info createTensorInfo(int dim, int calcIndex, char *lexema)
+{
+	tensor_info aux;
+	aux.dim = dim;
+	aux.calcIndex = calcIndex; 
+	aux.lexema = strdup(lexema);
 	return aux;
 }
 
@@ -180,6 +187,27 @@ char *getIdName(char *idWithAssign)
 	char *var = allocateSpaceForMessage(STR_MAX_LENGTH);
 	strncpy(var, idWithAssign, sentinel);
 	return var;
+}
+
+int getDim(char * key, int dim)
+{
+	sym_value_type entry;
+	int error = sym_lookup(key, &entry);
+	if (error == SYMTAB_OK)
+	{
+		if (dim < entry.num_dim) 
+		{
+			return entry.dims[dim - 1];
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	else 
+	{
+		return -1;
+	}
 }
 
 //CONTROLS
