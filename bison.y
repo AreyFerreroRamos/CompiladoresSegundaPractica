@@ -7,8 +7,6 @@
   #define YYLMAX 100
 
   extern FILE *yyout;
-  extern int yylineno;
-  extern int yylex();
   extern void yyerror(char *);
 %}
 
@@ -146,7 +144,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 									if (isNumberType($3.type))
 									{
-										$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
 										if (!doAritmeticOperation($1, $2, $3, &$$))
 										{
 											yyerror("Something wrong with operation.");
@@ -182,7 +180,7 @@ op_arit_p2: OP_ARIT_P2	{
 lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 									if (isNumberType($3.type))
 									{
-										$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
 										if (!doAritmeticOperation($1, $2, $3, &$$))
 										{
 											yyerror("Something wrong with operation.");
@@ -293,12 +291,7 @@ expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
 									}
 								}
 					| literal_boolea	{
-									if(isSameType($1.type,IDENT_T))
-									{
-										//Se deberia crear con la info en symtab
-										$$ = createValueInfo(strlen($1.value),$1.value,$1.type);
-									}
-									else if (isSameType($1.type,BOOLEAN_T))
+									if (isSameType($1.type,BOOLEAN_T))
 									{
 										$$ = createValueInfo(1,$1.value,$1.type);
 									}

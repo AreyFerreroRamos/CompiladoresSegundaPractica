@@ -14,7 +14,6 @@
   #include "bison.tab.h"
   #include "functions.h"
 
-  extern FILE *yyin;
   extern void yyerror(char *);
   bool assignFounded = false;
 %}
@@ -145,10 +144,9 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			debug("%s\n",yytext,0);
 			if (assignFounded == false)
 			{
-				char * idName = getIdName(yytext);
-				debug("%s\n",idName,0);
-				yylval.ident.lexema = strdup(idName);
-				yylval.ident.lenght = strlen(idName);
+				debug("%s\n",yytext,0);
+				yylval.ident.lexema = strdup(yytext);
+				yylval.ident.lenght = strlen(yytext);
 				yylval.ident.line = yylineno;
 				return ID;
 			}
