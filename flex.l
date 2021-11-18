@@ -16,6 +16,7 @@
 
   extern void yyerror(char *);
   bool assignFounded = false;
+  bool corcheteOpenFounded = false;
 %}
 
 %option yylineno
@@ -132,6 +133,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 
 "["	{
 		yylval.cadena = strdup(yytext);
+		corcheteOpenFounded = true;
 		return CORCHETE_ABIERTO;
 	}
 
@@ -142,7 +144,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 
 {id}	{
 			debug("%s\n",yytext,0);
-			if (assignFounded == false)
+			if (assignFounded == false && corcheteOpenFounded == false)
 			{
 				debug("%s\n",yytext,0);
 				yylval.ident.lexema = strdup(yytext);
@@ -198,6 +200,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 \n	{
 		debug("%s\n",yytext,0);
 		assignFounded = false;
+		corcheteOpenFounded = false;
 	}
 
 .	{}

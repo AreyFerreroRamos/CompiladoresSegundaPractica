@@ -35,7 +35,7 @@
 %token <real> FLOAT
 %token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA CORCHETE_ABIERTO CORCHETE_CERRADO
 %token <boolea> BOOLEAN
-%token <ident> ID
+%token <ident> ID ID_ARIT
 
 %type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal_aritmetic literal_boolea
 %type <cadena> op_arit_p2 concatenacion
@@ -95,6 +95,7 @@ asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
 id : ID | lista_indices CORCHETE_CERRADO
 
 lista_indices : ID CORCHETE_ABIERTO lista_sumas | lista_indices COMA lista_sumas
+
 
 concatenacion : concatenacion ASTERISCO STRING 	{
 							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
@@ -207,11 +208,14 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 					}
 
 literal_aritmetic : INTEGER	{ 	
-					$$ = createValueInfo(INT_MAX_LENGTH_STR,iota($1),INT32_T);
-				}
+								$$ = createValueInfo(INT_MAX_LENGTH_STR,iota($1),INT32_T);
+							}
 	| FLOAT		{
-				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,fota($1),FLOAT64_T);
-			}
+					$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,fota($1),FLOAT64_T);
+				}
+	| id_arit {
+
+	}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
 									if (isNumberType($2.type))
 									{
@@ -243,6 +247,11 @@ literal_aritmetic : INTEGER	{
 	| LENGTH STRING PARENTESIS_CERRADO	{
 							$$ = createValueInfo(INT_MAX_LENGTH_STR, iota(strlen($2)-2), INT32_T);
 						}
+
+
+id_arit : ID_ARIT | lista_indices_arit CORCHETE_CERRADO
+
+lista_indices_arit : ID_ARIT CORCHETE_ABIERTO lista_sumas | lista_indices_arit COMA lista_sumas
 
 expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 										if(strcmp($2,OP_BOOL_AND)==0)
