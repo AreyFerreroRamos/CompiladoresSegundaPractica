@@ -54,25 +54,11 @@ lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 
 sentencia : asignacion 
 	| expresion_aritmetica 	{
-								fprintf(yyout, "El resultado es %s",$1.value);
-							} 
+					fprintf(yyout, "El resultado es %s",$1.value);
+				} 
 	| expresion_booleana 	{
-								char * boolValue = atoi($1.value) ? "true" : "false";
-								fprintf(yyout, "La expresion booleana es %s",boolValue);
-							}
-
-concatenacion : concatenacion ASTERISCO STRING 	{
-							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
-							char * var = allocateSpaceForMessage(strlen($1));
-							strlcpy(var,&$1[0],strlen($1));
-							strcat($$,var);
-							free(var);
-							var = allocateSpaceForMessage(strlen($3));
-							strlcpy(var,&$3[1],strlen($3));
-							strcat($$,var);
-						}
-		| STRING 	{
-					$$ = strdup($1);
+					char * boolValue = atoi($1.value) ? "true" : "false";
+					fprintf(yyout, "La expresion booleana es %s",boolValue);
 				}
 
 asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
@@ -112,6 +98,20 @@ id : ID | lista_indices CORCHETE_CERRADO
 
 lista_indices : ID CORCHETE_ABIERTO lista_sumas | lista_indices COMA lista_sumas
 
+concatenacion : concatenacion ASTERISCO STRING 	{
+							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
+							char * var = allocateSpaceForMessage(strlen($1));
+							strlcpy(var,&$1[0],strlen($1));
+							strcat($$,var);
+							free(var);
+							var = allocateSpaceForMessage(strlen($3));
+							strlcpy(var,&$3[1],strlen($3));
+							strcat($$,var);
+						}
+		| STRING 	{
+					$$ = strdup($1);
+				}
+
 expresion_aritmetica : lista_sumas
 
 lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
@@ -141,14 +141,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 							sprintf(error,"Cannot do operation with type %s",$1.type);
 							yyerror(error);
 						}
-					}
-
-op_arit_p2: OP_ARIT_P2	{
-				$$ = strdup($1);
-			} 
-	| ASTERISCO	{
-				$$ = strdup($1);
-			}			
+					}			
 
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 									if (isNumberType($3.type))
@@ -179,34 +172,79 @@ lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 						}
 					}
 
+op_arit_p2: OP_ARIT_P2	{
+				$$ = strdup($1);
+			} 
+	| ASTERISCO	{
+				$$ = strdup($1);
+			}
+
 lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
-								if (isNumberType($3.type))
-								{
-									$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
-									if (!doAritmeticOperation($1, $2, $3, &$$))
+									if (isNumberType($3.type))
 									{
-										yyerror("Something wrong with operation.");
+										$$.value = (char *) malloc(sizeof(char)*STR_MAX_LENGTH);
+										if (!doAritmeticOperation($1, $2, $3, &$$))
+										{
+											yyerror("Something wrong with operation.");
+										}
+									}
+									else
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error, "Cannot do operation with %s", $3.value);
+										yyerror(error);
 									}
 								}
-								else
-								{
-									char * error = allocateSpaceForMessage();
-									sprintf(error, "Cannot do operation with %s", $3.value);
-									yyerror(error);
-								}
-							}
 		| literal_aritmetic	{
-					if(isNumberType($1.type))
-					{
-						$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,$1.value,$1.type);
+						if(isNumberType($1.type))
+						{
+							$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,$1.value,$1.type);
+						}
+						else
+						{
+							char * error = allocateSpaceForMessage();
+							sprintf(error, "Cannot do operation with %s", $1.value);
+							yyerror(error);
+						}
 					}
-					else
-					{
-						char * error = allocateSpaceForMessage();
-						sprintf(error, "Cannot do operation with %s", $1.value);
-						yyerror(error);
-					}
+
+literal_aritmetic : INTEGER	{ 	
+					$$ = createValueInfo(INT_MAX_LENGTH_STR,iota($1),INT32_T);
 				}
+	| FLOAT		{
+				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,fota($1),FLOAT64_T);
+			}
+	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
+									if (isNumberType($2.type))
+									{
+										$$ = createValueInfo(FLOAT_MAX_LENGTH_STR, $2.value, $2.type);
+									}
+									else 
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error, "Cannot do operation with %s", $2.value);
+										yyerror(error);	
+									}	
+								}
+	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
+									if ((isNumberType($2.type)) && (isNumberType($4.type)))
+									{
+										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
+										if(!doAritmeticOperation($2,"/",$4,&$$))
+										{
+											yyerror("Something wrong with operation 2");
+										}
+									}
+									else
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error,"Cannot do operation with type %s",$2.type);
+										yyerror(error);
+									} 
+								}
+	| LENGTH STRING PARENTESIS_CERRADO	{
+							$$ = createValueInfo(INT_MAX_LENGTH_STR, iota(strlen($2)-2), INT32_T);
+						}
 
 expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 										if(strcmp($2,OP_BOOL_AND)==0)
@@ -242,73 +280,35 @@ expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
 						}
 
 expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
-								if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type))
-								{
-									int res = doRelationalOperation(atof($1.value),$2,atof($3.value));
-									$$ = createValueInfo(1,iota(res),BOOLEAN_T);
-								}
-								else
-								{
-									char * error = allocateSpaceForMessage();
-									sprintf(error,"Cannot do comparation %s %s %s",$1.value,$2,$3.value);
-									yyerror(error);
-								}
-							}
-					| literal_boolea	{
-								if(isSameType($1.type,IDENT_T))
-								{
-									//Se deberia crear con la info en symtab
-									$$ = createValueInfo(strlen($1.value),$1.value,$1.type);
-								}
-								else if (isSameType($1.type,BOOLEAN_T))
-								{
-									$$ = createValueInfo(1,$1.value,$1.type);
-								}
-								else
-								{
-									char * error = allocateSpaceForMessage();
-									sprintf(error,"%s is not valid for boolean expression",$1.value);
-									yyerror(error);
-								}
-							}
-
-literal_aritmetic : INTEGER	{ 	
-				$$ = createValueInfo(INT_MAX_LENGTH_STR,iota($1),INT32_T);
-			}
-	| FLOAT		{
-				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,fota($1),FLOAT64_T);
-			}
-	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
-									if (isNumberType($2.type))
+									if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type))
 									{
-										$$ = createValueInfo(FLOAT_MAX_LENGTH_STR, $2.value, $2.type);
-									}
-									else 
-									{
-										char * error = allocateSpaceForMessage();
-										sprintf(error, "Cannot do operation with %s", $2.value);
-										yyerror(error);	
-									}	
-								}
-	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
-									if ((isNumberType($2.type)) && (isNumberType($4.type)))
-									{
-										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-										if(!doAritmeticOperation($2,"/",$4,&$$))
-										{
-											yyerror("Something wrong with operation 2");
-										}
+										int res = doRelationalOperation(atof($1.value),$2,atof($3.value));
+										$$ = createValueInfo(1,iota(res),BOOLEAN_T);
 									}
 									else
 									{
 										char * error = allocateSpaceForMessage();
-										sprintf(error,"Cannot do operation with type %s",$2.type);
+										sprintf(error,"Cannot do comparation %s %s %s",$1.value,$2,$3.value);
 										yyerror(error);
-									} 
+									}
 								}
-	| LENGTH STRING PARENTESIS_CERRADO	{
-							$$ = createValueInfo(INT_MAX_LENGTH_STR, iota(strlen($2)-2), INT32_T);
-						}
+					| literal_boolea	{
+									if(isSameType($1.type,IDENT_T))
+									{
+										//Se deberia crear con la info en symtab
+										$$ = createValueInfo(strlen($1.value),$1.value,$1.type);
+									}
+									else if (isSameType($1.type,BOOLEAN_T))
+									{
+										$$ = createValueInfo(1,$1.value,$1.type);
+									}
+									else
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error,"%s is not valid for boolean expression",$1.value);
+										yyerror(error);
+									}
+								}
 
 literal_boolea : BOOLEAN	{	
 					$$ = createValueInfo(1,iota($1),BOOLEAN_T);
