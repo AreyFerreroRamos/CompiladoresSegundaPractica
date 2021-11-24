@@ -60,7 +60,7 @@ tensor_info createTensorInfo(int dim, int calcIndex, char *lexema);
  ***/
 char *getIdName(char *idWithAssign);
 
-int getDim(char * key, int num_dims);
+int getDim(char *key, int num_dims);
 
 //CONTROLS
 
@@ -104,4 +104,11 @@ int intOperations(int num1, int num2, char *op, int *res);
  **/
 int floatOperations(float num1, float num2, char *op, float *res);
 
+/**
+ * Dado un string comprueba si es una key de la tabla de simbolos.
+ * Si es una key devuelve el size guardado en la variable, sino devuelve
+ * el strlen() del string pasado como parámetro. En el caso que al buscar
+ * en la tabla de símbolos de un error distinto a no encontrado se devolverá -1.
+ **/
+int lenght(char *key);
 #endif

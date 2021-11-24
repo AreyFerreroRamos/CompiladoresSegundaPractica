@@ -168,7 +168,7 @@ tensor_info createTensorInfo(int dim, int calcIndex, char *lexema)
 {
 	tensor_info aux;
 	aux.dim = dim;
-	aux.calcIndex = calcIndex; 
+	aux.calcIndex = calcIndex;
 	aux.lexema = strdup(lexema);
 	return aux;
 }
@@ -189,13 +189,13 @@ char *getIdName(char *idWithAssign)
 	return var;
 }
 
-int getDim(char * key, int dim)
+int getDim(char *key, int dim)
 {
 	sym_value_type entry;
 	int error = sym_lookup(key, &entry);
 	if (error == SYMTAB_OK)
 	{
-		if (dim < entry.num_dim) 
+		if (dim < entry.num_dim)
 		{
 			return entry.dims[dim - 1];
 		}
@@ -204,7 +204,7 @@ int getDim(char * key, int dim)
 			return -1;
 		}
 	}
-	else 
+	else
 	{
 		return -1;
 	}
@@ -379,4 +379,22 @@ int floatOperations(float num1, float num2, char *operand, float *res)
 		*res = (float)pow((double)num1, (double)num2);
 	}
 	return 1;
+}
+
+int lenght(char *key)
+{
+	sym_value_type entry;
+	int response = sym_lookup(key, &entry);
+	if (response == SYMTAB_OK)
+	{
+		return entry.size;
+	}
+	else if (response = SYMTAB_NOT_FOUND)
+	{
+		return strlen(key);
+	}
+	else
+	{
+		return -1;
+	}
 }

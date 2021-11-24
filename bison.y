@@ -158,11 +158,11 @@ lista_indices : ID CORCHETE_ABIERTO lista_sumas	{
 concatenacion : concatenacion ASTERISCO STRING 	{
 							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
 							char * var = allocateSpaceForMessage(strlen($1));
-							memcpy(var,&$1[0],strlen($1));
+							strlcpy(var,&$1[0],strlen($1));
 							strcat($$,var);
 							free(var);
 							var = allocateSpaceForMessage(strlen($3));
-							memcpy(var,&$3[1],strlen($3));
+							strlcpy(var,&$3[1],strlen($3));
 							strcat($$,var);
 						}
 		| STRING 	{
@@ -303,7 +303,7 @@ literal_aritmetic : INTEGER	{
 									} 
 								}
 	| LENGTH STRING PARENTESIS_CERRADO	{
-							$$ = createValueInfo(INT_MAX_LENGTH_STR, iota(strlen($2)-2), INT32_T);
+							$$ = createValueInfo(INT_MAX_LENGTH_STR, iota(lenght($2)), INT32_T);
 						}
 
 
