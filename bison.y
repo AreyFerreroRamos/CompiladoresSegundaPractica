@@ -301,6 +301,7 @@ id_arit : ID_ARIT	{
 	| lista_indices_arit CORCHETE_CERRADO	{
 							sym_value_type res;
 							sym_lookup($1.lexema, &res);
+							void * elem = res.elements;
 							if (isSameType(res.type, INT32_T))
 							{
 								$$.value = iota(((int *)res.elements)[$1.calcIndex]);
