@@ -304,11 +304,11 @@ id_arit : ID_ARIT	{
 							void * elem = res.elements;
 							if (isSameType(res.type, INT32_T))
 							{
-								$$.value = iota(*elem[$1.calcIndex]);
+								$$.value = iota(((int *)res.elements)[$1.calcIndex]);
 							}
 							else
 							{
-								$$.value = fota((float *) res.elements[$1.calcIndex]);
+								$$.value = fota(((float *) res.elements)[$1.calcIndex]);
 							}
 							$$.type = res.type;
 						}
