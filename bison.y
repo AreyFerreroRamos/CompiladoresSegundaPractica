@@ -144,11 +144,11 @@ lista_indices : ID CORCHETE_ABIERTO lista_sumas	{
 concatenacion : concatenacion ASTERISCO STRING 	{
 							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
 							char * var = allocateSpaceForMessage(strlen($1));
-							strlcpy(var,$1[0],strlen($1));
+							strlcpy(var,&$1[0],strlen($1));
 							strcat($$,var);
 							free(var);
 							var = allocateSpaceForMessage(strlen($3));
-							strlcpy(var,$3[1],strlen($3));
+							strlcpy(var,&$3[1],strlen($3));
 							strcat($$,var);
 						}
 		| STRING 	{
@@ -301,9 +301,10 @@ id_arit : ID_ARIT	{
 	| lista_indices_arit CORCHETE_CERRADO	{
 							sym_value_type res;
 							sym_lookup($1.lexema, &res);
+							void * elem = res.elements;
 							if (isSameType(res.type, INT32_T))
 							{
-								$$.value = iota((int) res.elements[$1.calcIndex]);
+								$$.value = iota(*elem[$1.calcIndex]);
 							}
 							else
 							{
