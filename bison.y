@@ -62,31 +62,47 @@ sentencia : asignacion
 					fprintf(yyout, "La expresion booleana es %s",boolValue);
 				}
 
-asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
-							entry.value = $3.value;
-							entry.type = $3.type;
-							entry.size = strlen($3.value);
-							entry.num_dim = 0;
-							entry.dims = NULL;
-							if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
-							{
-								yyerror("Error al guardar en symtab.");
-							}
-							fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
+asignacion : ID ASSIGN expresion_aritmetica {
+												sym_value_type entry;
+												entry.value = $3.value;
+												entry.type = $3.type;
+												entry.size = strlen($3.value);
+												entry.num_dim = 0;
+												entry.dims = NULL;
+												if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
+												{
+													yyerror("Error al guardar en symtab.");
+												}
+												fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
+
+											
+											}
+		| id ASSIGN expresion_aritmetica	{	
+												sym_value_type entry;
+												entry.value = $3.value;
+												entry.type = $3.type;
+												entry.size = strlen($3.value);
+												entry.num_dim = 0;
+												entry.dims = NULL;
+												if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
+												{
+													yyerror("Error al guardar en symtab.");
+												}
+												fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
 						}
 	| ID ASSIGN expresion_booleana	{
-						sym_value_type entry;
-						entry.value = $3.value;
-						entry.type = $3.type;
-						entry.size = 1;
-						entry.num_dim = 0;
-						entry.dims = NULL;
-						if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
-						{
-							yyerror("Error al guardar en symtab.");
-						}
-						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3.value);
-					}
+										sym_value_type entry;
+										entry.value = $3.value;
+										entry.type = $3.type;
+										entry.size = 1;
+										entry.num_dim = 0;
+										entry.dims = NULL;
+										if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
+										{
+											yyerror("Error al guardar en symtab.");
+										}
+										fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3.value);
+									}
 	| ID ASSIGN concatenacion	{
 						sym_value_type entry;
 						entry.value = $3;
@@ -104,9 +120,7 @@ asignacion : id ASSIGN expresion_aritmetica	{	sym_value_type entry;
 id : lista_indices CORCHETE_CERRADO	{
 						$$ = createTensorInfo($1.dim, $1.calcIndex, $1.lexema);
 					}
-   | ID	{
-		$$ = createTensorInfo(0, 0, $1.lexema);	
-	}
+   
 
 lista_indices : ID CORCHETE_ABIERTO lista_sumas	{
 	      						if (isSameType($3.type, INT32_T)) 
