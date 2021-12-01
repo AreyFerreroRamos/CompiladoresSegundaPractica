@@ -440,21 +440,28 @@ literal_boolea : BOOLEAN	{
 									}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
+									
 		     	  					}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
+									
 	   							}
 		| componente	{
+
 				}
 
 componente : lista_valores	{
+
 	   			}
 	| tensor	{
+
 			}
 
 lista_valores : lista_valores COMA lista_sumas	{
+
 	      					}
 		| lista_sumas	{
+
 				}
 
 
