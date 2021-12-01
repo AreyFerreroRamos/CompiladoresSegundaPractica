@@ -68,7 +68,7 @@ asignacion : ID ASSIGN expresion_aritmetica {
 												entry.type = $3.type;
 												entry.size = strlen($3.value);
 												entry.num_dim = 0;
-												entry.dims = NULL;
+												entry.elem_dims = NULL;
 												if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 												{
 													yyerror("Error al guardar en symtab.");
@@ -83,7 +83,7 @@ asignacion : ID ASSIGN expresion_aritmetica {
 												entry.type = $3.type;
 												entry.size = strlen($3.value);
 												entry.num_dim = 0;
-												entry.dims = NULL;
+												entry.elem_dims = NULL;
 												if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 												{
 													yyerror("Error al guardar en symtab.");
@@ -96,7 +96,7 @@ asignacion : ID ASSIGN expresion_aritmetica {
 										entry.type = $3.type;
 										entry.size = 1;
 										entry.num_dim = 0;
-										entry.dims = NULL;
+										entry.elem_dims = NULL;
 										if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 										{
 											yyerror("Error al guardar en symtab.");
@@ -109,7 +109,7 @@ asignacion : ID ASSIGN expresion_aritmetica {
 						entry.type = STRING_T;
 						entry.size = strlen($3);
 						entry.num_dim = 0;
-						entry.dims = NULL;
+						entry.elem_dims = NULL;
 						if(sym_enter($1.lexema, &entry)!=SYMTAB_OK)
 						{
 							yyerror("Error al guardar en symtab.");

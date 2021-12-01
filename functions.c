@@ -197,7 +197,7 @@ int getDim(char *key, int dim)
 	{
 		if (dim < entry.num_dim)
 		{
-			return entry.dims[dim - 1];
+			return entry.elem_dims[dim - 1];
 		}
 		else
 		{
