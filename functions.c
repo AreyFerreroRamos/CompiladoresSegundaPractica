@@ -398,3 +398,16 @@ int lenght(char *key)
 		return -1;
 	}
 }
+
+void invert_vector(char * vector, int dim)
+{
+	char * aux;
+	int i;
+
+	for (i = 0; i < dim / 2; i++)
+	{
+		*aux = vector[i];
+		vector[i] = vector[dim - i - 1];
+		vector[dim - i - 1] = *aux;
+	}
+}
