@@ -90,37 +90,31 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 
 "!"	{
 		debug("%s\n",yytext,0);
-		yylval.cadena = strdup(yytext);
 		return NEGACION;
 	}
 
 "("	{
 		debug("%s\n",yytext,0);
-		yylval.cadena = strdup(yytext);
 		return PARENTESIS_ABIERTO;
 	}
 
 ")"	{
 		debug("%s\n",yytext,0);
-		yylval.cadena = strdup(yytext);
 		return PARENTESIS_CERRADO;
 	}
 
 ,	{
 		debug("%s\n",yytext,0);
-		yylval.cadena = strdup(yytext);
 		return COMA;
 	}
 
 "div("	{
 		debug("%s\n",yytext,0);
-		yylval.cadena = strdup(yytext);
 		return DIV;
 	}
 
 "length("	{
 			debug("%s\n",yytext,0);
-			yylval.cadena = strdup(yytext);
 			return LENGTH;
 		}	
 
@@ -132,14 +126,16 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 	}
 
 "["	{
-		yylval.cadena = strdup(yytext);
 		corcheteOpenFounded = true;
 		return CORCHETE_ABIERTO;
 	}
 
 "]"	{
-		yylval.cadena = strdup(yytext);
 		return CORCHETE_CERRADO;
+	}
+
+";"	{
+		return PUNTO_Y_COMA;
 	}
 
 {id}	{

@@ -35,13 +35,13 @@
 %token <no_definit> ASSIGN
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA CORCHETE_ABIERTO CORCHETE_CERRADO
+%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA
 %token <boolea> BOOLEAN
 %token <ident> ID ID_ARIT
 
 %type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal_aritmetic literal_boolea id_arit
 %type <tensor_info> id lista_indices lista_indices_arit
-%type <cadena> op_arit_p2 concatenacion
+%type <cadena> op_arit_p2 concatenacion tensor lista_componentes componente lista_valores
 
 %start programa
 
@@ -116,6 +116,8 @@ asignacion : ID ASSIGN expresion_aritmetica {
 						}
 						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, $3);
 					}
+	| ID ASSIGN tensor	{
+				}
 
 id : lista_indices CORCHETE_CERRADO	{
 						$$ = createTensorInfo($1.dim, $1.calcIndex, $1.lexema);
@@ -158,11 +160,11 @@ lista_indices : ID CORCHETE_ABIERTO lista_sumas	{
 concatenacion : concatenacion ASTERISCO STRING 	{
 							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
 							char * var = allocateSpaceForMessage(strlen($1));
-							strlcpy(var,&$1[0],strlen($1));
+							memcpy(var,&$1[0],strlen($1));
 							strcat($$,var);
 							free(var);
 							var = allocateSpaceForMessage(strlen($3));
-							strlcpy(var,&$3[1],strlen($3));
+							memcpy(var,&$3[1],strlen($3));
 							strcat($$,var);
 						}
 		| STRING 	{
@@ -436,5 +438,24 @@ literal_boolea : BOOLEAN	{
 											yyerror(error);
 										}
 									}
+
+tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
+		     	  					}
+
+lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
+	   							}
+		| componente	{
+				}
+
+componente : lista_valores	{
+	   			}
+	| tensor	{
+			}
+
+lista_valores : lista_valores COMA lista_sumas	{
+	      					}
+		| lista_sumas	{
+				}
+
 
 %%
