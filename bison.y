@@ -440,28 +440,37 @@ literal_boolea : BOOLEAN	{
 									}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
-									
+									/* subir para arriba	o	llamar a convert_invert_vector(char * aux.elem_dims, int aux.num_dim) */		
 		     	  					}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
+		  							symtab_value_type aux;
 									
+		  							aux.elem_dims[aux.num_dims]++;							
 	   							}
 		| componente	{
-
+					/* subir para arriba */
 				}
 
 componente : lista_valores	{
-
+					/* subir para arriba */
 	   			}
 	| tensor	{
-
+				symtab_value_type aux;
+				
+				aux.num_dims++;
 			}
 
 lista_valores : lista_valores COMA lista_sumas	{
-
+	      						symtab_value_type aux;
+							
+							aux.elem_dims[aux.num_dim]++;
 	      					}
 		| lista_sumas	{
+					symbtab_value_type aux;
 
+					aux.num_dim = 0;
+					aux.elem_dims = {0, 0, 0, 0};
 				}
 
 

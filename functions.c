@@ -399,10 +399,14 @@ int lenght(char *key)
 	}
 }
 
-void invert_vector(char * vector, int dim)
+void convert_invert_vector(char * vector, int dim)
 {
 	char * aux;
 	int i;
+	
+	for (i = 0; i < dim - 1; i++) {
+		vector[i] = vector[i] / vector[i + 1];
+	}
 
 	for (i = 0; i < dim / 2; i++)
 	{
