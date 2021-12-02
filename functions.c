@@ -215,11 +215,12 @@ void convert_invert_vector(char * vector, int dim)
 	char * aux;
 	int i;
 	
-	for (i = 0; i < dim - 1; i++) {
+	for (i = 0; i < dim - 1; i++)	// Convertir el vector con el número de elementos totales por dimensión en un vector con el número de elementos de la siguiente dimensión.
+	{
 		vector[i] = vector[i] / vector[i + 1];
 	}
 
-	for (i = 0; i < dim / 2; i++)
+	for (i = 0; i < dim / 2; i++)	// Invertir el vector
 	{
 		*aux = vector[i];
 		vector[i] = vector[dim - i - 1];

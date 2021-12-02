@@ -114,14 +114,14 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						}
 						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, entry.value);
 					}
-	| ID ASSIGN tensor	{
+	| ID ASSIGN tensor	{		
 					sym_value_type entry;
 					entry.type = $3.type;
 					entry.value = NULL;
 					entry.size = calculateSizeTensor($3);
 					entry.num_dim = $3.num_dim;
 					entry.elem_dims = $3.elem_dims;
-					entry.elements = $3.elements;
+					entry.elements = $3.elements;		// llamar a convert_invert_vector(char * aux.elem_dims, int aux.num_dim)
 					if (sym_enter($1.lexema, &entry) != SYMTAB_OK)
 					{
 						yyerror("Error al guardar en symtab.");
@@ -445,11 +445,11 @@ literal_boolea : BOOLEAN	{
 										}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
-									/* subir para arriba	o	llamar a convert_invert_vector(char * aux.elem_dims, int aux.num_dim) */		
+									/* subir para arribar */		
 		     	  					}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
-		  							symtab_value_type aux;
+		  							sym_value_type aux;
 									
 		  							aux.elem_dims[aux.num_dims]++;							
 	   							}
@@ -461,21 +461,21 @@ componente : lista_valores	{
 					/* subir para arriba */
 	   			}
 	| tensor	{
-				symtab_value_type aux;
+				sym_value_type aux;
 				
 				aux.num_dims++;
 			}
 
 lista_valores : lista_valores COMA lista_sumas	{
-	      						symtab_value_type aux;
+	      						sym_value_type aux;
 							
 							aux.elem_dims[aux.num_dim]++;
 	      					}
 		| lista_sumas	{
-					symbtab_value_type aux;
+					sym_value_type aux;
 
 					aux.num_dim = 0;
-					aux.elem_dims = {0, 0, 0, 0};
+					aux.elem_dims = 0;
 				}
 
 
