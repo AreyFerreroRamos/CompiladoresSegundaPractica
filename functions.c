@@ -210,10 +210,11 @@ int getDim(char *key, int index_dim)
 	}
 }
 
-void convert_invert_vector(int *vector, int dim)
+int * convert_invert_vector(int * vector, int dim)
 {
 	char *aux;
 	int i;
+
 	for (i = 0; i < dim - 1; i++) // Convertir el vector con el número de elementos totales por dimensión en un vector con el número de elementos de la siguiente dimensión.
 	{
 		vector[i] = vector[i] / vector[i + 1];
@@ -225,6 +226,7 @@ void convert_invert_vector(int *vector, int dim)
 		vector[i] = vector[dim - i - 1];
 		vector[dim - i - 1] = *aux;
 	}
+	return vector;
 }
 
 void *castValueToVoidPointer(char *value, char *type)

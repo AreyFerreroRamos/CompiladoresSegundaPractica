@@ -67,7 +67,7 @@ int getDim(char *key, int num_dims);
  * la siguiente; excepto la última posición, que se guarda sin realizar ninguna operación.
  * A continuación se invierte el orden de los elementos del vector.
  **/
-void convert_invert_vector(int *vector, int dim);
+int * convert_invert_vector(int * vector, int dim);
 
 /**
  * Dado un valor en formato caracter y el tipo de este valor lo convierte a

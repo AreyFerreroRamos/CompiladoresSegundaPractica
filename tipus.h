@@ -44,8 +44,8 @@ typedef struct
 
 typedef struct
 {
-	int dim;		//Dimension concreta que se esta evaluando actaulmente
-	char *type;		//Tipo concreto que se esta evaluando actualmente
+	int dim;	//Dimension concreta que se esta evaluando actaulmente
+	char *type;	//Tipo concreto que se esta evaluando actualmente
 	void *elements; //Valores dentro del componente
 } tensor_ini_info;
 

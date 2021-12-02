@@ -9,7 +9,7 @@
   extern FILE *yyout;
   extern int yylex();
   extern void yyerror(char *);
-  extern int *vector_dims_tensor
+  extern int *vector_dims_tensor;
 %}
 
 %code requires {
@@ -121,10 +121,10 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					sym_value_type entry;
 					entry.type = $3.type;
 					entry.value = NULL;
-					entry.size = calculateSizeType($3.type)*sizeof($3.elem_dims);
-					entry.num_dim = $3.num_dim;
-					entry.elem_dims = convert_invert_vector(vector_dims_tensor,$3.type);
-					entry.elements = $3.elements;		// llamar a convert_invert_vector(char * aux.elem_dims, int aux.num_dim)
+					entry.size = calculateSizeType($3.type)*sizeof($3.elements);
+					entry.num_dim = $3.dim;
+					entry.elem_dims = convert_invert_vector(vector_dims_tensor,$3.dim);
+					entry.elements = $3.elements;
 					if (sym_enter($1.lexema, &entry) != SYMTAB_OK)
 					{
 						yyerror("Error al guardar en symtab.");
@@ -448,9 +448,9 @@ literal_boolea : BOOLEAN	{
 										}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
-																	$$.dim=$1.dim+1
-																	$$.type=$1.type;
-																	$$.elements = $1.elements;		
+																	$$.dim = $2.dim + 1;
+																	$$.type = $2.type;
+																	$$.elements = $2.elements;		
 																}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
@@ -461,22 +461,22 @@ lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
 																		$$.type=FLOAT64_T;
 																	}
 																	$$.elements = castTensorToVoidPointer($1.elements,$1.type,$3.elements,$3.type);						
-																	addElementsDim(vector_dims_tensor,$1.dim)
+																	addElementsDim(vector_dims_tensor,$1.dim);
 																}
 		| componente	{
-							$$.dim=$1.dim
+							$$.dim=$1.dim;
 							$$.type=$1.type;
 							$$.elements = $1.elements;
-							addElementsDim(vector_dims_tensor,$1.dim)
+							addElementsDim(vector_dims_tensor,$1.dim);
 						}
 
 componente : lista_valores	{
-								$$.dim=$1.dim
+								$$.dim=$1.dim;
 								$$.type=$1.type;
 								$$.elements = $1.elements;
 							}
 	| tensor	{
-					$$.dim=$1.dim
+					$$.dim=$1.dim;
 					$$.type=$1.type;
 					$$.elements = $1.elements;
 				}
@@ -489,13 +489,13 @@ lista_valores : lista_valores COMA lista_sumas	{
 														$$.type=FLOAT64_T;
 													}
 													$$.elements = castTensorToVoidPointer($1.elements,$1.type,castValueToVoidPointer($3.value,$3.type),$3.type);
-													addElementsDim(vector_dims_tensor,0)
+													addElementsDim(vector_dims_tensor,0);
 												}
 		| lista_sumas	{
 							$$.dim=0;
 							$$.type=$1.type;
 							$$.elements =castValueToVoidPointer($1.value,$1.type);
-							addElementsDim(vector_dims_tensor,0)
+							addElementsDim(vector_dims_tensor,0);
 						}
 
 
