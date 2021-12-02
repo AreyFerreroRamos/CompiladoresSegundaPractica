@@ -37,7 +37,7 @@ typedef struct
 
 typedef struct
 {
-	int dim;
+	int index_dim;
 	int calcIndex;
 	char *lexema;
 } tensor_info;

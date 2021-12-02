@@ -62,6 +62,13 @@ char *getIdName(char *idWithAssign);
 
 int getDim(char *key, int num_dims);
 
+/**
+ * Dado un vector, reescribe sobre cada posición el cociente de esa misma posición por
+ * la siguiente; excepto la última posición, que se guarda sin realizar ninguna operación.
+ * A continuación se invierte el orden de los elementos del vector.
+ **/
+void convert_invert_vector(char * vector, int dim);
+
 //CONTROLS
 
 /**
@@ -112,10 +119,4 @@ int floatOperations(float num1, float num2, char *op, float *res);
  **/
 int lenght(char *key);
 
-/**
- * Dado un vector, reescribe sobre cada posición el cociente de esa misma posición por
- * la siguiente; excepto la última posición, que se guarda sin realizar ninguna operación.
- * A continuación se invierte el orden de los elementos del vector.
- **/
-void convert_invert_vector(char * vector, int dim);
 #endif

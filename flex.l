@@ -134,61 +134,61 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		return CORCHETE_CERRADO;
 	}
 
-";"	{
+;	{
 		return PUNTO_Y_COMA;
 	}
 
 {id}	{
+		debug("%s\n",yytext,0);
+		if (assignFounded == false && corcheteOpenFounded == false)
+		{
 			debug("%s\n",yytext,0);
-			if (assignFounded == false && corcheteOpenFounded == false)
+			yylval.ident.lexema = strdup(yytext);
+			yylval.ident.lenght = strlen(yytext);
+			yylval.ident.line = yylineno;
+			return ID;
+		}
+		else
+		{
+			debug("%s\n",yytext,0);
+			sym_value_type entry;
+			int response =  sym_lookup(yytext, &entry);
+			if(response==SYMTAB_OK)
 			{
-				debug("%s\n",yytext,0);
-				yylval.ident.lexema = strdup(yytext);
-				yylval.ident.lenght = strlen(yytext);
-				yylval.ident.line = yylineno;
-				return ID;
-			}
-			else
-			{
-				debug("%s\n",yytext,0);
-				sym_value_type entry;
-				int response =  sym_lookup(yytext, &entry);
-				if(response==SYMTAB_OK)
+				value_info v = createValueInfo(strlen((char*)entry.value),(char*)entry.value,(char*)entry.type);
+				if(isSameType(v.type,INT32_T) || isSameType(v.type,FLOAT64_T))
 				{
-					value_info v = createValueInfo(strlen((char*)entry.value),(char*)entry.value,(char*)entry.type);
-					if(isSameType(v.type,INT32_T) || isSameType(v.type,FLOAT64_T))
-					{
-						yylval.ident.lexema = strdup(v.value);
-						yylval.ident.lenght = strlen(v.value);
-						yylval.ident.line = yylineno;
-						return ID_ARIT;
-					}
-					else if(isSameType(v.type,STRING_T))
-					{
-						yylval.cadena = v.value;
-						return STRING;
-					}
-					else
-					{
-						yylval.boolea = atoi(v.value);
-						return BOOLEAN;
-					}
+					yylval.ident.lexema = strdup(v.value);
+					yylval.ident.lenght = strlen(v.value);
+					yylval.ident.line = yylineno;
+					return ID_ARIT;
+				}
+				else if(isSameType(v.type,STRING_T))
+				{
+					yylval.cadena = v.value;
+					return STRING;
 				}
 				else
 				{
-					char * error = allocateSpaceForMessage();
-					sprintf(error, "The id %s is not initialized", yytext);
-					yyerror(error);	
+					yylval.boolea = atoi(v.value);
+					return BOOLEAN;
 				}
 			}
-			
+			else
+			{
+				char * error = allocateSpaceForMessage();
+				sprintf(error, "The id %s is not initialized", yytext);
+				yyerror(error);	
+			}
 		}
+		
+	}
 
 \"(\\.|[^\"])*\"	{
-			debug("%s\n",yytext,0);
-			yylval.cadena = strdup(yytext);
-			return STRING;
-		}
+				debug("%s\n",yytext,0);
+				yylval.cadena = strdup(yytext);
+				return STRING;
+			}
 
 \n	{
 		debug("%s\n",yytext,0);

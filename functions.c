@@ -189,15 +189,15 @@ char *getIdName(char *idWithAssign)
 	return var;
 }
 
-int getDim(char *key, int dim)
+int getDim(char *key, int index_dim)
 {
 	sym_value_type entry;
 	int error = sym_lookup(key, &entry);
 	if (error == SYMTAB_OK)
 	{
-		if (dim < entry.num_dim)
+		if (index_dim < entry.num_dim)
 		{
-			return entry.elem_dims[dim - 1];
+			return entry.elem_dims[index_dim - 1];
 		}
 		else
 		{
@@ -207,6 +207,23 @@ int getDim(char *key, int dim)
 	else
 	{
 		return -1;
+	}
+}
+
+void convert_invert_vector(char * vector, int dim)
+{
+	char * aux;
+	int i;
+	
+	for (i = 0; i < dim - 1; i++) {
+		vector[i] = vector[i] / vector[i + 1];
+	}
+
+	for (i = 0; i < dim / 2; i++)
+	{
+		*aux = vector[i];
+		vector[i] = vector[dim - i - 1];
+		vector[dim - i - 1] = *aux;
 	}
 }
 
@@ -396,22 +413,5 @@ int lenght(char *key)
 	else
 	{
 		return -1;
-	}
-}
-
-void convert_invert_vector(char * vector, int dim)
-{
-	char * aux;
-	int i;
-	
-	for (i = 0; i < dim - 1; i++) {
-		vector[i] = vector[i] / vector[i + 1];
-	}
-
-	for (i = 0; i < dim / 2; i++)
-	{
-		*aux = vector[i];
-		vector[i] = vector[dim - i - 1];
-		vector[dim - i - 1] = *aux;
 	}
 }
