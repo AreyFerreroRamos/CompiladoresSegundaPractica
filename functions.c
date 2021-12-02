@@ -9,7 +9,7 @@ extern FILE *yyin;
 extern FILE *yyout;
 extern int yylineno;
 
-//FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR
+// FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR
 
 int init_analisi_lexic(char *file_name)
 {
@@ -100,29 +100,29 @@ void yyerror(char *explanation)
 
 void debug(char *text, char *var, int typeFile)
 {
-	//flex
+	// flex
 	if (typeFile == 0)
 	{
 		printf(text, var);
 	}
-	//bison
+	// bison
 	else
 	{
-		//printf(text, var);
+		// printf(text, var);
 	}
 }
 
 void simpleDebug(char *text, int typeFile)
 {
-	//flex
+	// flex
 	if (typeFile == 0)
 	{
-		//printf(text);
+		// printf(text);
 	}
-	//bison
+	// bison
 	else
 	{
-		//printf(text);
+		// printf(text);
 	}
 }
 
@@ -164,10 +164,10 @@ value_info createValueInfo(int length, char *value, char *type)
 	return aux;
 }
 
-tensor_info createTensorInfo(int dim, int calcIndex, char *lexema)
+tensor_info createTensorInfo(int index_dim, int calcIndex, char *lexema)
 {
 	tensor_info aux;
-	aux.dim = dim;
+	aux.index_dim = index_dim;
 	aux.calcIndex = calcIndex;
 	aux.lexema = strdup(lexema);
 	return aux;
@@ -210,17 +210,16 @@ int getDim(char *key, int index_dim)
 	}
 }
 
-void convert_invert_vector(char * vector, int dim)
+void convert_invert_vector(int *vector, int dim)
 {
-	char * aux;
+	char *aux;
 	int i;
-	
-	for (i = 0; i < dim - 1; i++)	// Convertir el vector con el número de elementos totales por dimensión en un vector con el número de elementos de la siguiente dimensión.
+	for (i = 0; i < dim - 1; i++) // Convertir el vector con el número de elementos totales por dimensión en un vector con el número de elementos de la siguiente dimensión.
 	{
 		vector[i] = vector[i] / vector[i + 1];
 	}
 
-	for (i = 0; i < dim / 2; i++)	// Invertir el vector
+	for (i = 0; i < dim / 2; i++) // Invertir el vector
 	{
 		*aux = vector[i];
 		vector[i] = vector[dim - i - 1];
@@ -228,7 +227,124 @@ void convert_invert_vector(char * vector, int dim)
 	}
 }
 
-//CONTROLS
+void *castValueToVoidPointer(char *value, char *type)
+{
+	void *aux = malloc(calculateSizeType(type));
+	if (isSameType(type, INT32_T))
+	{
+		((int *)aux)[0] = atoi(value);
+	}
+	else if (isSameType(type, FLOAT64_T))
+	{
+		((float *)aux)[0] = atof(value);
+	}
+	return aux;
+}
+
+void *castTensorToVoidPointer(void *elements1, char *type1, void *elements2, char *type2)
+{
+	char *typefinal;
+	if (isSameType(type1, INT32_T) && isSameType(type2, INT32_T))
+	{
+		typefinal = INT32_T;
+	}
+	else
+	{
+		typefinal = FLOAT64_T;
+	}
+	int num_element1 = sizeof(elements1) / calculateSizeType(type1);
+	int num_element2 = sizeof(elements2) / calculateSizeType(type2);
+	void *aux = malloc((num_element1 + num_element2) * calculateSizeType(typefinal));
+	// Si la lista final se trata como entera
+	if (isSameType(typefinal, INT32_T))
+	{
+		int i;
+		for (i = 0; i < num_element1; i++)
+		{
+			((int *)aux)[i] = ((int *)elements1)[i];
+		}
+		for (int j = i; j < num_element1 + num_element2; j++)
+		{
+			((int *)aux)[j] = ((int *)elements2)[j];
+		}
+	}
+	// Si la lista final se trata como float
+	else if (isSameType(typefinal, FLOAT64_T))
+	{
+		int i;
+		// Si los valores se tratan como enteros
+		if (isSameType(type1, INT32_T))
+		{
+			for (i = 0; i < num_element1; i++)
+			{
+				((float *)aux)[i] = (float)((int *)elements1)[i];
+			}
+		}
+		// Si los valores se tratan como float
+		else if (isSameType(type1, FLOAT64_T))
+		{
+			for (i = 0; i < num_element1; i++)
+			{
+				((float *)aux)[i] = ((float *)elements1)[i];
+			}
+		}
+		// Si los valores se tratan como enteros
+		if (isSameType(type2, INT32_T))
+		{
+			for (int j = i; j < num_element1 + num_element2; j++)
+			{
+				((float *)aux)[j] = (float)((int *)elements2)[j];
+			}
+		}
+		// Si los valores se tratan como float
+		else if (isSameType(type2, FLOAT64_T))
+		{
+			for (int j = i; j < num_element1 + num_element2; j++)
+			{
+				((float *)aux)[j] = ((float *)elements2)[j];
+			}
+		}
+	}
+}
+
+int calculateSizeType(char *type)
+{
+	if (isSameType(type, FLOAT64_T))
+	{
+		return 8;
+	}
+	else if (isSameType(type, INT32_T))
+	{
+		return 4;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+void addElementsDim(int *vector_dims_tensor, int index)
+{
+	if (vector_dims_tensor == NULL)
+	{
+		vector_dims_tensor = malloc(4);
+		vector_dims_tensor[0] = 1;
+	}
+	else
+	{
+		if (index < sizeof(vector_dims_tensor) / 4)
+		{
+			vector_dims_tensor[index]++;
+		}
+		else
+		{
+			vector_dims_tensor = realloc(vector_dims_tensor, sizeof(vector_dims_tensor) + 4);
+			vector_dims_tensor[index] = 1;
+		}
+	}
+}
+
+// CONTROLS
 
 int isSameType(char *type1, char *type2)
 {
@@ -240,7 +356,7 @@ int isNumberType(char *type)
 	return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
 }
 
-//OPERATIONS
+// OPERATIONS
 
 int doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val)
 {

@@ -9,6 +9,7 @@
   extern FILE *yyout;
   extern int yylex();
   extern void yyerror(char *);
+  extern int *vector_dims_tensor
 %}
 
 %code requires {
@@ -28,6 +29,7 @@
 	bool boolea;
 	value_info operand;
 	tensor_info tensor_info;
+	tensor_ini_info tensor_ini_info;
 	sym_value_type sym_value_type;
 	void *no_definit;
 }
@@ -41,7 +43,8 @@
 
 %type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal_aritmetic literal_boolea id_arit
 %type <tensor_info> id lista_indices lista_indices_arit
-%type <cadena> op_arit_p2 concatenacion tensor lista_componentes componente lista_valores
+%type <tensor_ini_info> tensor componente lista_componentes lista_valores
+%type <cadena> op_arit_p2 concatenacion
 
 %start programa
 
@@ -118,9 +121,9 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					sym_value_type entry;
 					entry.type = $3.type;
 					entry.value = NULL;
-					entry.size = calculateSizeTensor($3);
+					entry.size = calculateSizeType($3.type)*sizeof($3.elem_dims);
 					entry.num_dim = $3.num_dim;
-					entry.elem_dims = $3.elem_dims;
+					entry.elem_dims = convert_invert_vector(vector_dims_tensor,$3.type);
 					entry.elements = $3.elements;		// llamar a convert_invert_vector(char * aux.elem_dims, int aux.num_dim)
 					if (sym_enter($1.lexema, &entry) != SYMTAB_OK)
 					{
@@ -445,38 +448,55 @@ literal_boolea : BOOLEAN	{
 										}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
-									/* subir para arribar */		
-		     	  					}
+																	$$.dim=$1.dim+1
+																	$$.type=$1.type;
+																	$$.elements = $1.elements;		
+																}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
-		  							sym_value_type aux;
-									
-		  							aux.elem_dims[aux.num_dims]++;							
-	   							}
+																	$$.dim=$1.dim;
+																	if(isSameType($1.type,INT32_T) && isSameType($3.type,INT32_T)){
+																		$$.type=INT32_T;
+																	}else{
+																		$$.type=FLOAT64_T;
+																	}
+																	$$.elements = castTensorToVoidPointer($1.elements,$1.type,$3.elements,$3.type);						
+																	addElementsDim(vector_dims_tensor,$1.dim)
+																}
 		| componente	{
-					/* subir para arriba */
-				}
+							$$.dim=$1.dim
+							$$.type=$1.type;
+							$$.elements = $1.elements;
+							addElementsDim(vector_dims_tensor,$1.dim)
+						}
 
 componente : lista_valores	{
-					/* subir para arriba */
-	   			}
+								$$.dim=$1.dim
+								$$.type=$1.type;
+								$$.elements = $1.elements;
+							}
 	| tensor	{
-				sym_value_type aux;
-				
-				aux.num_dims++;
-			}
+					$$.dim=$1.dim
+					$$.type=$1.type;
+					$$.elements = $1.elements;
+				}
 
 lista_valores : lista_valores COMA lista_sumas	{
-	      						sym_value_type aux;
-							
-							aux.elem_dims[aux.num_dim]++;
-	      					}
+													$$.dim=0;
+													if(isSameType($1.type,INT32_T) && isSameType($3.type,INT32_T)){
+														$$.type=INT32_T;
+													}else{
+														$$.type=FLOAT64_T;
+													}
+													$$.elements = castTensorToVoidPointer($1.elements,$1.type,castValueToVoidPointer($3.value,$3.type),$3.type);
+													addElementsDim(vector_dims_tensor,0)
+												}
 		| lista_sumas	{
-					sym_value_type aux;
-
-					aux.num_dim = 0;
-					aux.elem_dims = 0;
-				}
+							$$.dim=0;
+							$$.type=$1.type;
+							$$.elements =castValueToVoidPointer($1.value,$1.type);
+							addElementsDim(vector_dims_tensor,0)
+						}
 
 
 %%

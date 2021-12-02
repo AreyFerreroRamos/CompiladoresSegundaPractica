@@ -3,7 +3,7 @@
 #include "tipus.h"
 #include "symtab.h"
 
-//FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR
+// FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR
 
 int init_analisi_lexic(char *);
 int init_analisi_sintactic(char *);
@@ -12,7 +12,7 @@ int end_analisi_lexic();
 int end_analisi_sintactic();
 void yyerror(char *);
 
-//UTILS
+// UTILS
 
 /**
  * Función que hace un printf del texto pasado con una variable como parametro.
@@ -67,9 +67,32 @@ int getDim(char *key, int num_dims);
  * la siguiente; excepto la última posición, que se guarda sin realizar ninguna operación.
  * A continuación se invierte el orden de los elementos del vector.
  **/
-void convert_invert_vector(char * vector, int dim);
+void convert_invert_vector(int *vector, int dim);
 
-//CONTROLS
+/**
+ * Dado un valor en formato caracter y el tipo de este valor lo convierte a
+ * un void* interpretado como el tipo
+ **/
+void *castValueToVoidPointer(char *value, char *type);
+
+/**
+ * Dadas dos listas  y el tipo de cada una las une en una sola lista que tendrá el tipo
+ * prioritario (1.Float 2.Int)
+ **/
+void *castTensorToVoidPointer(void *elements1, char *type1, void *elements2, char *type2);
+
+/**
+ * Dado un tipo devuelve el tamaño en bytes
+ * */
+int calculateSizeType(char *type);
+
+/**
+ * Dado un vector de numeros que indican cuantos componentes hay en una dimension y un indice
+ * que marca una posicion dentro de este vector incrementa el número que tenga en su interior
+ */
+void addElementsDim(int *vector_dims_tensor, int index);
+
+// CONTROLS
 
 /**
  * Dados dos tipos comprueba que son iguales y en ese caso devuelve 1,
@@ -78,12 +101,12 @@ void convert_invert_vector(char * vector, int dim);
 int isSameType(char *type1, char *type2);
 
 /**
- * Dado un tipo controla si es entero o float y devuelve 1 en caso de serlo 
+ * Dado un tipo controla si es entero o float y devuelve 1 en caso de serlo
  * o 0 si no lo es
  **/
 int isNumberType(char *type);
 
-//OPERATIONS
+// OPERATIONS
 
 /**
  * Dados dos operadores y un operando realiza la operacion y la almacena

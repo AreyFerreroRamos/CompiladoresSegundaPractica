@@ -42,5 +42,11 @@ typedef struct
 	char *lexema;
 } tensor_info;
 
+typedef struct
+{
+	int dim;		//Dimension concreta que se esta evaluando actaulmente
+	char *type;		//Tipo concreto que se esta evaluando actualmente
+	void *elements; //Valores dentro del componente
+} tensor_ini_info;
 
 #endif
