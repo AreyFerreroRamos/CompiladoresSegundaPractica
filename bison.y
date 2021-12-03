@@ -9,7 +9,7 @@
   extern FILE *yyout;
   extern int yylex();
   extern void yyerror(char *);
-  extern int *vector_dims_tensor;
+  int *vector_dims_tensor;
 %}
 
 %code requires {
