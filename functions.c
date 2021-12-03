@@ -96,7 +96,7 @@ void yyerror(char *explanation)
 	exit(EXIT_FAILURE);
 }
 
-// UTILS
+// FUNCIONES DE UTILIDAD
 
 void debug(char *text, char *var, int typeFile)
 {
@@ -128,14 +128,16 @@ void simpleDebug(char *text, int typeFile)
 
 char *iota(int num)
 {
-	char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	char *string = (char *) malloc(sizeof(char) * STR_MAX_LENGTH);
+	
 	sprintf(string, "%i", num);
 	return string;
 }
 
 char *fota(float num)
 {
-	char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	char *string = (char *) malloc(sizeof(char) * STR_MAX_LENGTH);
+	
 	sprintf(string, "%f", num);
 	return string;
 }
@@ -143,7 +145,8 @@ char *fota(float num)
 char *allocateSpaceForMessage()
 {
 	char *message;
-	message = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	
+	message = (char *) malloc(sizeof(char) * STR_MAX_LENGTH);
 	return message;
 }
 
@@ -159,6 +162,7 @@ int negateBoolean(int boolean)
 value_info createValueInfo(int length, char *value, char *type)
 {
 	value_info aux;
+	
 	aux.value = strdup(value);
 	aux.type = strdup(type);
 	return aux;
@@ -167,6 +171,7 @@ value_info createValueInfo(int length, char *value, char *type)
 tensor_info createTensorInfo(int index_dim, int calcIndex, char *lexema)
 {
 	tensor_info aux;
+	
 	aux.index_dim = index_dim;
 	aux.calcIndex = calcIndex;
 	aux.lexema = strdup(lexema);
@@ -175,8 +180,9 @@ tensor_info createTensorInfo(int index_dim, int calcIndex, char *lexema)
 
 char *getIdName(char *idWithAssign)
 {
-	int sentinel;
-	for (int i = 0; i < strlen(idWithAssign); i++)
+	int sentinel, i;
+	
+	for (i = 0; i < strlen(idWithAssign); i++)
 	{
 		if (idWithAssign[i] == ' ' || idWithAssign[i] == '\t' || idWithAssign[i] == '=')
 		{
@@ -193,6 +199,7 @@ int getDim(char *key, int index_dim)
 {
 	sym_value_type entry;
 	int error = sym_lookup(key, &entry);
+	
 	if (error == SYMTAB_OK)
 	{
 		if (index_dim < entry.num_dim)
@@ -220,7 +227,7 @@ int * convert_invert_vector(int * vector, int dim)
 		vector[i] = vector[i] / vector[i + 1];
 	}
 
-	for (i = 0; i < dim / 2; i++) // Invertir el vector
+	for (i = 0; i < dim / 2; i++) // Invertir el vector.
 	{
 		*aux = vector[i];
 		vector[i] = vector[dim - i - 1];
@@ -232,13 +239,14 @@ int * convert_invert_vector(int * vector, int dim)
 void *castValueToVoidPointer(char *value, char *type)
 {
 	void *aux = malloc(calculateSizeType(type));
+	
 	if (isSameType(type, INT32_T))
 	{
-		((int *)aux)[0] = atoi(value);
+		((int *) aux)[0] = atoi(value);
 	}
 	else if (isSameType(type, FLOAT64_T))
 	{
-		((float *)aux)[0] = atof(value);
+		((float *) aux)[0] = atof(value);
 	}
 	return aux;
 }
@@ -246,6 +254,7 @@ void *castValueToVoidPointer(char *value, char *type)
 void *castTensorToVoidPointer(void *elements1, char *type1, void *elements2, char *type2)
 {
 	char *typefinal;
+	
 	if (isSameType(type1, INT32_T) && isSameType(type2, INT32_T))
 	{
 		typefinal = INT32_T;
@@ -257,53 +266,53 @@ void *castTensorToVoidPointer(void *elements1, char *type1, void *elements2, cha
 	int num_element1 = sizeof(elements1) / calculateSizeType(type1);
 	int num_element2 = sizeof(elements2) / calculateSizeType(type2);
 	void *aux = malloc((num_element1 + num_element2) * calculateSizeType(typefinal));
-	// Si la lista final se trata como entera
+		// Si la lista final se trata como entera
 	if (isSameType(typefinal, INT32_T))
 	{
 		int i;
 		for (i = 0; i < num_element1; i++)
 		{
-			((int *)aux)[i] = ((int *)elements1)[i];
+			((int *) aux)[i] = ((int *) elements1)[i];
 		}
 		for (int j = i; j < num_element1 + num_element2; j++)
 		{
-			((int *)aux)[j] = ((int *)elements2)[j];
+			((int *) aux)[j] = ((int *) elements2)[j];
 		}
 	}
-	// Si la lista final se trata como float
+		// Si la lista final se trata como float
 	else if (isSameType(typefinal, FLOAT64_T))
 	{
 		int i;
-		// Si los valores se tratan como enteros
+			// Si los valores se tratan como enteros
 		if (isSameType(type1, INT32_T))
 		{
 			for (i = 0; i < num_element1; i++)
 			{
-				((float *)aux)[i] = (float)((int *)elements1)[i];
+				((float *) aux)[i] = (float) ((int *) elements1)[i];
 			}
 		}
-		// Si los valores se tratan como float
+			// Si los valores se tratan como float
 		else if (isSameType(type1, FLOAT64_T))
 		{
 			for (i = 0; i < num_element1; i++)
 			{
-				((float *)aux)[i] = ((float *)elements1)[i];
+				((float *) aux)[i] = ((float *) elements1)[i];
 			}
 		}
-		// Si los valores se tratan como enteros
+			// Si los valores se tratan como enteros
 		if (isSameType(type2, INT32_T))
 		{
 			for (int j = i; j < num_element1 + num_element2; j++)
 			{
-				((float *)aux)[j] = (float)((int *)elements2)[j];
+				((float *) aux)[j] = (float) ((int *) elements2)[j];
 			}
 		}
-		// Si los valores se tratan como float
+			// Si los valores se tratan como float
 		else if (isSameType(type2, FLOAT64_T))
 		{
 			for (int j = i; j < num_element1 + num_element2; j++)
 			{
-				((float *)aux)[j] = ((float *)elements2)[j];
+				((float *) aux)[j] = ((float *) elements2)[j];
 			}
 		}
 	}
@@ -346,11 +355,11 @@ void addElementsDim(int *vector_dims_tensor, int index)
 	}
 }
 
-// CONTROLS
+// FUNCIONES DE CONTROL DE ERRORES
 
 int isSameType(char *type1, char *type2)
 {
-	return strcmp(type1, type2) == 0;
+	return (strcmp(type1, type2) == 0);
 }
 
 int isNumberType(char *type)
@@ -358,7 +367,7 @@ int isNumberType(char *type)
 	return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
 }
 
-// OPERATIONS
+// FUNCIONES PARA REALIZAR OPERACIONES
 
 int doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val)
 {
@@ -480,7 +489,7 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
 	{
 		simpleDebug("Estoy en la potencia\n", 1);
-		*res = (int)pow((double)num1, (double)num2);
+		*res = (int) pow((double) num1, (double) num2);
 	}
 	return 1;
 }
@@ -512,7 +521,7 @@ int floatOperations(float num1, float num2, char *operand, float *res)
 	}
 	else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
 	{
-		*res = (float)pow((double)num1, (double)num2);
+		*res = (float) pow((double) num1, (double) num2);
 	}
 	return 1;
 }
@@ -521,6 +530,7 @@ int lenght(char *key)
 {
 	sym_value_type entry;
 	int response = sym_lookup(key, &entry);
+	
 	if (response == SYMTAB_OK)
 	{
 		return entry.size;

@@ -144,7 +144,8 @@ lista_indices : lista_indices COMA lista_sumas	{
 								{
 									$$ = createTensorInfo($1.index_dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);
 								}
-						{
+								else
+								{
 									yyerror("Array out of bound.");
 								}
 							}
@@ -268,7 +269,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 		| literal_aritmetic	{
 						if(isNumberType($1.type))
 						{
-							$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,$1.value,$1.type);
+							$$ = createValueInfo(FLOAT_MAX_LENGTH_STR, $1.value, $1.type);
 						}
 						else
 						{
@@ -279,13 +280,13 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 					}
 
 literal_aritmetic : INTEGER	{ 	
-					$$ = createValueInfo(INT_MAX_LENGTH_STR,iota($1),INT32_T);
+					$$ = createValueInfo(INT_MAX_LENGTH_STR, iota($1), INT32_T);
 				}
 	| FLOAT		{
-				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,fota($1),FLOAT64_T);
+				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR, fota($1), FLOAT64_T);
 			}
 	| id_arit 	{
-				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,$1.value,$1.type);
+				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR, $1.value, $1.type);
 			}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
 									if (isNumberType($2.type))
@@ -303,7 +304,7 @@ literal_aritmetic : INTEGER	{
 									if ((isNumberType($2.type)) && (isNumberType($4.type)))
 									{
 										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-										if(!doAritmeticOperation($2,"/",$4,&$$))
+										if(!doAritmeticOperation($2, "/", $4, &$$))
 										{
 											yyerror("Something wrong with operation 2");
 										}
@@ -311,7 +312,7 @@ literal_aritmetic : INTEGER	{
 									else
 									{
 										char * error = allocateSpaceForMessage();
-										sprintf(error,"Cannot do operation with type %s",$2.type);
+										sprintf(error,"Cannot do operation with type %s", $2.type);
 										yyerror(error);
 									} 
 								}
@@ -321,8 +322,8 @@ literal_aritmetic : INTEGER	{
 
 id_arit : ID_ARIT	{
 				sym_value_type res;
-				sym_lookup($1.lexema,&res);
-				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,res.value,res.type);	
+				sym_lookup($1.lexema, &res);
+				$$ = createValueInfo(FLOAT_MAX_LENGTH_STR,res.value, res.type);	
        			}	
 	| lista_indices_arit CORCHETE_CERRADO	{
 							sym_value_type res;
@@ -367,72 +368,72 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 								else
 								{
 									char * error = allocateSpaceForMessage();
-									sprintf(error,"Index %s is not type Int32",$3.type);
+									sprintf(error,"Index %s is not type Int32", $3.type);
 									yyerror(error);
 								}
 							}
 
 expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
-										if(strcmp($2,OP_BOOL_AND)==0)
+										if(strcmp($2,OP_BOOL_AND) == 0)
 										{
-											if( !atoi($1.value) || !atoi($3.value))
+											if( ! atoi($1.value) || ! atoi($3.value))
 											{
-												$$ = createValueInfo(1,iota(0),BOOLEAN_T);
+												$$ = createValueInfo(1, iota(0), BOOLEAN_T);
 											}
 											else
 											{
-												$$ = createValueInfo(1,iota(1),BOOLEAN_T);
+												$$ = createValueInfo(1, iota(1), BOOLEAN_T);
 											}
 										}
 										else
 										{
 											if( atoi($1.value) || atoi($3.value))
 											{
-												$$ = createValueInfo(1,iota(1),BOOLEAN_T);
+												$$ = createValueInfo(1, iota(1), BOOLEAN_T);
 											}
 											else
 											{
-												$$ = createValueInfo(1,iota(0),BOOLEAN_T);
+												$$ = createValueInfo(1, iota(0), BOOLEAN_T);
 											}
 											
 										}
 									}
 		| NEGACION expresion_booleana_base	{
 								int res = negateBoolean(atoi($2.value));
-								$$ = createValueInfo(1,iota(res),BOOLEAN_T);
+								$$ = createValueInfo(1, iota(res), BOOLEAN_T);
 							}
 		| expresion_booleana_base	{ 
-							$$ = createValueInfo(1,$1.value,BOOLEAN_T);
+							$$ = createValueInfo(1, $1.value, BOOLEAN_T);
 						}
 
 expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
-									if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type,$3.type))
+									if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type, $3.type))
 									{
-										int res = doRelationalOperation(atof($1.value),$2,atof($3.value));
-										$$ = createValueInfo(1,iota(res),BOOLEAN_T);
+										int res = doRelationalOperation(atof($1.value), $2, atof($3.value));
+										$$ = createValueInfo(1, iota(res), BOOLEAN_T);
 									}
 									else
 									{
 										char * error = allocateSpaceForMessage();
-										sprintf(error,"Cannot do comparation %s %s %s",$1.value,$2,$3.value);
+										sprintf(error, "Cannot do comparation %s %s %s", $1.value, $2, $3.value);
 										yyerror(error);
 									}
 								}
 			| literal_boolea	{
 							if (isSameType($1.type,BOOLEAN_T))
 							{
-								$$ = createValueInfo(1,$1.value,$1.type);
+								$$ = createValueInfo(1, $1.value, $1.type);
 							}
 							else
 							{
 								char * error = allocateSpaceForMessage();
-								sprintf(error,"%s is not valid for boolean expression",$1.value);
+								sprintf(error, "%s is not valid for boolean expression", $1.value);
 								yyerror(error);
 							}
 						}
 
 literal_boolea : BOOLEAN	{	
-					$$ = createValueInfo(1,iota($1),BOOLEAN_T);
+					$$ = createValueInfo(1, iota($1), BOOLEAN_T);
 				}
 		| PARENTESIS_ABIERTO expresion_booleana PARENTESIS_CERRADO	{
 											if (isSameType($2.type, BOOLEAN_T))
@@ -448,55 +449,61 @@ literal_boolea : BOOLEAN	{
 										}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
-																	$$.dim = $2.dim + 1;
-																	$$.type = $2.type;
-																	$$.elements = $2.elements;		
-																}
+									$$.dim = $2.dim + 1;
+									$$.type = $2.type;
+									$$.elements = $2.elements;		
+								}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
-																	$$.dim=$1.dim;
-																	if(isSameType($1.type,INT32_T) && isSameType($3.type,INT32_T)){
-																		$$.type=INT32_T;
-																	}else{
-																		$$.type=FLOAT64_T;
-																	}
-																	$$.elements = castTensorToVoidPointer($1.elements,$1.type,$3.elements,$3.type);						
-																	addElementsDim(vector_dims_tensor,$1.dim);
-																}
+									$$.dim = $1.dim;
+									if(isSameType($1.type, INT32_T) && isSameType($3.type, INT32_T))
+									{
+										$$.type = INT32_T;
+									}
+									else
+									{
+										$$.type = FLOAT64_T;
+									}
+									$$.elements = castTensorToVoidPointer($1.elements, $1.type, $3.elements, $3.type);						
+									addElementsDim(vector_dims_tensor, $1.dim);
+								}
 		| componente	{
-							$$.dim=$1.dim;
-							$$.type=$1.type;
-							$$.elements = $1.elements;
-							addElementsDim(vector_dims_tensor,$1.dim);
-						}
-
-componente : lista_valores	{
-								$$.dim=$1.dim;
-								$$.type=$1.type;
-								$$.elements = $1.elements;
-							}
-	| tensor	{
-					$$.dim=$1.dim;
-					$$.type=$1.type;
+					$$.dim = $1.dim;
+					$$.type = $1.type;
 					$$.elements = $1.elements;
+					addElementsDim(vector_dims_tensor, $1.dim);
 				}
 
+componente : lista_valores	{
+					$$.dim = $1.dim;
+					$$.type = $1.type;
+					$$.elements = $1.elements;
+				}
+	| tensor	{
+				$$.dim = $1.dim;
+				$$.type = $1.type;
+				$$.elements = $1.elements;
+			}
+
 lista_valores : lista_valores COMA lista_sumas	{
-													$$.dim=0;
-													if(isSameType($1.type,INT32_T) && isSameType($3.type,INT32_T)){
-														$$.type=INT32_T;
-													}else{
-														$$.type=FLOAT64_T;
-													}
-													$$.elements = castTensorToVoidPointer($1.elements,$1.type,castValueToVoidPointer($3.value,$3.type),$3.type);
-													addElementsDim(vector_dims_tensor,0);
-												}
-		| lista_sumas	{
-							$$.dim=0;
-							$$.type=$1.type;
-							$$.elements =castValueToVoidPointer($1.value,$1.type);
-							addElementsDim(vector_dims_tensor,0);
+							$$.dim = 0;
+							if(isSameType($1.type, INT32_T) && isSameType($3.type, INT32_T))
+							{
+								$$.type = INT32_T;
+							}
+							else
+							{
+								$$.type = FLOAT64_T;
+							}
+							$$.elements = castTensorToVoidPointer($1.elements, $1.type, castValueToVoidPointer($3.value, $3.type), $3.type);
+							addElementsDim(vector_dims_tensor, 0);
 						}
+		| lista_sumas	{
+					$$.dim = 0;
+					$$.type = $1.type;
+					$$.elements = castValueToVoidPointer($1.value, $1.type);
+					addElementsDim(vector_dims_tensor, 0);
+				}
 
 
 %%

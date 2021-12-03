@@ -16,7 +16,8 @@
                                         /* for your application.            */
 					/* Ho subtituim per un unio o struct*/
 					/* segons ens convingui.            */
-typedef struct sym_value_type {
+typedef struct sym_value_type 
+{
 	void * type;	/* Tipo de variable */
 	void * value;	/* Valor en las variables de dimensión 0 */
 	int size;	/* Tamaño en bytes del elemento */

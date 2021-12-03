@@ -12,7 +12,7 @@ int end_analisi_lexic();
 int end_analisi_sintactic();
 void yyerror(char *);
 
-// UTILS
+// FUNCIONES DE UTILIDAD
 
 /**
  * Función que hace un printf del texto pasado con una variable como parametro.
@@ -52,6 +52,10 @@ int negateBoolean(int boolean);
  **/
 value_info createValueInfo(int length, char *value, char *type);
 
+/**
+ * Dados los parámetros necesarios para crear una estructura de tipo tensor_info (dim,
+ * calcIndex y lexema) se crea dicha estructura.
+ **/
 tensor_info createTensorInfo(int dim, int calcIndex, char *lexema);
 
 /**
@@ -60,6 +64,11 @@ tensor_info createTensorInfo(int dim, int calcIndex, char *lexema);
  ***/
 char *getIdName(char *idWithAssign);
 
+/**
+ * Dada el nombre de una variable (de tipo Tensor) y una dimensión (posición en el vector 
+ * de dimensiones) devuelve cuantos elementos de la siguiente dimensión contiene dicha 
+ * dimensión (contenido de dicha posición en el vector de dimensiones).
+ **/
 int getDim(char *key, int num_dims);
 
 /**
@@ -92,7 +101,7 @@ int calculateSizeType(char *type);
  */
 void addElementsDim(int *vector_dims_tensor, int index);
 
-// CONTROLS
+// FUNCIONES DE CONTROL DE ERRORES
 
 /**
  * Dados dos tipos comprueba que son iguales y en ese caso devuelve 1,
@@ -106,7 +115,7 @@ int isSameType(char *type1, char *type2);
  **/
 int isNumberType(char *type);
 
-// OPERATIONS
+// FUNCIONES PARA REALIZAR OPERACIONES
 
 /**
  * Dados dos operadores y un operando realiza la operacion y la almacena
