@@ -58,11 +58,11 @@ lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 
 sentencia : asignacion 
 	| expresion_aritmetica 	{
-					fprintf(yyout, "El resultado es %s",$1.value);
+					fprintf(yyout, "El resultado es %s\n",$1.value);
 				} 
 	| expresion_booleana 	{
 					char * boolValue = atoi($1.value) ? "true" : "false";
-					fprintf(yyout, "La expresion booleana es %s",boolValue);
+					fprintf(yyout, "La expresion booleana es %s\n",boolValue);
 				}
 
 asignacion : ID ASSIGN expresion_aritmetica	{
