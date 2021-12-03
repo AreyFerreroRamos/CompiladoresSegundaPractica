@@ -172,11 +172,11 @@ lista_indices : lista_indices COMA lista_sumas	{
 concatenacion : concatenacion ASTERISCO STRING 	{
 							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
 							char * var = allocateSpaceForMessage(strlen($1));
-							memcpy(var,&$1[0],strlen($1));
+							strlcpy(var,&$1[0],strlen($1));
 							strcat($$,var);
 							free(var);
 							var = allocateSpaceForMessage(strlen($3));
-							memcpy(var,&$3[1],strlen($3));
+							strlcpy(var,&$3[1],strlen($3));
 							strcat($$,var);
 						}
 		| STRING 	{
