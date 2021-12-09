@@ -153,6 +153,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		else
 		{
 			debug("ID ARIT: %s\n", yytext, 0);
+			//TODO MIRAR PORQUE PETA AQUI AL HACER ULTIMO CASO DE PRUEBAS
 			sym_value_type entry;
 			int response =  sym_lookup(yytext, &entry);
 			if(response==SYMTAB_OK)

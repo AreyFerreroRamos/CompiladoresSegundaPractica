@@ -130,7 +130,9 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					{
 						yyerror("Error al guardar en symtab.");
 					}
-					fprintf(yyout, "ID: %s pren per valor: %i\n", $1.lexema, ((int*)entry.elements)[0]);	// Refinar como se realizará la escritura en fichero.
+					for(int i =0;i<24;i++){
+					fprintf(yyout, "ID: %s pren per valor: %i\n", $1.lexema, ((int*)entry.elements)[i]);	// Refinar como se realizará la escritura en fichero.
+					}
 				}
 
 id : lista_indices CORCHETE_CERRADO	{
@@ -468,7 +470,7 @@ lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
 									}
 									$$.num_elem = $1.num_elem + $3.num_elem;
 									$$.elements = realloc($1.elements,($1.num_elem+$3.num_elem)*calculateSizeType($$.type));
-									castTensorToVoidPointer($$.elements, $1.elements, $1.type,$1.num_elem, $3.elements, $3.type,$3.num_elem);						
+									castTensorToVoidPointer($$.elements, $1.elements, $1.type,$1.num_elem, $3.elements, $3.type,$3.num_elem);	
 									vector_dims_tensor[$1.dim] += 1;
 								}
 		| componente	{

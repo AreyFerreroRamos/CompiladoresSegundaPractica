@@ -263,20 +263,11 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 	// Si la lista final se trata como entera
 	if (isSameType(typefinal, INT32_T))
 	{
-		int i;
-		printf("---");
-		for (i = 0; i < num_element1; i++)
-		{
-			printf("%i ", ((int *)elements1)[i]);
-			((int *)ptr)[i] = ((int *)elements1)[i];
-		}
-
+		int i = num_element1;
 		for (int j = 0; j < num_element2; j++)
 		{
-			printf("%i ", ((int *)elements2)[j]);
 			((int *)ptr)[i++] = ((int *)elements2)[j];
 		}
-		printf("---\n");
 	}
 	// Si la lista final se trata como float
 	else
