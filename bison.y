@@ -10,6 +10,7 @@
   extern int yylex();
   extern void yyerror(char *);
   int *vector_dims_tensor;
+  int num_dims_tensor=0;
 %}
 
 %code requires {
@@ -117,11 +118,11 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						}
 						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, entry.value);
 					}
-	| ID ASSIGN tensor	{		
+	| ID ASSIGN tensor	{	
 					sym_value_type entry;
 					entry.type = $3.type;
 					entry.value = NULL;
-					entry.size = calculateSizeType($3.type)*sizeof($3.elements);
+					entry.size = calculateSizeType($3.type)*$3.num_elem;
 					entry.num_dim = $3.dim;
 					entry.elem_dims = convert_invert_vector(vector_dims_tensor,$3.dim);
 					entry.elements = $3.elements;
@@ -129,7 +130,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					{
 						yyerror("Error al guardar en symtab.");
 					}
-					fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, entry.elements);	// Refinar como se realizará la escritura en fichero.
+					fprintf(yyout, "ID: %s pren per valor: %i\n", $1.lexema, ((int*)entry.elements)[0]);	// Refinar como se realizará la escritura en fichero.
 				}
 
 id : lista_indices CORCHETE_CERRADO	{
@@ -451,7 +452,8 @@ literal_boolea : BOOLEAN	{
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
 									$$.dim = $2.dim + 1;
 									$$.type = $2.type;
-									$$.elements = $2.elements;		
+									$$.elements = $2.elements;
+									$$.num_elem =$2.num_elem;		
 								}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
@@ -464,25 +466,35 @@ lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
 									{
 										$$.type = FLOAT64_T;
 									}
-									$$.elements = castTensorToVoidPointer($1.elements, $1.type, $3.elements, $3.type);						
-									addElementsDim(vector_dims_tensor, $1.dim);
+									$$.num_elem = $1.num_elem + $3.num_elem;
+									$$.elements = realloc($1.elements,($1.num_elem+$3.num_elem)*calculateSizeType($$.type));
+									castTensorToVoidPointer($$.elements, $1.elements, $1.type,$1.num_elem, $3.elements, $3.type,$3.num_elem);						
+									vector_dims_tensor[$1.dim] += 1;
 								}
 		| componente	{
 					$$.dim = $1.dim;
 					$$.type = $1.type;
 					$$.elements = $1.elements;
-					addElementsDim(vector_dims_tensor, $1.dim);
+					$$.num_elem =$1.num_elem;
+					if($1.dim>=num_dims_tensor){
+						vector_dims_tensor = realloc(vector_dims_tensor, ++num_dims_tensor * 4);
+						vector_dims_tensor[$1.dim] = 1;
+					}else{
+						vector_dims_tensor[$1.dim] += 1;
+					}
 				}
 
 componente : lista_valores	{
 					$$.dim = $1.dim;
 					$$.type = $1.type;
 					$$.elements = $1.elements;
+					$$.num_elem =$1.num_elem;
 				}
 	| tensor	{
 				$$.dim = $1.dim;
 				$$.type = $1.type;
 				$$.elements = $1.elements;
+				$$.num_elem =$1.num_elem;
 			}
 
 lista_valores : lista_valores COMA lista_sumas	{
@@ -495,14 +507,22 @@ lista_valores : lista_valores COMA lista_sumas	{
 							{
 								$$.type = FLOAT64_T;
 							}
-							$$.elements = castTensorToVoidPointer($1.elements, $1.type, castValueToVoidPointer($3.value, $3.type), $3.type);
-							addElementsDim(vector_dims_tensor, 0);
+							$$.elements = realloc($1.elements,($1.num_elem+1)*calculateSizeType($$.type));
+							void * elem2 = malloc(calculateSizeType($3.type));
+							castValueToVoidPointer(elem2,$3.value, $3.type);
+							castTensorToVoidPointer($$.elements,$1.elements, $1.type,$1.num_elem,elem2, $3.type,1);
+							$$.num_elem = $1.num_elem + 1;
+							vector_dims_tensor[0] += 1;
 						}
 		| lista_sumas	{
 					$$.dim = 0;
 					$$.type = $1.type;
-					$$.elements = castValueToVoidPointer($1.value, $1.type);
-					addElementsDim(vector_dims_tensor, 0);
+					$$.elements = malloc(calculateSizeType($1.type));
+					castValueToVoidPointer($$.elements, $1.value, $1.type);
+					$$.num_elem =1;
+					vector_dims_tensor = malloc(4);
+					vector_dims_tensor[0] = 1;
+					num_dims_tensor++;
 				}
 
 

@@ -65,8 +65,8 @@ tensor_info createTensorInfo(int dim, int calcIndex, char *lexema);
 char *getIdName(char *idWithAssign);
 
 /**
- * Dada el nombre de una variable (de tipo Tensor) y una dimensión (posición en el vector 
- * de dimensiones) devuelve cuantos elementos de la siguiente dimensión contiene dicha 
+ * Dada el nombre de una variable (de tipo Tensor) y una dimensión (posición en el vector
+ * de dimensiones) devuelve cuantos elementos de la siguiente dimensión contiene dicha
  * dimensión (contenido de dicha posición en el vector de dimensiones).
  **/
 int getDim(char *key, int num_dims);
@@ -76,19 +76,19 @@ int getDim(char *key, int num_dims);
  * la siguiente; excepto la última posición, que se guarda sin realizar ninguna operación.
  * A continuación se invierte el orden de los elementos del vector.
  **/
-int * convert_invert_vector(int * vector, int dim);
+int *convert_invert_vector(int *vector, int dim);
 
 /**
  * Dado un valor en formato caracter y el tipo de este valor lo convierte a
  * un void* interpretado como el tipo
  **/
-void *castValueToVoidPointer(char *value, char *type);
+void castValueToVoidPointer(void *ptr, char *value, char *type);
 
 /**
  * Dadas dos listas  y el tipo de cada una las une en una sola lista que tendrá el tipo
  * prioritario (1.Float 2.Int)
  **/
-void *castTensorToVoidPointer(void *elements1, char *type1, void *elements2, char *type2);
+void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_element1, void *elements2, char *type2, int num_element2);
 
 /**
  * Dado un tipo devuelve el tamaño en bytes
@@ -99,7 +99,7 @@ int calculateSizeType(char *type);
  * Dado un vector de numeros que indican cuantos componentes hay en una dimension y un indice
  * que marca una posicion dentro de este vector incrementa el número que tenga en su interior
  */
-void addElementsDim(int *vector_dims_tensor, int index);
+/*void addElementsDim(int *vector_dims_tensor, int index, int *num_dims);*/
 
 // FUNCIONES DE CONTROL DE ERRORES
 

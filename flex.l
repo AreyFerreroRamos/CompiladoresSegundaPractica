@@ -142,10 +142,9 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 	}
 
 {id}	{
-		debug("%s\n", yytext, 0);
 		if (assignFounded == false && corcheteOpenFounded == false)
 		{
-			debug("%s\n", yytext, 0);
+			debug("ID POINTER: %s\n", yytext, 0);
 			yylval.ident.lexema = strdup(yytext);
 			yylval.ident.lenght = strlen(yytext);
 			yylval.ident.line = yylineno;
@@ -153,7 +152,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		}
 		else
 		{
-			debug("%s\n", yytext, 0);
+			debug("ID ARIT: %s\n", yytext, 0);
 			sym_value_type entry;
 			int response =  sym_lookup(yytext, &entry);
 			if(response==SYMTAB_OK)
