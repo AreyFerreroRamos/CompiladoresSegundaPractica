@@ -32,23 +32,23 @@
 
 typedef struct
 {
-	char *type;
-	char *value;
+	char *type;	// Tipo del elemenento.
+	char *value;	// Valor del elemento.
 } value_info;
 
 typedef struct
 {
-	int index_dim;
-	int calcIndex;
-	char *lexema;
+	int index_dim;		// Posición actual del vector de dimensiones del tensor.
+	int calcIndex;		// Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor demandada.
+	char *lexema;		// Nombre de la variable tensor.
 } tensor_info;
 
 typedef struct
 {
 	int dim;		// Dimension concreta que se esta evaluando actaulmente.
 	char *type;		// Tipo concreto que se esta evaluando actualmente.
-	void *elements; // Valores dentro del componente.
-	int num_elem;
+	void *elements; 	// Valores dentro del componente.
+	int num_elem;		// Número de elementos del tensor. 
 } tensor_ini_info;
 
 #endif

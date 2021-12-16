@@ -156,9 +156,15 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			//TODO MIRAR PORQUE PETA AQUI AL HACER ULTIMO CASO DE PRUEBAS
 			sym_value_type entry;
 			int response =  sym_lookup(yytext, &entry);
-			if(response==SYMTAB_OK)
+			if (response == SYMTAB_OK)
 			{
-				value_info v = createValueInfo(strlen((char*)entry.value), (char*)entry.value, (char*)entry.type);
+				value_info v;
+				if (entry.value == NULL) {
+					v = createValueInfo(strlen(yytext), yytext, (char *)entry.type);
+				}
+				else {
+					v = createValueInfo(strlen((char*)entry.value), (char*)entry.value, (char*)entry.type);
+				}				
 				if(isSameType(v.type,INT32_T) || isSameType(v.type,FLOAT64_T))
 				{
 					yylval.ident.lexema = strdup(v.value);
@@ -166,7 +172,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 					yylval.ident.line = yylineno;
 					return ID_ARIT;
 				}
-				else if(isSameType(v.type,STRING_T))
+				else if (isSameType(v.type,STRING_T))
 				{
 					yylval.cadena = v.value;
 					return STRING;
@@ -183,8 +189,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 				sprintf(error, "The id %s is not initialized", yytext);
 				yyerror(error);	
 			}
-		}
-		
+		}	
 	}
 
 \"(\\.|[^\"])*\"	{
