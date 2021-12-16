@@ -30,6 +30,8 @@
 #define OP_BOOL_AND "&&"
 #define OP_BOOL_OR "||"
 
+#define TMP_FOR_TENSOR_RESULT "tmp_for_tesor_result"
+
 typedef struct
 {
 	char *type;	  // Tipo del elemenento.

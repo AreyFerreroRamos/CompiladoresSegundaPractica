@@ -50,7 +50,7 @@ int negateBoolean(int boolean);
  * Dados los datos necesarios para crear una entrada en la symtab,
  * genera un objeto que contiene todos ellos y lo devuele.
  **/
-value_info createValueInfo(int length, char *value, char *type);
+value_info createValueInfo(char *value, char *type, char *lexema);
 
 /**
  * Dados los parámetros necesarios para crear una estructura de tipo tensor_info (dim,
@@ -94,6 +94,23 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
  * Dado un tipo devuelve el tamaño en bytes
  * */
 int calculateSizeType(char *type);
+
+/**
+ * Dados dos nombres de tensores y una operación (suma o resta) realiza la operación y la almacena en un entrada de la symtab
+ * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
+ *  0 -> EJECUCIÓN CORRECTA, SE HAN CALCULADO LAS MATRICES Y LA ALMACENA EN SYMTAB
+ * -1 -> ERROR, SE INTENTA SUMAR TENSOR CON VALOR
+ * -2 -> NO SON TENSORES NINGUNO DE LOS DOS
+ * -3 -> ERROR, ALGUN TENSOR NO ESTA DEFINIDO EN LA SYMTAB
+ * -4 -> ERROR, LOS TENSORES SON DE DIFERENTE DIMENSION
+ * -5 -> ERROR, NO SE HA PODIDO GUARDAR EL RESULTADO TEMPORAL
+ */
+int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation);
+
+/**
+ * Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño
+ */
+int maxNum(float a, float b);
 
 // FUNCIONES DE CONTROL DE ERRORES
 

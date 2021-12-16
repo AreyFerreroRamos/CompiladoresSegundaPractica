@@ -159,12 +159,12 @@ int negateBoolean(int boolean)
 	return 0;
 }
 
-value_info createValueInfo(int length, char *value, char *type)
+value_info createValueInfo(char *value, char *type, char *lexema)
 {
 	value_info aux;
-
 	aux.value = strdup(value);
 	aux.type = strdup(type);
+	aux.lexema = lexema;
 	return aux;
 }
 
@@ -315,6 +315,148 @@ int calculateSizeType(char *type)
 	else
 	{
 		return 1;
+	}
+}
+
+int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation)
+{
+	// Si las dos variables son tensores
+	if (nameVar1 != NULL && nameVar2 != NULL)
+	{
+		sym_value_type entry1;
+		int response1 = sym_lookup(nameVar1, &entry1);
+		sym_value_type entry2;
+		int response2 = sym_lookup(nameVar2, &entry2);
+		// Si las dos variables existen
+		if (response1 == SYMTAB_OK && response2 == SYMTAB_OK)
+		{
+			// Si los dos tensores tienen el mismo numero de dimensiones
+			if (entry1.num_dim == entry2.num_dim)
+			{
+				// Si los dos tensores tienen el mismo numero de delementos en cada dimension
+				for (int i = 0; i < entry1.num_dim; i++)
+				{
+					if (entry1.elem_dims[i] != entry2.elem_dims[i])
+					{
+						return -5;
+					}
+				}
+				sym_value_type tmp;
+				tmp.num_dim = entry1.num_dim;
+				tmp.value = NULL;
+				// Si tienen el mismo tamaño (son del mismo tipo)
+				if (entry1.size = entry2.size)
+				{
+					tmp.size = entry1.size;
+				}
+				else
+				{
+					if (maxNum((float)entry1.size, (float)entry2.size))
+					{
+						tmp.size = entry1.size;
+					}
+					else
+					{
+						tmp.size = entry2.size;
+					}
+				}
+				// Si alguno de los dos tipos es float
+				if (isSameType(entry1.type, FLOAT64_T) || isSameType(entry2.type, FLOAT64_T))
+				{
+					tmp.type = FLOAT64_T;
+				}
+				else
+				{
+					tmp.type = INT32_T;
+				}
+				tmp.elements = malloc(tmp.size);
+				tmp.elem_dims = entry1.elem_dims;
+
+				// Por cada elemento hacemos operación
+				for (int i = 0; i < tmp.size / calculateSizeType(tmp.type); i++)
+				{
+					value_info v1;
+					if (isSameType(entry1.type, INT32_T))
+					{
+						v1.value = iota(((int *)entry1.elements)[i]);
+					}
+					else if (isSameType(entry1.type, FLOAT64_T))
+					{
+						v1.value = fota(((float *)entry1.elements)[i]);
+					}
+					v1.lexema = nameVar1;
+					v1.type = entry1.type;
+					value_info v2;
+					if (isSameType(tmp.type, INT32_T))
+					{
+						v2.value = iota(((int *)entry2.elements)[i]);
+					}
+					else if (isSameType(tmp.type, FLOAT64_T))
+					{
+						v2.value = fota(((float *)entry2.elements)[i]);
+					}
+					v2.lexema = nameVar2;
+					v2.type = entry2.type;
+					value_info aux;
+					doAritmeticOperation(v1, operation, v2, &aux);
+					if (isSameType(tmp.type, INT32_T))
+					{
+						((int *)tmp.elements)[i] = atoi(aux.value);
+					}
+					else if (isSameType(tmp.type, FLOAT64_T))
+					{
+						((float *)tmp.elements)[i] = atof(aux.value);
+					}
+				}
+				int message = sym_enter(TMP_FOR_TENSOR_RESULT, &tmp);
+				if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
+				{
+					return -5;
+				}
+				return 0;
+			}
+			else
+			{
+				return -4;
+			}
+		}
+		else
+		{
+			return -3;
+		}
+	}
+	// Si las dos variables son numeros
+	if (nameVar1 == NULL && nameVar2 == NULL)
+	{
+		return -2;
+	}
+	return -1;
+}
+
+void fillTemporalTensor(sym_value_type tensor1, sym_value_type tensor2, sym_value_type tensorTmp, char *operation)
+{
+
+	if (strcmp(operation, OP_ARIT_SUMA) == 0)
+	{
+	}
+	else if (strcmp(operation, OP_ARIT_RESTA) == 0)
+	{
+	}
+}
+
+int maxNum(float a, float b)
+{
+	if (a > b)
+	{
+		return 1;
+	}
+	else if (a == b)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
 	}
 }
 

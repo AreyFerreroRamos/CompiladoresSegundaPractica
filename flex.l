@@ -160,10 +160,10 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			{
 				value_info v;
 				if (entry.value == NULL) {
-					v = createValueInfo(strlen(yytext), yytext, (char *)entry.type);
+					v = createValueInfo(0, entry.type, yytext);
 				}
 				else {
-					v = createValueInfo(strlen((char*)entry.value), (char*)entry.value, (char*)entry.type);
+					v = createValueInfo(entry.value, entry.type,NULL);
 				}				
 				if(isSameType(v.type,INT32_T) || isSameType(v.type,FLOAT64_T))
 				{
