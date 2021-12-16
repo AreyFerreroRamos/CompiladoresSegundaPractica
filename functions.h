@@ -95,12 +95,6 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
  * */
 int calculateSizeType(char *type);
 
-/**
- * Dado un vector de numeros que indican cuantos componentes hay en una dimension y un indice
- * que marca una posicion dentro de este vector incrementa el número que tenga en su interior
- */
-/*void addElementsDim(int *vector_dims_tensor, int index, int *num_dims);*/
-
 // FUNCIONES DE CONTROL DE ERRORES
 
 /**

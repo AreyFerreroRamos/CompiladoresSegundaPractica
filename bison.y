@@ -66,6 +66,25 @@ sentencia : asignacion
 					char * boolValue = atoi($1.value) ? "true" : "false";
 					fprintf(yyout, "La expresion booleana es %s\n",boolValue);
 				}
+	| ID{
+			sym_value_type entry;
+			int response =  sym_lookup($1.lexema, &entry);
+			if(response == SYMTAB_OK){
+				if(entry.num_dim>0){
+					fprintf(yyout, "%s[",$1.lexema);
+					for(int i=0;i<(entry.size/calculateSizeType(entry.type));i++){
+						if(isSameType(entry.type,INT32_T)){
+							fprintf(yyout, "%i,",((int*)entry.elements)[i]);
+						}else if(isSameType(entry.type,FLOAT64_T)){
+							fprintf(yyout, "%f,",((float*)entry.elements)[i]);
+						}
+					}
+					fprintf(yyout, "]");
+				}else{
+					fprintf(yyout, "ID: %s val:%s\n",$1.lexema,entry.value);
+				}
+			}
+	}
 
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
@@ -74,7 +93,8 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 							entry.size = strlen($3.value);
 							entry.num_dim = 0;
 							entry.elem_dims = NULL;
-							if (sym_enter($1.lexema, &entry) != SYMTAB_OK)
+							int message = sym_enter($1.lexema, &entry);
+							if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
 							{
 								yyerror("Error al guardar en symtab.");
 							}
@@ -82,16 +102,23 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						}
 	| id ASSIGN expresion_aritmetica	{	
 							sym_value_type entry;
-							entry.type = $3.type;
-							entry.value = $3.value;
-							entry.size = strlen($3.value);
-							entry.num_dim = 0;
-							entry.elem_dims = NULL;
-							if (sym_enter($1.lexema, &entry) != SYMTAB_OK)
-							{
-								yyerror("Error al guardar en symtab.");
+							int response =  sym_lookup($1.lexema, &entry);
+							if(response == SYMTAB_OK){
+								entry.type=$3.type;
+								if(isSameType($3.type,INT32_T)){
+									((int*)entry.elements)[$1.calcIndex]=atoi($3.value);
+								}else if(isSameType($3.type,FLOAT64_T)){
+									((float*)entry.elements)[$1.calcIndex]=atof($3.value);
+								}
+								response = sym_enter($1.lexema, &entry);
+								if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
+								{
+									yyerror("Error al guardar en symtab.");
+								}
+								fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n",$1.lexema, $3.value,$1.calcIndex);
+							}else{
+								yyerror("Error al cargar variable de la symtab");
 							}
-							fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
 						}
 	| ID ASSIGN expresion_booleana	{
 						sym_value_type entry;
@@ -100,7 +127,8 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						entry.size = 1;
 						entry.num_dim = 0;
 						entry.elem_dims = NULL;
-						if (sym_enter($1.lexema, &entry) != SYMTAB_OK)
+						int message = sym_enter($1.lexema, &entry);
+						if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
 						{
 							yyerror("Error al guardar en symtab.");
 						}
@@ -113,7 +141,8 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						entry.size = strlen($3);
 						entry.num_dim = 0;
 						entry.elem_dims = NULL;
-						if (sym_enter($1.lexema, &entry) != SYMTAB_OK)
+						int message = sym_enter($1.lexema, &entry);
+						if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
 						{
 							yyerror("Error al guardar en symtab.");
 						}
@@ -127,7 +156,8 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					entry.num_dim = $3.dim;
 					entry.elem_dims = convert_invert_vector(vector_dims_tensor,$3.dim);
 					entry.elements = $3.elements;
-					if (sym_enter($1.lexema, &entry) != SYMTAB_OK)
+					int message = sym_enter($1.lexema, &entry);
+					if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
 					{
 						yyerror("Error al guardar en symtab.");
 					}
@@ -150,7 +180,7 @@ lista_indices : lista_indices COMA lista_sumas	{
 								}
 								else
 								{
-									yyerror("Array out of bound.");
+									yyerror("Array out of bound2.");
 								}
 							}
 							else
@@ -176,11 +206,11 @@ lista_indices : lista_indices COMA lista_sumas	{
 concatenacion : concatenacion ASTERISCO STRING 	{
 							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
 							char * var = allocateSpaceForMessage(strlen($1));
-							strncpy(var,&$1[0],strlen($1));
+							strlcpy(var,&$1[0],strlen($1));
 							strcat($$,var);
 							free(var);
 							var = allocateSpaceForMessage(strlen($3));
-							strncpy(var,&$3[1],strlen($3));
+							strlcpy(var,&$3[1],strlen($3));
 							strcat($$,var);
 						}
 		| STRING 	{
@@ -191,7 +221,7 @@ expresion_aritmetica : lista_sumas
 
 lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 								if(isNumberType($3.type))
-								{
+								{				
 									$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
 									if(!doAritmeticOperation($1,$2,$3,&$$))
 									{
@@ -351,11 +381,10 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 										if (dim != -1) 
 										{
 											$$ = createTensorInfo($1.index_dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);
-											printf("calcIndex: %d",$1.calcIndex);
 										}
 										else 
 										{
-											yyerror("Array out of bound.");
+											yyerror("Array out of bound1.");
 										}
 									}
 									else

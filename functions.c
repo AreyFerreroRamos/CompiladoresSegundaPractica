@@ -103,7 +103,7 @@ void debug(char *text, char *var, int typeFile)
 	// flex
 	if (typeFile == 0)
 	{
-		//printf(text, var);
+		// printf(text, var);
 	}
 	// bison
 	else
@@ -199,12 +199,11 @@ int getDim(char *key, int index_dim)
 {
 	sym_value_type entry;
 	int error = sym_lookup(key, &entry);
-
 	if (error == SYMTAB_OK)
 	{
 		if (index_dim < entry.num_dim)
 		{
-			return entry.elem_dims[index_dim - 1];
+			return entry.elem_dims[index_dim];
 		}
 		else
 		{
@@ -222,11 +221,6 @@ int *convert_invert_vector(int *vector, int dim)
 
 	int aux;
 	int i;
-
-	for (i = 0; i < dim - 1; i++) // Convertir el vector con el número de elementos totales por dimensión en un vector con el número de elementos de la siguiente dimensión.
-	{
-		vector[i] = vector[i] / vector[i + 1];
-	}
 
 	for (i = 0; i < dim / 2; i++) // Invertir el vector.
 	{
@@ -323,17 +317,6 @@ int calculateSizeType(char *type)
 		return 1;
 	}
 }
-
-/*void addElementsDim(int *vector_dims_tensor, int index, int *num_dims)
-{
-	printf("addElementDim1: num_dims:%i\n", *num_dims);
-
-	printf("addElementDim2: num elem: %i en dim: %i", vector_dims_tensor[0], index);
-
-	vector_dims_tensor[index] += 1;
-
-	printf("addElementDim3: num_dims:%i\n", *num_dims);
-}*/
 
 // FUNCIONES DE CONTROL DE ERRORES
 
