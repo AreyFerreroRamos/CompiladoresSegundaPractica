@@ -153,23 +153,23 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		else
 		{
 			debug("ID ARIT: %s\n", yytext, 0);
-			//TODO MIRAR PORQUE PETA AQUI AL HACER ULTIMO CASO DE PRUEBAS
 			sym_value_type entry;
 			int response =  sym_lookup(yytext, &entry);
 			if (response == SYMTAB_OK)
 			{
+				
 				value_info v;
+				//SI EL ID_ARIT ES TENSOR
 				if (entry.value == NULL) {
-					v = createValueInfo(0, entry.type, yytext);
+					v = createValueInfo(NULL, entry.type, yytext);
 				}
+				//SI EL ID_ARIT ES DE DIM 0
 				else {
 					v = createValueInfo(entry.value, entry.type,NULL);
 				}				
 				if(isSameType(v.type,INT32_T) || isSameType(v.type,FLOAT64_T))
 				{
-					yylval.ident.lexema = strdup(v.value);
-					yylval.ident.lenght = strlen(v.value);
-					yylval.ident.line = yylineno;
+					yylval.operand = v;
 					return ID_ARIT;
 				}
 				else if (isSameType(v.type,STRING_T))

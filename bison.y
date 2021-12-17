@@ -41,7 +41,8 @@
 %token <real> FLOAT
 %token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA
 %token <boolea> BOOLEAN
-%token <ident> ID ID_ARIT
+%token <ident> ID 
+%token <operand> ID_ARIT
 
 %type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal_aritmetic literal_boolea id_arit
 %type <tensor_info> id lista_indices lista_indices_arit
@@ -221,11 +222,12 @@ expresion_aritmetica : lista_sumas
 
 lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 								if(isNumberType($3.type))
-								{		
-									int response = doTensorCalcs($1.lexema,$2,$3.lexema);
+								{	
+									printf("LEXEMA 1: %s LEXEMA 2: %s\n",$1.lexema,$3.lexema);
+									fflush(stdout);
+									int response = doTensorCalcs($1.lexema,$3.lexema,$2);
 									if(response==0){
 										$$.lexema = TMP_FOR_TENSOR_RESULT;
-
 									}else if(response==-2){
 										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
 										if(!doAritmeticOperation($1,$2,$3,&$$))
@@ -233,7 +235,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 											yyerror("Something wrong with operation 1");
 										}
 									}else{
-										yyerror("EERORES. HAYQ UE DEFINIRLOS MEJOR SEGUN EL ESTADO DE SALIDA");
+										yyerror("ERRORES. HAY QUE DEFINIRLOS MEJOR SEGUN EL ESTADO DE SALIDA");
 									}		
 									
 								}
@@ -363,12 +365,7 @@ literal_aritmetic : INTEGER	{
 							$$ = createValueInfo(iota(lenght($2)), INT32_T,NULL);
 						}
 
-id_arit : ID_ARIT	{
-				sym_value_type res;
-				sym_lookup($1.lexema, &res);
-				$$ = createValueInfo(res.value, res.type,$1.lexema);	
-				$$.lexema = $1.lexema;
-       			}	
+id_arit : ID_ARIT	{ $$=$1; }	
 	| lista_indices_arit CORCHETE_CERRADO	{
 							sym_value_type res;
 							sym_lookup($1.lexema, &res);
@@ -382,6 +379,7 @@ id_arit : ID_ARIT	{
 								$$.value = fota(((float *) res.elements)[$1.calcIndex]);
 							}
 							$$.type = res.type;
+							$$.lexema =NULL;
 						}
 
 lista_indices_arit : lista_indices_arit COMA lista_sumas	{

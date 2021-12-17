@@ -103,7 +103,7 @@ void debug(char *text, char *var, int typeFile)
 	// flex
 	if (typeFile == 0)
 	{
-		// printf(text, var);
+		printf(text, var);
 	}
 	// bison
 	else
@@ -162,9 +162,23 @@ int negateBoolean(int boolean)
 value_info createValueInfo(char *value, char *type, char *lexema)
 {
 	value_info aux;
-	aux.value = strdup(value);
+	if (value != NULL)
+	{
+		aux.value = strdup(value);
+	}
+	else
+	{
+		aux.value = NULL;
+	}
 	aux.type = strdup(type);
-	aux.lexema = lexema;
+	if (lexema != NULL)
+	{
+		aux.lexema = strdup(lexema);
+	}
+	else
+	{
+		aux.lexema = NULL;
+	}
 	return aux;
 }
 
@@ -174,7 +188,14 @@ tensor_info createTensorInfo(int index_dim, int calcIndex, char *lexema)
 
 	aux.index_dim = index_dim;
 	aux.calcIndex = calcIndex;
-	aux.lexema = strdup(lexema);
+	if (lexema != NULL)
+	{
+		aux.lexema = strdup(lexema);
+	}
+	else
+	{
+		aux.lexema = NULL;
+	}
 	return aux;
 }
 
@@ -345,7 +366,7 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation)
 				tmp.num_dim = entry1.num_dim;
 				tmp.value = NULL;
 				// Si tienen el mismo tamaño (son del mismo tipo)
-				if (entry1.size = entry2.size)
+				if (entry1.size == entry2.size)
 				{
 					tmp.size = entry1.size;
 				}
@@ -373,8 +394,11 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation)
 				tmp.elem_dims = entry1.elem_dims;
 
 				// Por cada elemento hacemos operación
-				for (int i = 0; i < tmp.size / calculateSizeType(tmp.type); i++)
+				int cont = tmp.size / calculateSizeType(tmp.type);
+				for (int i = 0; i < cont; i++)
 				{
+					printf("NUMDIM1: %i, NUMDIM2: %i, OP: %s, CONT:%i\n", ((int *)entry1.elements)[i], ((int *)entry2.elements)[i], operation, cont);
+					fflush(stdout);
 					value_info v1;
 					if (isSameType(entry1.type, INT32_T))
 					{
@@ -408,6 +432,7 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation)
 						((float *)tmp.elements)[i] = atof(aux.value);
 					}
 				}
+				printf("adfsgdhtryjutkijyfhdgfsd\n");
 				int message = sym_enter(TMP_FOR_TENSOR_RESULT, &tmp);
 				if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
 				{

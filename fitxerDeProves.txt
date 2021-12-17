@@ -2,8 +2,8 @@
 var1 = div(8,4) # var1 = 2
 var2 = ""  # var2 = ""   
 var3 = var2 * "Hola " * "mundo" # var3 = "Hola mundo"
-var4 = 5 *5 + (8+2)/4 + 6.5
-var5 = ( true && false) || 5>2
+var4 = 5 *5 + (8+2)/4 + 6.5 # 33.5
+var5 = ( true && false) || 5>2 
 var2x3x4 = [[[0, 1, 2, 3]; [4, 5, 6, 7]; [8, 9, 10, 11]]; [[12, 13, 14, 15]; [16, 17, 18, 19]; [20, 21, 22, 23]]]
 var6 =3
 var6 = var2x3x4[0,2,var6]
@@ -14,3 +14,5 @@ var2x3x4[0,0,1] = 102
 var2x3x4[0,0,2] = 103
 var2x3x4[0,0,3] = 104
 var = var2x3x4[0,0,3] + var2x3x4[0,0,3]
+var2x3x4
+varfinal = var2x3x4 +var2x3x4
