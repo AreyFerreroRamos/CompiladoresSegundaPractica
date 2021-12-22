@@ -15,4 +15,4 @@ var2x3x4[0,0,2] = 103
 var2x3x4[0,0,3] = 104
 var = var2x3x4[0,0,3] + var2x3x4[0,0,3]
 var2x3x4
-varfinal = var2x3x4 +var2x3x4
+varfinal = (var2x3x4 +var2x3x4) +( var2x3x4 +var2x3x4 +var2x3x4)

@@ -72,15 +72,7 @@ sentencia : asignacion
 			int response =  sym_lookup($1.lexema, &entry);
 			if(response == SYMTAB_OK){
 				if(entry.num_dim>0){
-					fprintf(yyout, "%s[",$1.lexema);
-					for(int i=0;i<(entry.size/calculateSizeType(entry.type));i++){
-						if(isSameType(entry.type,INT32_T)){
-							fprintf(yyout, "%i,",((int*)entry.elements)[i]);
-						}else if(isSameType(entry.type,FLOAT64_T)){
-							fprintf(yyout, "%f,",((float*)entry.elements)[i]);
-						}
-					}
-					fprintf(yyout, "]");
+					printTensor($1.lexema, entry, 1);
 				}else{
 					fprintf(yyout, "ID: %s val:%s\n",$1.lexema,entry.value);
 				}
@@ -88,39 +80,59 @@ sentencia : asignacion
 	}
 
 asignacion : ID ASSIGN expresion_aritmetica	{
-							sym_value_type entry;
-							entry.type = $3.type;
-							entry.value = $3.value;
-							entry.size = strlen($3.value);
-							entry.num_dim = 0;
-							entry.elem_dims = NULL;
-							int message = sym_enter($1.lexema, &entry);
-							if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
-							{
-								yyerror("Error al guardar en symtab.");
-							}
-							fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
-						}
-	| id ASSIGN expresion_aritmetica	{	
-							sym_value_type entry;
-							int response =  sym_lookup($1.lexema, &entry);
-							if(response == SYMTAB_OK){
-								entry.type=$3.type;
-								if(isSameType($3.type,INT32_T)){
-									((int*)entry.elements)[$1.calcIndex]=atoi($3.value);
-								}else if(isSameType($3.type,FLOAT64_T)){
-									((float*)entry.elements)[$1.calcIndex]=atof($3.value);
-								}
-								response = sym_enter($1.lexema, &entry);
-								if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
+							if($3.value!=NULL){
+								sym_value_type entry;
+								entry.type = $3.type;
+								entry.value = $3.value;
+								entry.size = strlen($3.value);
+								entry.num_dim = 0;
+								entry.elem_dims = NULL;
+								int message = sym_enter($1.lexema, &entry);
+								if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
 								{
 									yyerror("Error al guardar en symtab.");
 								}
-								fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n",$1.lexema, $3.value,$1.calcIndex);
+								fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
 							}else{
-								yyerror("Error al cargar variable de la symtab");
+								sym_value_type entry;
+								int response =  sym_lookup($3.lexema, &entry);
+								if(response == SYMTAB_OK){
+									if(strcmp($3.lexema, TMP_FOR_TENSOR_RESULT) == 0){
+										sym_remove($3.lexema);
+									}
+									response = sym_enter($1.lexema, &entry);
+									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
+									{
+										yyerror("Error al guardar en symtab.");
+									}
+									printTensor($1.lexema, entry, 1);
+								}
 							}
 						}
+	| id ASSIGN expresion_aritmetica	{	
+											if($3.value!=NULL){
+												sym_value_type entry;
+												int response =  sym_lookup($1.lexema, &entry);
+												if(response == SYMTAB_OK){
+													entry.type=$3.type;
+													if(isSameType($3.type,INT32_T)){
+														((int*)entry.elements)[$1.calcIndex]=atoi($3.value);
+													}else if(isSameType($3.type,FLOAT64_T)){
+														((float*)entry.elements)[$1.calcIndex]=atof($3.value);
+													}
+													response = sym_enter($1.lexema, &entry);
+													if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
+													{
+														yyerror("Error al guardar en symtab.");
+													}
+													fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n",$1.lexema, $3.value,$1.calcIndex);
+												}else{
+													yyerror("Error al cargar variable de la symtab");
+												}
+											}else{
+												yyerror("No se puede asignar un tensor a un indice de un tensor.");
+											}
+										}
 	| ID ASSIGN expresion_booleana	{
 						sym_value_type entry;
 						entry.type = $3.type;
@@ -223,11 +235,15 @@ expresion_aritmetica : lista_sumas
 lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 								if(isNumberType($3.type))
 								{	
-									printf("LEXEMA 1: %s LEXEMA 2: %s\n",$1.lexema,$3.lexema);
-									fflush(stdout);
 									int response = doTensorCalcs($1.lexema,$3.lexema,$2);
 									if(response==0){
 										$$.lexema = TMP_FOR_TENSOR_RESULT;
+										if(isSameType($1.type,FLOAT64_T) || isSameType($3.type,FLOAT64_T)){
+											$$.type = FLOAT64_T;
+										}else{
+											$$.type = INT32_T;
+										}
+										$$.value=NULL;
 									}else if(response==-2){
 										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
 										if(!doAritmeticOperation($1,$2,$3,&$$))

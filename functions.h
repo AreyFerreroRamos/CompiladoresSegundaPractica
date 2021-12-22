@@ -108,9 +108,43 @@ int calculateSizeType(char *type);
 int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation);
 
 /**
- * Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño
+ * Dados dos nombres de tensores y una operación (solo se admite producto) realiza la operación y la almacena en un entrada de la symtab
+ * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
+ *
  */
-int maxNum(float a, float b);
+int doTensorProduct(char *nameVar1, char *nameVar2, char *operation);
+
+/**
+ * Comprueba si las dimensiones de los tensores son compatibles para poder hacer el prodcto.
+ * Si algo va mal devolverá alguno de los mensajes de error.
+ * 0 -> EJECUCIÓN CORRECTA, TENSORES MULTIPLICABLES
+ * -1 -> ERROR, ESTOS TENSORES NO SE PUEDEN MULTIPLICAR
+ * -2 -> ERROR, NO ESTA IMPLEMENTADO EL PRODUCTO DE TENSORES DE MÁS DE 2 DIMENSIONES
+ */
+int isPossibleTensorProduct(int *elemDims1, int numDims1, int *elemDims2, int numDims2);
+
+/**
+ *
+ */
+int doNumberProductTensor(char *number, char type, char *nameTensor);
+
+/**
+ *
+ */
+int doTensorProductTensor(sym_value_type matrix1, sym_value_type matrix2, sym_value_type tmp);
+
+int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_info v2, char *op)
+
+    /**
+     * Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño
+     */
+    int maxNum(float a, float b);
+
+/**
+ * Dado un tensor, el nombre de la variable i si se quiere imprimir en el archivo de salida o en consola
+ * imprime los valores almacenados dentro del tensor de forma continua (como si fuese un vector de una dimensión)
+ */
+void printTensor(char *nameVar, sym_value_type tensor, int inFile);
 
 // FUNCIONES DE CONTROL DE ERRORES
 
