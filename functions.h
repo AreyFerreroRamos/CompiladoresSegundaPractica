@@ -135,10 +135,10 @@ int doTensorProductTensor(sym_value_type matrix1, sym_value_type matrix2, sym_va
 
 int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_info v2, char *op)
 
-    /**
-     * Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño
-     */
-    int maxNum(float a, float b);
+/**
+* Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño
+*/
+int maxNum(float a, float b);
 
 /**
  * Dado un tensor, el nombre de la variable i si se quiere imprimir en el archivo de salida o en consola

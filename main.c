@@ -36,17 +36,17 @@ int main(int argc, char *argv[])
 			}
 			else 
 			{
-				printf("The output file %s can not be created\n",argv[2]);
+				printf("The output file %s can not be created\n", argv[2]);
 			}      
 		}
 		else 
 		{
-			printf("The input file %s can not be opened\n",argv[1]);
+			printf("The input file %s can not be opened\n", argv[1]);
 		}    
 	}
 	else 
 	{
-		printf("\nUsage: %s INPUT_FILE OUTPUT_FILE\n",argv[0]);
+		printf("\nUsage: %s INPUT_FILE OUTPUT_FILE\n", argv[0]);
 	}
 	return EXIT_SUCCESS;
 }

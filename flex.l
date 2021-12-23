@@ -49,7 +49,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		}
 
 (#(.)*|#=(.|\n)*=#) 	{
-				debug("COMMENT: %s\n",yytext,0);
+				debug("COMMENT: %s\n", yytext, 0);
 			}
 
 "^"	{
@@ -159,20 +159,22 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			{
 				
 				value_info v;
-				//SI EL ID_ARIT ES TENSOR
-				if (entry.value == NULL) {
+					//SI EL ID_ARIT ES TENSOR
+				if (entry.value == NULL) 
+				{
 					v = createValueInfo(NULL, entry.type, yytext);
 				}
-				//SI EL ID_ARIT ES DE DIM 0
-				else {
-					v = createValueInfo(entry.value, entry.type,NULL);
+					//SI EL ID_ARIT ES DE DIM 0
+				else 
+				{
+					v = createValueInfo(entry.value, entry.type, NULL);
 				}				
-				if(isSameType(v.type,INT32_T) || isSameType(v.type,FLOAT64_T))
+				if(isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
 				{
 					yylval.operand = v;
 					return ID_ARIT;
 				}
-				else if (isSameType(v.type,STRING_T))
+				else if (isSameType(v.type, STRING_T))
 				{
 					yylval.cadena = v.value;
 					return STRING;
@@ -199,7 +201,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			}
 
 \n	{
-		debug("%s\n",yytext,0);
+		debug("%s\n", yytext, 0);
 		assignFounded = false;
 		corcheteOpenFounded = false;
 	}
