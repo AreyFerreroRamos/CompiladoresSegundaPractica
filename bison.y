@@ -10,7 +10,7 @@
   extern int yylex();
   extern void yyerror(char *);
   int *vector_dims_tensor;	// Vector con el número de elementos de cada dimensión del tensor.
-  int num_dims_tensor = 0;	// Número de dimensiones dek tensor.
+  int num_dims_tensor = 0;	// Número de dimensiones del tensor.
   bool *ampliar_vector_dims; 	// Vector de booleanos para limitar la ampliación de memoria del vector de dimensiones a una sola por dimensión.
 %}
 
@@ -184,7 +184,8 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					entry.value = NULL;
 					entry.size = calculateSizeType($3.type)*$3.num_elem;
 					entry.num_dim = $3.dim;
-					entry.elem_dims = convert_invert_vector(vector_dims_tensor,$3.dim);
+					convert_invert_vector(vector_dims_tensor,$3.dim);
+					entry.elem_dims = vector_dims_tensor;
 					entry.elements = $3.elements;
 					int message = sym_enter($1.lexema, &entry);
 					if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
@@ -192,6 +193,9 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						yyerror("Error al guardar en symtab.");
 					}
 					printTensor($1.lexema, entry, 1);
+					vector_dims_tensor=NULL;
+					ampliar_vector_dims=NULL;
+					num_dims_tensor=0;
 				}
 
 id : lista_indices CORCHETE_CERRADO	{

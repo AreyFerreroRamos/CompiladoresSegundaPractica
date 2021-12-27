@@ -76,7 +76,7 @@ int getDim(char *key, int num_dims);
  * la siguiente; excepto la última posición, que se guarda sin realizar ninguna operación.
  * A continuación se invierte el orden de los elementos del vector.
  **/
-int *convert_invert_vector(int *vector, int dim);
+void convert_invert_vector(int *vector, int dim);
 
 /**
  * Dado un valor en formato caracter y el tipo de este valor lo convierte a
@@ -154,6 +154,17 @@ int maxNum(float a, float b);
  * imprime los valores almacenados dentro del tensor de forma continua (como si fuese un vector de una dimensión).
  */
 void printTensor(char *nameVar, sym_value_type tensor, int inFile);
+
+/**
+ * Dado un sym_value_type muestra el valor
+ */
+void printSymValueType(sym_value_type entry);
+
+/**
+ * Dado un vector de enteros que representa las dimensiones de un tensor, devuelve el número
+ * de elemntos que hay dentro de el
+ */
+int getAcumElemDim(int *elem_dim, int num_dim);
 
 // FUNCIONES DE CONTROL DE ERRORES
 
