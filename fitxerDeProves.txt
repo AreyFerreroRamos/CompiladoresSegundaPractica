@@ -16,3 +16,7 @@ var2x3x4[0,0,3] = 104
 var = var2x3x4[0,0,3] + var2x3x4[0,0,3]
 var2x3x4
 varfinal = (var2x3x4 +var2x3x4) +( var2x3x4 +var2x3x4 +var2x3x4)
+multMatrix = 4 * var2x3x4 *4
+vector = [0,1,2,3]
+matrix4x2= [[0,1];[2,3];[4,5];[6,7]]
+resulta = vector*matrix4x2

@@ -174,9 +174,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					{
 						yyerror("Error al guardar en symtab.");
 					}
-					for(int i =0;i<24;i++){
-						fprintf(yyout, "ID: %s pren per valor: %i\n", $1.lexema, ((int*)entry.elements)[i]);	// Refinar como se realizará la escritura en fichero.
-					}
+					printTensor($1.lexema, entry, 1);
 				}
 
 id : lista_indices CORCHETE_CERRADO	{
@@ -276,21 +274,68 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 					}			
 
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
-									if (isNumberType($3.type))
-									{
-										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-										if (!doAritmeticOperation($1, $2, $3, &$$))
-										{
-											yyerror("Something wrong with operation.");
-										}
-									}
-									else
-									{
-										char * error = allocateSpaceForMessage();
-										sprintf(error, "Cannot do operation with %s", $3.value);
-										yyerror(error);
-									}
-								}		
+																	if (isNumberType($3.type)){
+																		int response = -4;
+																		if(strcmp($2,OP_ARIT_MULT)==0){
+																			response = doTensorProduct($1.lexema,$3.lexema,$2);
+																		}
+																		sym_value_type tmp;
+																		if(response==0){
+																			int res = doTensorProductTensor($1.lexema,$3.lexema,&tmp);
+																			if(res!=0){
+																				yyerror("Alguna variable no se ha encontrado en la symtab.");
+																			}else{
+																				$$.lexema = TMP_FOR_TENSOR_RESULT;
+																				int message = sym_enter($$.lexema, &tmp);
+																				if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
+																				{
+																					yyerror("Error al guardar en symtab.");
+																				}else{
+																					if(isSameType($1.type,FLOAT64_T) || isSameType($3.type,FLOAT64_T)){
+																						$$.type = FLOAT64_T;
+																					}else{
+																						$$.type = INT32_T;
+																					}
+																					$$.value=NULL;
+																				}
+																			}
+																		}else if(response==-1){
+																			yyerror("Los indices de los tensores no son válidos para el producto.");
+																		}else if(response==-2){
+																			yyerror("No esta permitido hacer el producto de un tensor +2 dim.");
+																		}else if(response==-3){
+																			int res;
+																			if($1.value!=NULL){
+																				res = doNumberProductTensor($1.value,$1.type,$3.lexema);
+																			}else{
+																				res = doNumberProductTensor($3.value,$3.type,$1.lexema);
+																			}
+																			if(res==0){
+																				$$.lexema = TMP_FOR_TENSOR_RESULT;
+																				if(isSameType($1.type,FLOAT64_T) || isSameType($3.type,FLOAT64_T)){
+																					$$.type = FLOAT64_T;
+																				}else{
+																					$$.type = INT32_T;
+																				}
+																				$$.value=NULL;
+																			}else{
+																				yyerror("Error al guardar en symtab.");
+																			}
+																		}else if(response==-4){
+																			$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
+																			if (!doAritmeticOperation($1, $2, $3, &$$))
+																			{
+																				yyerror("Algún problema durante la operación.");
+																			}
+																		}
+																	}
+																	else
+																	{
+																		char * error = allocateSpaceForMessage();
+																		sprintf(error, "Cannot do operation with %s", $3.value);
+																		yyerror(error);
+																	}
+																}		
 		| lista_potencias	{
 						if(isNumberType($1.type))
 						{

@@ -517,6 +517,7 @@ int doTensorProduct(char *nameVar1, char *nameVar2, char *operation)
 				tmp.elem_dims[1] = nColsMatrix2;
 			}
 			// MUTLIPLICACION DE DOS TENSORES
+			return 0;
 		}
 		else
 		{
@@ -536,7 +537,7 @@ int doTensorProduct(char *nameVar1, char *nameVar2, char *operation)
 	}
 }
 
-int doNumberProductTensor(char *number, char type, char *nameTensor)
+int doNumberProductTensor(char *number, char *type, char *nameTensor)
 {
 	sym_value_type entry;
 	int response1 = sym_lookup(nameTensor, &entry);
@@ -580,7 +581,7 @@ int doNumberProductTensor(char *number, char type, char *nameTensor)
 	return 0;
 }
 
-int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type tmp)
+int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 {
 	sym_value_type matrix1, matrix2;
 	int response = sym_lookup(nameVar1, &matrix1);
@@ -610,34 +611,44 @@ int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type tmp)
 				rowsM2 = matrix2.elem_dims[0];
 				colsM2 = matrix2.elem_dims[1];
 			}
+
+			sym_value_type aux;
+			aux.elements = malloc(tmp->size);
 			for (int i = 0; i < rowsM1; i++)
 			{
 				for (int j = 0; j < colsM2; j++)
 				{
-					if (isSameType(tmp.type, INT32_T))
+					if (isSameType(tmp->type, INT32_T))
 					{
-						((int *)tmp.elements)[i * colsM2 + j] = 0;
+						((int *)aux.elements)[i * colsM2 + j] = 0;
 					}
 					else
 					{
-						((float *)tmp.elements)[i * colsM2 + j] = 0;
+						((float *)aux.elements)[i * colsM2 + j] = 0;
 					}
-					sym_value_type aux;
-					aux.elements = malloc(tmp.size);
 					for (int k = 0; k < colsM1; k++)
 					{
 						value_info v1;
 						v1.lexema = nameVar1;
 						v1.type = matrix1.type;
-						v1.value = i * colsM1 + k;
+						v1.value = iota(i * colsM1 + k);
 						value_info v2;
 						v2.lexema = nameVar2;
 						v2.type = matrix2.type;
-						v2.value = k * colsM2 + j;
+						v2.value = iota(k * colsM2 + j);
 						asignacionTensor(&aux, i * colsM1 + j, v1, v2, "+");
+					}
+					if (isSameType(tmp->type, INT32_T))
+					{
+						((int *)tmp->elements)[i * colsM1 + j] = ((int *)aux.elements)[i * colsM1 + j];
+					}
+					else
+					{
+						((float *)tmp->elements)[i * colsM1 + j] = ((int *)aux.elements)[i * colsM1 + j];
 					}
 				}
 			}
+			return 0;
 		}
 		else
 		{
