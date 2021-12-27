@@ -16,33 +16,33 @@ void yyerror(char *);
 
 /**
  * Función que hace un printf del texto pasado con una variable como parametro.
- * typeFile identificara si pertenece a flex (0) o bison/funciones (1)
+ * typeFile identificara si pertenece a flex (0) o bison/funciones (1).
  **/
 void debug(char *text, char *var, int typeFile);
 
 /**
  * Función que hace un printf del texto pasado.
- * typeFile identificara si pertenece a flex (0) o bison/funciones (1)
+ * typeFile identificara si pertenece a flex (0) o bison/funciones (1).
  **/
 void simpleDebug(char *text, int typeFile);
 
 /**
- * Convierte un entero a string
+ * Convierte un entero a string.
  **/
 char *iota(int num);
 
 /**
- * Convierte un float a string
+ * Convierte un float a string.
  **/
 char *fota(float num);
 
 /**
- * Reserva espacio en una variable char * para 200 carácteres como máximo y la devuleve
+ * Reserva espacio en una variable char * para 200 carácteres como máximo y la devuleve.
  **/
 char *allocateSpaceForMessage();
 
 /**
- * Dado un booleano (0/1) devuelve su contrario
+ * Dado un booleano (0/1) devuelve su contrario.
  **/
 int negateBoolean(int boolean);
 
@@ -60,8 +60,8 @@ tensor_info createTensorInfo(int dim, int calcIndex, char *lexema);
 
 /**
  * Dado un string que contiene el id, posibles espacios y el símbolo "="
- * devuelve otro string con solo la parte del id
- ***/
+ * devuelve otro string con solo la parte del id.
+ **/
 char *getIdName(char *idWithAssign);
 
 /**
@@ -80,19 +80,19 @@ int *convert_invert_vector(int *vector, int dim);
 
 /**
  * Dado un valor en formato caracter y el tipo de este valor lo convierte a
- * un void* interpretado como el tipo
+ * un void* interpretado como el tipo.
  **/
 void castValueToVoidPointer(void *ptr, char *value, char *type);
 
 /**
  * Dadas dos listas  y el tipo de cada una las une en una sola lista que tendrá el tipo
- * prioritario (1.Float 2.Int)
+ * prioritario (1.Float 2.Int).
  **/
 void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_element1, void *elements2, char *type2, int num_element2);
 
 /**
- * Dado un tipo devuelve el tamaño en bytes
- * */
+ * Dado un tipo devuelve el tamaño en bytes.
+ **/
 int calculateSizeType(char *type);
 
 /**
@@ -110,7 +110,6 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation);
 /**
  * Dados dos nombres de tensores y una operación (solo se admite producto) realiza la operación y la almacena en un entrada de la symtab
  * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
- *
  */
 int doTensorProduct(char *nameVar1, char *nameVar2, char *operation);
 
@@ -124,25 +123,35 @@ int doTensorProduct(char *nameVar1, char *nameVar2, char *operation);
 int isPossibleTensorProduct(int *elemDims1, int numDims1, int *elemDims2, int numDims2);
 
 /**
- *
+ * Realiza el producto de un número por un tensor.
  */
 int doNumberProductTensor(char *number, char *type, char *nameTensor);
 
 /**
- *
+ * Realiza el producto de dos tensores.
+ * Teniendo en cuenta la dificultad del diseño de la operación,
+ * únicamente se pueden multiplicar los tensores de una y de dos dimensiones.
+ * En consecuencia, hay cuatro posibilidades:
+ * 	- Producto de dos vectores.
+ * 	- Producto de un vector por un matriz.
+ * 	- Producto de una matriz por un vector.
+ * 	- Producto de dos matrices.
  */
 int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp);
 
+/**
+ *
+ **/
 int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_info v2, char *op);
 
 /**
- * Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño
+ * Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño.
  */
 int maxNum(float a, float b);
 
 /**
  * Dado un tensor, el nombre de la variable i si se quiere imprimir en el archivo de salida o en consola
- * imprime los valores almacenados dentro del tensor de forma continua (como si fuese un vector de una dimensión)
+ * imprime los valores almacenados dentro del tensor de forma continua (como si fuese un vector de una dimensión).
  */
 void printTensor(char *nameVar, sym_value_type tensor, int inFile);
 
@@ -156,7 +165,7 @@ int isSameType(char *type1, char *type2);
 
 /**
  * Dado un tipo controla si es entero o float y devuelve 1 en caso de serlo
- * o 0 si no lo es
+ * o 0 si no lo es.
  **/
 int isNumberType(char *type);
 
@@ -164,7 +173,7 @@ int isNumberType(char *type);
 
 /**
  * Dados dos operadores y un operando realiza la operacion y la almacena
- * en finish_val
+ * en finish_val.
  **/
 int doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val);
 

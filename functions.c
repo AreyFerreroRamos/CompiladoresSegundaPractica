@@ -92,7 +92,7 @@ int end_analisi_sintactic()
 
 void yyerror(char *explanation)
 {
-	fprintf(stderr, "Error: %s ,in line %d \n", explanation, yylineno);
+	fprintf(stderr, "Error: %s, in line %d\n", explanation, yylineno);
 	exit(EXIT_FAILURE);
 }
 
@@ -275,7 +275,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 	{
 		typefinal = FLOAT64_T;
 	}
-	// Si la lista final se trata como entera
+	// Si la lista final se trata como entera.
 	if (isSameType(typefinal, INT32_T))
 	{
 		int i = num_element1;
@@ -288,7 +288,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 	else
 	{
 		int i;
-		// Si los valores se tratan como enteros
+		// Si los valores se tratan como enteros.
 		if (isSameType(type1, INT32_T))
 		{
 			for (i = 0; i < num_element1; i++)
@@ -296,7 +296,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 				((float *)ptr)[i] = (float)((int *)elements1)[i];
 			}
 		}
-		// Si los valores se tratan como float
+		// Si los valores se tratan como float.
 		else if (isSameType(type1, FLOAT64_T))
 		{
 			for (i = 0; i < num_element1; i++)
@@ -312,7 +312,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 				((float *)ptr)[j] = (float)((int *)elements2)[j];
 			}
 		}
-		// Si los valores se tratan como float
+		// Si los valores se tratan como float.
 		else if (isSameType(type2, FLOAT64_T))
 		{
 			for (int j = i; j < num_element1 + num_element2; j++)
@@ -341,20 +341,20 @@ int calculateSizeType(char *type)
 
 int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation)
 {
-	// Si las dos variables son tensores
+	// Si las dos variables son tensores.
 	if (nameVar1 != NULL && nameVar2 != NULL)
 	{
 		sym_value_type entry1;
 		int response1 = sym_lookup(nameVar1, &entry1);
 		sym_value_type entry2;
 		int response2 = sym_lookup(nameVar2, &entry2);
-		// Si las dos variables existen
+		// Si las dos variables existen.
 		if (response1 == SYMTAB_OK && response2 == SYMTAB_OK)
 		{
-			// Si los dos tensores tienen el mismo numero de dimensiones
+			// Si los dos tensores tienen el mismo numero de dimensiones.
 			if (entry1.num_dim == entry2.num_dim)
 			{
-				// Si los dos tensores tienen el mismo numero de delementos en cada dimension
+				// Si los dos tensores tienen el mismo numero de delementos en cada dimension.
 				for (int i = 0; i < entry1.num_dim; i++)
 				{
 					if (entry1.elem_dims[i] != entry2.elem_dims[i])
@@ -365,7 +365,7 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation)
 				sym_value_type tmp;
 				tmp.num_dim = entry1.num_dim;
 				tmp.value = NULL;
-				// Si tienen el mismo tamaño (son del mismo tipo)
+				// Si tienen el mismo tamaño (son del mismo tipo).
 				if (entry1.size == entry2.size)
 				{
 					tmp.size = entry1.size;
@@ -447,7 +447,7 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation)
 			return -3;
 		}
 	}
-	// Si las dos variables son numeros
+	// Si las dos variables son numeros.
 	if (nameVar1 == NULL && nameVar2 == NULL)
 	{
 		return -2;
@@ -458,7 +458,7 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation)
 int doTensorProduct(char *nameVar1, char *nameVar2, char *operation)
 {
 	sym_value_type tmp;
-	// Si las dos variables son tensores
+	// Si las dos variables son tensores.
 	if (nameVar1 != NULL && nameVar2 != NULL)
 	{
 		sym_value_type entry1;
@@ -524,15 +524,15 @@ int doTensorProduct(char *nameVar1, char *nameVar2, char *operation)
 			return response;
 		}
 	}
-	// Si las dos variables son numeros
+	// Si las dos variables son numeros.
 	else if (nameVar1 == NULL && nameVar2 == NULL)
 	{
 		return -4;
 	}
-	// Si una es valor i la otra es un tensor
+	// Si una es valor i la otra es un tensor.
 	else
 	{
-		// HACER VALOR POR CADA UNO DE LOS VALORES DEL TENSOR
+		// HACER VALOR POR CADA UNO DE LOS VALORES DEL TENSOR.
 		return -3;
 	}
 }
@@ -652,11 +652,11 @@ int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 		}
 		else
 		{
-			// NO EXISTE NAMEVAR2
+			// NO EXISTE NAMEVAR2.
 			return -2;
 		}
 	}
-	// NO EXISTE NAMEVAR1
+	// NO EXISTE NAMEVAR1.
 	return -1;
 }
 
@@ -736,7 +736,7 @@ int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_
 
 int isPossibleTensorProduct(int *elemDims1, int numDims1, int *elemDims2, int numDims2)
 {
-	// Si son matrices o vectores
+	// Si son matrices o vectores.
 	if (numDims1 <= 2 && numDims2 <= 2)
 	{
 		int nColsMatrix1, nRowsMatrix2;

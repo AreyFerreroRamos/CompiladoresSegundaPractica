@@ -67,20 +67,24 @@ sentencia : asignacion
 					char * boolValue = atoi($1.value) ? "true" : "false";
 					fprintf(yyout, "La expresion booleana es %s\n",boolValue);
 				}
-	| ID{
+	| ID	{
 			sym_value_type entry;
-			int response =  sym_lookup($1.lexema, &entry);
-			if(response == SYMTAB_OK){
-				if(entry.num_dim>0){
+			int response = sym_lookup($1.lexema, &entry);
+			if (response == SYMTAB_OK) 
+			{
+				if (entry.num_dim > 0)
+				{
 					printTensor($1.lexema, entry, 1);
-				}else{
+				}
+				else
+				{
 					fprintf(yyout, "ID: %s val:%s\n",$1.lexema,entry.value);
 				}
 			}
-	}
+		}
 
 asignacion : ID ASSIGN expresion_aritmetica	{
-							if($3.value!=NULL){
+							if ($3.value != NULL) {
 								sym_value_type entry;
 								entry.type = $3.type;
 								entry.value = $3.value;
@@ -93,11 +97,15 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 									yyerror("Error al guardar en symtab.");
 								}
 								fprintf(yyout, "ID: %s pren per valor: %s\n",$1.lexema, entry.value);
-							}else{
+							}
+							else
+							{
 								sym_value_type entry;
-								int response =  sym_lookup($3.lexema, &entry);
-								if(response == SYMTAB_OK){
-									if(strcmp($3.lexema, TMP_FOR_TENSOR_RESULT) == 0){
+								int response = sym_lookup($3.lexema, &entry);
+								if (response == SYMTAB_OK)
+								{
+									if (strcmp($3.lexema, TMP_FOR_TENSOR_RESULT) == 0) 
+									{
 										sym_remove($3.lexema);
 									}
 									response = sym_enter($1.lexema, &entry);
@@ -110,29 +118,38 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 							}
 						}
 	| id ASSIGN expresion_aritmetica	{	
-											if($3.value!=NULL){
-												sym_value_type entry;
-												int response =  sym_lookup($1.lexema, &entry);
-												if(response == SYMTAB_OK){
-													entry.type=$3.type;
-													if(isSameType($3.type,INT32_T)){
-														((int*)entry.elements)[$1.calcIndex]=atoi($3.value);
-													}else if(isSameType($3.type,FLOAT64_T)){
-														((float*)entry.elements)[$1.calcIndex]=atof($3.value);
-													}
-													response = sym_enter($1.lexema, &entry);
-													if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
-													{
-														yyerror("Error al guardar en symtab.");
-													}
-													fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n",$1.lexema, $3.value,$1.calcIndex);
-												}else{
-													yyerror("Error al cargar variable de la symtab");
-												}
-											}else{
-												yyerror("No se puede asignar un tensor a un indice de un tensor.");
-											}
-										}
+							if ($3.value!=NULL)
+							{
+								sym_value_type entry;
+								int response = sym_lookup($1.lexema, &entry);
+								if (response == SYMTAB_OK)
+								{
+									entry.type=$3.type;
+									if (isSameType($3.type,INT32_T))
+									{
+										((int*) entry.elements)[$1.calcIndex] = atoi($3.value);
+									}
+									else if(isSameType($3.type,FLOAT64_T))
+									{
+										((float*) entry.elements)[$1.calcIndex] = atof($3.value);
+									}
+									response = sym_enter($1.lexema, &entry);
+									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
+									{
+										yyerror("Error al guardar en symtab.");
+									}
+									fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n",$1.lexema, $3.value,$1.calcIndex);
+								}
+								else
+								{
+									yyerror("Error al cargar variable de la symtab");
+								}
+							}
+							else
+							{
+								yyerror("No se puede asignar un tensor a un indice de un tensor.");
+							}
+						}
 	| ID ASSIGN expresion_booleana	{
 						sym_value_type entry;
 						entry.type = $3.type;
@@ -209,20 +226,20 @@ lista_indices : lista_indices COMA lista_sumas	{
 								else
 								{
 									char * error = allocateSpaceForMessage();
-									sprintf(error,"Index %s is not type Int32",$3.type);
+									sprintf(error, "Index %s is not type Int32", $3.type);
 									yyerror(error);
 								}	
 		     					}
 
 concatenacion : concatenacion ASTERISCO STRING 	{
-							$$ = allocateSpaceForMessage(strlen($1)+strlen($3)-2);
+							$$ = allocateSpaceForMessage(strlen($1) + strlen($3) - 2);
 							char * var = allocateSpaceForMessage(strlen($1));
-							strlcpy(var,&$1[0],strlen($1));
-							strcat($$,var);
+							strlcpy(var,&$1[0], strlen($1));
+							strcat($$, var);
 							free(var);
 							var = allocateSpaceForMessage(strlen($3));
-							strlcpy(var,&$3[1],strlen($3));
-							strcat($$,var);
+							strlcpy(var,&$3[1], strlen($3));
+							strcat($$, var);
 						}
 		| STRING 	{
 					$$ = strdup($1);
@@ -231,24 +248,32 @@ concatenacion : concatenacion ASTERISCO STRING 	{
 expresion_aritmetica : lista_sumas
 
 lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
-								if(isNumberType($3.type))
+								if (isNumberType($3.type))
 								{	
-									int response = doTensorCalcs($1.lexema,$3.lexema,$2);
-									if(response==0){
+									int response = doTensorCalcs($1.lexema, $3.lexema, $2);
+									if (response == 0)
+									{
 										$$.lexema = TMP_FOR_TENSOR_RESULT;
-										if(isSameType($1.type,FLOAT64_T) || isSameType($3.type,FLOAT64_T)){
+										if (isSameType($1.type,FLOAT64_T) || isSameType($3.type,FLOAT64_T))
+										{
 											$$.type = FLOAT64_T;
-										}else{
+										}
+										else
+										{
 											$$.type = INT32_T;
 										}
-										$$.value=NULL;
-									}else if(response==-2){
-										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-										if(!doAritmeticOperation($1,$2,$3,&$$))
+										$$.value = NULL;
+									}
+									else if (response == -2)
+									{
+										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+										if (!doAritmeticOperation($1, $2, $3, &$$))
 										{
 											yyerror("Something wrong with operation 1");
 										}
-									}else{
+									}
+									else
+									{
 										yyerror("ERRORES. HAY QUE DEFINIRLOS MEJOR SEGUN EL ESTADO DE SALIDA");
 									}		
 									
@@ -258,20 +283,20 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 									char * error = allocateSpaceForMessage();
 									sprintf(error,"Cannot do operation with type %s",$3.type);
 									yyerror(error);
-								} 
+								}
 							}	
 		| lista_productos	{ 	
-						if(isNumberType($1.type))
+						if (isNumberType($1.type))
 						{
-							$$ = createValueInfo($1.value,$1.type,$1.lexema);
+							$$ = createValueInfo($1.value, $1.type, $1.lexema);
 						}
 						else
 						{
 							char * error = allocateSpaceForMessage();
-							sprintf(error,"Cannot do operation with type %s",$1.type);
+							sprintf(error, "Cannot do operation with type %s", $1.type);
 							yyerror(error);
 						}
-					}			
+					}
 
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 																	if (isNumberType($3.type)){
@@ -337,9 +362,9 @@ lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 																	}
 																}		
 		| lista_potencias	{
-						if(isNumberType($1.type))
+						if (isNumberType($1.type))
 						{
-							$$ = createValueInfo($1.value,$1.type,$1.lexema);
+							$$ = createValueInfo($1.value, $1.type, $1.lexema);
 						}
 						else
 						{
@@ -359,7 +384,7 @@ op_arit_p2: OP_ARIT_P2	{
 lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 									if (isNumberType($3.type))
 									{
-										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
+										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
 										if (!doAritmeticOperation($1, $2, $3, &$$))
 										{
 											yyerror("Something wrong with operation.");
@@ -373,7 +398,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 									}
 								}
 		| literal_aritmetic	{
-						if(isNumberType($1.type))
+						if (isNumberType($1.type))
 						{
 							$$ = createValueInfo($1.value, $1.type,$1.lexema);
 						}
@@ -385,32 +410,32 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 						}
 					}
 
-literal_aritmetic : INTEGER	{ 	
-					$$ = createValueInfo(iota($1), INT32_T,NULL);
+literal_aritmetic : INTEGER	{
+					$$ = createValueInfo(iota($1), INT32_T, NULL);
 				}
 	| FLOAT		{
-				$$ = createValueInfo(fota($1), FLOAT64_T,NULL);
+				$$ = createValueInfo(fota($1), FLOAT64_T, NULL);
 			}
 	| id_arit 	{
-				$$ = createValueInfo($1.value, $1.type,$1.lexema);
+				$$ = createValueInfo($1.value, $1.type, $1.lexema);
 			}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
 									if (isNumberType($2.type))
 									{
-										$$ = createValueInfo($2.value, $2.type,$2.lexema);
+										$$ = createValueInfo($2.value, $2.type, $2.lexema);
 									}
-									else 
+									else
 									{
 										char * error = allocateSpaceForMessage();
 										sprintf(error, "Cannot do operation with %s", $2.value);
-										yyerror(error);	
+										yyerror(error);
 									}	
 								}
 	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
 									if ((isNumberType($2.type)) && (isNumberType($4.type)))
 									{
-										$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-										if(!doAritmeticOperation($2, "/", $4, &$$))
+										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+										if (!doAritmeticOperation($2, "/", $4, &$$))
 										{
 											yyerror("Something wrong with operation 2");
 										}
@@ -418,15 +443,17 @@ literal_aritmetic : INTEGER	{
 									else
 									{
 										char * error = allocateSpaceForMessage();
-										sprintf(error,"Cannot do operation with type %s", $2.type);
+										sprintf(error, "Cannot do operation with type %s", $2.type);
 										yyerror(error);
-									} 
+									}
 								}
 	| LENGTH STRING PARENTESIS_CERRADO	{
-							$$ = createValueInfo(iota(lenght($2)), INT32_T,NULL);
+							$$ = createValueInfo(iota(lenght($2)), INT32_T, NULL);
 						}
 
-id_arit : ID_ARIT	{ $$=$1; }	
+id_arit : ID_ARIT	{ 
+				$$=$1; 
+			}	
 	| lista_indices_arit CORCHETE_CERRADO	{
 							sym_value_type res;
 							sym_lookup($1.lexema, &res);
@@ -440,7 +467,7 @@ id_arit : ID_ARIT	{ $$=$1; }
 								$$.value = fota(((float *) res.elements)[$1.calcIndex]);
 							}
 							$$.type = res.type;
-							$$.lexema =NULL;
+							$$.lexema = NULL;
 						}
 
 lista_indices_arit : lista_indices_arit COMA lista_sumas	{
@@ -453,7 +480,7 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 										}
 										else 
 										{
-											yyerror("Array out of bound1.");
+											yyerror("Array out of bound.");
 										}
 									}
 									else
@@ -462,7 +489,7 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 										sprintf(error,"Index %s is not type Int32", $3.type);
 										yyerror(error);
 									}					
-								} 
+								}
 		| ID_ARIT CORCHETE_ABIERTO lista_sumas	{
 	   							if (isSameType($3.type, INT32_T)) 
 								{
@@ -471,49 +498,49 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 								else
 								{
 									char * error = allocateSpaceForMessage();
-									sprintf(error,"Index %s is not type Int32", $3.type);
+									sprintf(error, "Index %s is not type Int32", $3.type);
 									yyerror(error);
 								}
 							}
 
 expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
-										if(strcmp($2,OP_BOOL_AND) == 0)
+										if (strcmp($2,OP_BOOL_AND) == 0)
 										{
 											if( ! atoi($1.value) || ! atoi($3.value))
 											{
-												$$ = createValueInfo(iota(0), BOOLEAN_T,$1.lexema);
+												$$ = createValueInfo(iota(0), BOOLEAN_T, $1.lexema);
 											}
 											else
 											{
-												$$ = createValueInfo(iota(1), BOOLEAN_T,$1.lexema);
+												$$ = createValueInfo(iota(1), BOOLEAN_T, $1.lexema);
 											}
 										}
 										else
 										{
 											if( atoi($1.value) || atoi($3.value))
 											{
-												$$ = createValueInfo(iota(1), BOOLEAN_T,$1.lexema);
+												$$ = createValueInfo(iota(1), BOOLEAN_T, $1.lexema);
 											}
 											else
 											{
-												$$ = createValueInfo(iota(0), BOOLEAN_T,$1.lexema);
+												$$ = createValueInfo(iota(0), BOOLEAN_T, $1.lexema);
 											}
 											
 										}
 									}
 		| NEGACION expresion_booleana_base	{
 								int res = negateBoolean(atoi($2.value));
-								$$ = createValueInfo(iota(res), BOOLEAN_T,$2.lexema);
+								$$ = createValueInfo(iota(res), BOOLEAN_T, $2.lexema);
 							}
 		| expresion_booleana_base	{ 
-							$$ = createValueInfo($1.value, BOOLEAN_T,$1.lexema);
+							$$ = createValueInfo($1.value, BOOLEAN_T, $1.lexema);
 						}
 
 expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
 									if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type, $3.type))
 									{
 										int res = doRelationalOperation(atof($1.value), $2, atof($3.value));
-										$$ = createValueInfo(iota(res), BOOLEAN_T,$1.lexema);
+										$$ = createValueInfo(iota(res), BOOLEAN_T, $1.lexema);
 									}
 									else
 									{
@@ -523,7 +550,7 @@ expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
 									}
 								}
 			| literal_boolea	{
-							if (isSameType($1.type,BOOLEAN_T))
+							if (isSameType($1.type, BOOLEAN_T))
 							{
 								$$ = createValueInfo($1.value, $1.type, $1.lexema);
 							}
@@ -541,7 +568,7 @@ literal_boolea : BOOLEAN	{
 		| PARENTESIS_ABIERTO expresion_booleana PARENTESIS_CERRADO	{
 											if (isSameType($2.type, BOOLEAN_T))
 											{
-												$$ = createValueInfo($2.value, BOOLEAN_T,$2.lexema);
+												$$ = createValueInfo($2.value, BOOLEAN_T, $2.lexema);
 											}
 											else
 											{
@@ -573,8 +600,8 @@ lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
 										$$.type = FLOAT64_T;
 									}
 									$$.num_elem = $1.num_elem + $3.num_elem;
-									$$.elements = realloc($1.elements,($1.num_elem+$3.num_elem)*calculateSizeType($$.type));
-									castTensorToVoidPointer($$.elements, $1.elements, $1.type,$1.num_elem, $3.elements, $3.type,$3.num_elem);	
+									$$.elements = realloc($1.elements, ($1.num_elem + $3.num_elem) * calculateSizeType($$.type));
+									castTensorToVoidPointer($$.elements, $1.elements, $1.type, $1.num_elem, $3.elements, $3.type, $3.num_elem);	
 									if (ampliar_vector_dims[$1.dim])
 									{
 										vector_dims_tensor[$$.dim] += 1;
@@ -604,12 +631,12 @@ componente : lista_valores	{
 				$$.dim = $1.dim;
 				$$.type = $1.type;
 				$$.elements = $1.elements;
-				$$.num_elem =$1.num_elem;
+				$$.num_elem = $1.num_elem;
 			}
 
 lista_valores : lista_valores COMA lista_sumas	{
 							$$.dim = 0;
-							if(isSameType($1.type, INT32_T) && isSameType($3.type, INT32_T))
+							if (isSameType($1.type, INT32_T) && isSameType($3.type, INT32_T))
 							{
 								$$.type = INT32_T;
 							}
@@ -617,10 +644,10 @@ lista_valores : lista_valores COMA lista_sumas	{
 							{
 								$$.type = FLOAT64_T;
 							}
-							$$.elements = realloc($1.elements,($1.num_elem+1)*calculateSizeType($$.type));
+							$$.elements = realloc($1.elements, ($1.num_elem + 1) * calculateSizeType($$.type));
 							void * elem2 = malloc(calculateSizeType($3.type));
-							castValueToVoidPointer(elem2,$3.value, $3.type);
-							castTensorToVoidPointer($$.elements,$1.elements, $1.type,$1.num_elem,elem2, $3.type,1);
+							castValueToVoidPointer(elem2, $3.value, $3.type);
+							castTensorToVoidPointer($$.elements, $1.elements, $1.type, $1.num_elem, elem2, $3.type, 1);
 							$$.num_elem = $1.num_elem + 1;
 							if (ampliar_vector_dims[0])
 							{
