@@ -131,7 +131,7 @@ void simpleDebug(char *text, int typeFile)
 
 char *iota(int num)
 {
-	char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	char *string = (char *) malloc(sizeof(char) * STR_MAX_LENGTH);
 
 	sprintf(string, "%i", num);
 	return string;
@@ -139,7 +139,7 @@ char *iota(int num)
 
 char *fota(float num)
 {
-	char *string = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	char *string = (char *) malloc(sizeof(char) * STR_MAX_LENGTH);
 
 	sprintf(string, "%f", num);
 	return string;
@@ -148,7 +148,7 @@ char *fota(float num)
 char *allocateSpaceForMessage()
 {
 	char *message;
-	message = (char *)malloc(sizeof(char) * STR_MAX_LENGTH);
+	message = (char *) malloc(sizeof(char) * STR_MAX_LENGTH);
 	return message;
 }
 
@@ -245,8 +245,8 @@ void convert_invert_vector(int *vector, int dim)
 	int aux;
 	int i;
 
-	for (i = 0; i < dim / 2; i++) // Invertir el vector.
-	{
+	for (i = 0; i < dim / 2; i++)
+	{	// Invertir el vector.
 		aux = vector[i];
 		vector[i] = vector[dim - i - 1];
 		vector[dim - i - 1] = aux;
@@ -257,11 +257,11 @@ void castValueToVoidPointer(void *ptr, char *value, char *type)
 {
 	if (isSameType(type, INT32_T))
 	{
-		((int *)ptr)[0] = atoi(value);
+		((int *) ptr)[0] = atoi(value);
 	}
 	else if (isSameType(type, FLOAT64_T))
 	{
-		((float *)ptr)[0] = atof(value);
+		((float *) ptr)[0] = atof(value);
 	}
 }
 
@@ -282,7 +282,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 		int i = num_element1;
 		for (int j = 0; j < num_element2; j++)
 		{
-			((int *)ptr)[i++] = ((int *)elements2)[j];
+			((int *) ptr)[i++] = ((int *) elements2)[j];
 		}
 	}
 	// Si la lista final se trata como float
@@ -294,7 +294,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 		{
 			for (i = 0; i < num_element1; i++)
 			{
-				((float *)ptr)[i] = (float)((int *)elements1)[i];
+				((float *) ptr)[i] = (float)((int *) elements1)[i];
 			}
 		}
 		// Si los valores se tratan como float.
@@ -302,7 +302,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 		{
 			for (i = 0; i < num_element1; i++)
 			{
-				((float *)ptr)[i] = ((float *)elements1)[i];
+				((float *) ptr)[i] = ((float *) elements1)[i];
 			}
 		}
 		// Si los valores se tratan como enteros
@@ -310,7 +310,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 		{
 			for (int j = i; j < num_element1 + num_element2; j++)
 			{
-				((float *)ptr)[j] = (float)((int *)elements2)[j];
+				((float *) ptr)[j] = (float)((int *) elements2)[j];
 			}
 		}
 		// Si los valores se tratan como float.
@@ -318,7 +318,7 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 		{
 			for (int j = i; j < num_element1 + num_element2; j++)
 			{
-				((float *)ptr)[j] = ((float *)elements2)[j];
+				((float *) ptr)[j] = ((float *) elements2)[j];
 			}
 		}
 	}
@@ -352,11 +352,11 @@ int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_
 			v1.type = entry1.type;
 			if (isSameType(entry1.type, INT32_T))
 			{
-				v1.value = iota(((int *)entry1.elements)[aux]);
+				v1.value = iota(((int *) entry1.elements)[aux]);
 			}
 			else
 			{
-				v1.value = fota(((float *)entry1.elements)[aux]);
+				v1.value = fota(((float *) entry1.elements)[aux]);
 			}
 		}
 		else
@@ -373,11 +373,11 @@ int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_
 			v2.type = entry2.type;
 			if (isSameType(entry2.type, INT32_T))
 			{
-				v2.value = iota(((int *)entry2.elements)[aux]);
+				v2.value = iota(((int *) entry2.elements)[aux]);
 			}
 			else
 			{
-				v2.value = fota(((float *)entry2.elements)[aux]);
+				v2.value = fota(((float *) entry2.elements)[aux]);
 			}
 		}
 		else
@@ -391,11 +391,11 @@ int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_
 		doAritmeticOperation(v1, op, v2, &finishVal);
 		if (isSameType(finishVal.type, INT32_T))
 		{
-			((int *)result->elements)[posicion] = atoi(finishVal.value);
+			((int *) result->elements)[posicion] = atoi(finishVal.value);
 		}
 		else
 		{
-			((int *)result->elements)[posicion] = (int)atof(finishVal.value);
+			((int *) result->elements)[posicion] = (int) atof(finishVal.value);
 		}
 	}
 	else
@@ -404,11 +404,11 @@ int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_
 		doAritmeticOperation(v1, op, v2, &finishVal);
 		if (isSameType(finishVal.type, INT32_T))
 		{
-			((float *)result->elements)[posicion] = (float)atoi(finishVal.value);
+			((float *) result->elements)[posicion] = (float) atoi(finishVal.value);
 		}
 		else
 		{
-			((float *)result->elements)[posicion] = atof(finishVal.value);
+			((float *) result->elements)[posicion] = atof(finishVal.value);
 		}
 	}
 	return 0;
@@ -470,11 +470,11 @@ void printTensor(char *nameVar, sym_value_type tensor, int inFile)
 		{
 			if (isSameType(tensor.type, INT32_T))
 			{
-				fprintf(yyout, "%i,", ((int *)tensor.elements)[i]);
+				fprintf(yyout, "%i,", ((int *) tensor.elements)[i]);
 			}
 			else if (isSameType(tensor.type, FLOAT64_T))
 			{
-				fprintf(yyout, "%f,", ((float *)tensor.elements)[i]);
+				fprintf(yyout, "%f,", ((float *) tensor.elements)[i]);
 			}
 		}
 		fprintf(yyout, "]\n");
@@ -486,11 +486,11 @@ void printTensor(char *nameVar, sym_value_type tensor, int inFile)
 		{
 			if (isSameType(tensor.type, INT32_T))
 			{
-				printf("%i,", ((int *)tensor.elements)[i]);
+				printf("%i,", ((int *) tensor.elements)[i]);
 			}
 			else if (isSameType(tensor.type, FLOAT64_T))
 			{
-				printf("%f,", ((float *)tensor.elements)[i]);
+				printf("%f,", ((float *) tensor.elements)[i]);
 			}
 		}
 		printf("]\n");
@@ -551,6 +551,8 @@ void saveTmpTensorInSymTab(value_info *val, char *type1, char *type2, sym_value_
 
 char *generateTmpTensorId()
 {
+	char *id;
+	
 	if (list_tmp_variables_symtab == NULL)
 	{
 		list_tmp_variables_symtab = malloc(sizeof(char *));
@@ -559,8 +561,7 @@ char *generateTmpTensorId()
 	{
 		list_tmp_variables_symtab = realloc(list_tmp_variables_symtab, (num_tmp_variable + 1) * sizeof(char *));
 	}
-	char *id;
-	id = (char *)malloc(sizeof(char) * TMP_ID_MAX_LENGTH);
+	id = (char *) malloc(sizeof(char) * TMP_ID_MAX_LENGTH);
 	sprintf(id, "%s%i", TMP_BASE_ID, num_tmp_variable);
 	list_tmp_variables_symtab[num_tmp_variable] = id;
 	num_tmp_variable++;
@@ -804,7 +805,7 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation, sym_value_typ
 				}
 				else
 				{
-					if (maxNum((float)entry1.size, (float)entry2.size))
+					if (maxNum((float) entry1.size, (float) entry2.size))
 					{
 						tmp->size = entry1.size;
 					}
@@ -905,7 +906,7 @@ int doTensorProductInit(char *nameVar1, char *nameVar2, char *operation, sym_val
 			if (tmp->num_dim == 1)
 			{
 				tmp->elem_dims = malloc(calculateSizeType(tmp->type));
-				if (maxNum((float)rowsM1, (float)colsM2) == 1)
+				if (maxNum((float) rowsM1, (float) colsM2) == 1)
 				{
 					tmp->elem_dims[0] = rowsM1;
 				}
@@ -1011,11 +1012,11 @@ int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 					cFinal = colsM2 == 1 ? i : j;
 					if (isSameType(tmp->type, INT32_T))
 					{
-						((int *)aux.elements)[0] = 0;
+						((int *) aux.elements)[0] = 0;
 					}
 					else
 					{
-						((float *)aux.elements)[0] = 0;
+						((float *) aux.elements)[0] = 0;
 					}
 					for (int k = 0; k < colsM1; k++)
 					{
@@ -1030,20 +1031,20 @@ int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 						asignacionTensor(tmp, rFinal * colsM2 + cFinal, v1, v2, "*");
 						if (isSameType(tmp->type, INT32_T))
 						{
-							((int *)aux.elements)[0] += ((int *)tmp->elements)[rFinal * colsM2 + cFinal];
+							((int *) aux.elements)[0] += ((int *) tmp->elements)[rFinal * colsM2 + cFinal];
 						}
 						else
 						{
-							((float *)aux.elements)[0] += ((float *)tmp->elements)[rFinal * colsM2 + cFinal];
+							((float *) aux.elements)[0] += ((float *) tmp->elements)[rFinal * colsM2 + cFinal];
 						}
 					}
 					if (isSameType(tmp->type, INT32_T))
 					{
-						((int *)tmp->elements)[rFinal * colsM2 + cFinal] = ((int *)aux.elements)[0];
+						((int *) tmp->elements)[rFinal * colsM2 + cFinal] = ((int *) aux.elements)[0];
 					}
 					else
 					{
-						((float *)tmp->elements)[rFinal * colsM2 + cFinal] = ((float *)aux.elements)[0];
+						((float *) tmp->elements)[rFinal * colsM2 + cFinal] = ((float *) aux.elements)[0];
 					}
 				}
 			}

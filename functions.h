@@ -101,7 +101,7 @@ int calculateSizeType(char *type);
  * 0 -> EJECUCIÓN CORRECTA, TENSORES MULTIPLICABLES
  * -1 -> ERROR, ESTOS TENSORES NO SE PUEDEN MULTIPLICAR
  * -2 -> ERROR, NO ESTA IMPLEMENTADO EL PRODUCTO DE TENSORES DE MÁS DE 2 DIMENSIONES
- */
+ **/
 int isPossibleTensorProduct(int *elemDims1, int numDims1, int *elemDims2, int numDims2);
 
 /**
@@ -111,31 +111,41 @@ int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_
 
 /**
  * Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño.
- */
+ **/
 int maxNum(float a, float b);
 
 /**
  * Dado un tensor, el nombre de la variable i si se quiere imprimir en el archivo de salida o en consola
  * imprime los valores almacenados dentro del tensor de forma continua (como si fuese un vector de una dimensión).
- */
+ **/
 void printTensor(char *nameVar, sym_value_type tensor, int inFile);
 
 /**
  * Dado un sym_value_type muestra el valor
- */
+ **/
 void printSymValueType(sym_value_type entry);
 
 /**
  * Dado un vector de enteros que representa las dimensiones de un tensor, devuelve el número
  * de elemntos que hay dentro de el
- */
+ **/
 int getAcumElemDim(int *elem_dim, int num_dim);
 
+/**
+ *
+ **/
 void saveTmpTensorInSymTab(value_info *val, char *type1, char *type2, sym_value_type entry);
 
+/**
+ *
+ **/
 char *generateTmpTensorId();
 
+/**
+ *
+ **/
 void clearTmpTensorId();
+
 // FUNCIONES DE CONTROL DE ERRORES
 
 /**
@@ -194,18 +204,18 @@ int lenght(char *key);
  * -2 -> NO SON TENSORES NINGUNO DE LOS DOS
  * -3 -> ERROR, ALGUN TENSOR NO ESTA DEFINIDO EN LA SYMTAB
  * -4 -> ERROR, LOS TENSORES SON DE DIFERENTE DIMENSION
- */
+ **/
 int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation, sym_value_type *tmp);
 
 /**
  * Dados dos nombres de tensores y una operación (solo se admite producto) realiza la operación y la almacena en un entrada de la symtab
  * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
- */
+ **/
 int doTensorProductInit(char *nameVar1, char *nameVar2, char *operation, sym_value_type *tmp);
 
 /**
  * Realiza el producto de un número por un tensor.
- */
+ **/
 int doNumberProductTensor(char *number, char *type, char *nameTensor, sym_value_type *tmp);
 
 /**
@@ -217,7 +227,7 @@ int doNumberProductTensor(char *number, char *type, char *nameTensor, sym_value_
  * 	- Producto de un vector por un matriz.
  * 	- Producto de una matriz por un vector.
  * 	- Producto de dos matrices.
- */
+ **/
 int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp);
 
 #endif

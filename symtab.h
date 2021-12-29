@@ -17,9 +17,9 @@
 								   /* segons ens convingui.            */
 typedef struct sym_value_type
 {
-	void *type;		/* Tipo de variable */
+	void *type;	/* Tipo de variable */
 	void *value;	/* Valor en las variables de dimensión 0 */
-	int size;		/* Tamaño en bytes del elemento */
+	int size;	/* Tamaño en bytes del elemento */
 	int num_dim;	/* Número de dimensiones que tendrá un tensor (variables de dimensión diferente de 0) */
 	int *elem_dims; /* Vector con las dimensiones del tensor (Variables de dimensión diferente de 0) */
 	void *elements; /* Vector con todos los elementos del tensor (Variables de dimensión diferente de 0) */
