@@ -143,7 +143,7 @@ typedef const char *sym_name_type; /* If you are using something other */
 
 /****************************************************************************/
 /*                                                                          */
-/*                   end of #defines to configure symtab                    /
+/*                   end of #defines to configure symtab                    */
 /*    Most configuration can be accomplished by editing lines above this.   */
 /*                                                                          */
 /****************************************************************************/
