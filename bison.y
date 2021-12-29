@@ -9,9 +9,16 @@
   extern FILE *yyout;
   extern int yylex();
   extern void yyerror(char *);
+
+  //Variables necesarias para la inicialización de un tensor
   int *vector_dims_tensor;	// Vector con el número de elementos de cada dimensión del tensor.
   int num_dims_tensor = 0;	// Número de dimensiones del tensor.
   bool *ampliar_vector_dims; 	// Vector de booleanos para limitar la ampliación de memoria del vector de dimensiones a una sola por dimensión.
+
+  //Variables para controlar el flujo de variables temporales en la symtab
+  char **list_tmp_variables_symtab;
+  int num_tmp_variable=0;
+
 %}
 
 %code requires {
@@ -104,16 +111,13 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 								int response = sym_lookup($3.lexema, &entry);
 								if (response == SYMTAB_OK)
 								{
-									if (strcmp($3.lexema, TMP_FOR_TENSOR_RESULT) == 0) 
-									{
-										sym_remove($3.lexema);
-									}
 									response = sym_enter($1.lexema, &entry);
 									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
 									{
 										yyerror("Error al guardar en symtab.");
 									}
 									printTensor($1.lexema, entry, 1);
+									clearTmpTensorId();
 								}
 							}
 						}
@@ -254,19 +258,14 @@ expresion_aritmetica : lista_sumas
 lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 								if (isNumberType($3.type))
 								{	
-									int response = doTensorCalcs($1.lexema, $3.lexema, $2);
+									sym_value_type tmp;
+									int response = doTensorCalcs($1.lexema, $3.lexema, $2,&tmp);
 									if (response == 0)
 									{
-										$$.lexema = TMP_FOR_TENSOR_RESULT;
-										if (isSameType($1.type,FLOAT64_T) || isSameType($3.type,FLOAT64_T))
-										{
-											$$.type = FLOAT64_T;
-										}
-										else
-										{
-											$$.type = INT32_T;
-										}
-										$$.value = NULL;
+										saveTmpTensorInSymTab(&$$,$1.type,$3.type,tmp);
+									}
+									else if(response == -1){
+										yyerror("No se puede sumar un tensor con un numero.");
 									}
 									else if (response == -2)
 									{
@@ -276,10 +275,14 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 											yyerror("Something wrong with operation 1");
 										}
 									}
-									else
+									else if(response == -3)
 									{
-										yyerror("ERRORES. HAY QUE DEFINIRLOS MEJOR SEGUN EL ESTADO DE SALIDA");
-									}		
+										yyerror("Ha habido un error buscando una variable en la symtab.");
+									}	
+									else if (response == -4)
+									{
+										yyerror("No se pueden sumar o restar tensores con diferentes dimensiones");
+									}	
 									
 								}
 								else
@@ -305,28 +308,16 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 																	if (isNumberType($3.type)){
 																		int response = -4;
-																		if(strcmp($2,OP_ARIT_MULT)==0){
-																			response = doTensorProduct($1.lexema,$3.lexema,$2);
-																		}
 																		sym_value_type tmp;
+																		if(strcmp($2,OP_ARIT_MULT)==0){
+																			response = doTensorProductInit($1.lexema,$3.lexema,$2,&tmp);
+																		}
 																		if(response==0){
 																			int res = doTensorProductTensor($1.lexema,$3.lexema,&tmp);
 																			if(res!=0){
 																				yyerror("Alguna variable no se ha encontrado en la symtab.");
 																			}else{
-																				$$.lexema = TMP_FOR_TENSOR_RESULT;
-																				int message = sym_enter($$.lexema, &tmp);
-																				if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
-																				{
-																					yyerror("Error al guardar en symtab.");
-																				}else{
-																					if(isSameType($1.type,FLOAT64_T) || isSameType($3.type,FLOAT64_T)){
-																						$$.type = FLOAT64_T;
-																					}else{
-																						$$.type = INT32_T;
-																					}
-																					$$.value=NULL;
-																				}
+																				saveTmpTensorInSymTab(&$$,$1.type,$3.type,tmp);
 																			}
 																		}else if(response==-1){
 																			yyerror("Los indices de los tensores no son válidos para el producto.");
@@ -335,26 +326,24 @@ lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 																		}else if(response==-3){
 																			int res;
 																			if($1.value!=NULL){
-																				res = doNumberProductTensor($1.value,$1.type,$3.lexema);
+																				res = doNumberProductTensor($1.value,$1.type,$3.lexema,&tmp);
 																			}else{
-																				res = doNumberProductTensor($3.value,$3.type,$1.lexema);
+																				res = doNumberProductTensor($3.value,$3.type,$1.lexema,&tmp);
 																			}
-																			if(res==0){
-																				$$.lexema = TMP_FOR_TENSOR_RESULT;
-																				if(isSameType($1.type,FLOAT64_T) || isSameType($3.type,FLOAT64_T)){
-																					$$.type = FLOAT64_T;
-																				}else{
-																					$$.type = INT32_T;
-																				}
-																				$$.value=NULL;
+																			if(res!=0){
+																				yyerror("Alguna variable no se ha encontrado en la symtab.");
 																			}else{
-																				yyerror("Error al guardar en symtab.");
+																				saveTmpTensorInSymTab(&$$,$1.type,$3.type,tmp);
 																			}
 																		}else if(response==-4){
-																			$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-																			if (!doAritmeticOperation($1, $2, $3, &$$))
-																			{
-																				yyerror("Algún problema durante la operación.");
+																			if($1.lexema==NULL && $3.lexema==NULL){
+																				$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
+																				if (!doAritmeticOperation($1, $2, $3, &$$))
+																				{
+																					yyerror("Algún problema durante la operación.");
+																				}
+																			}else{
+																				yyerror("Los tensores no admiten la división.");
 																			}
 																		}
 																	}

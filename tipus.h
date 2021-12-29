@@ -30,7 +30,8 @@
 #define OP_BOOL_AND "&&"
 #define OP_BOOL_OR "||"
 
-#define TMP_FOR_TENSOR_RESULT "tmp_for_tesor_result"
+#define TMP_BASE_ID "_tmp_"
+#define TMP_ID_MAX_LENGTH 10
 
 typedef struct
 {

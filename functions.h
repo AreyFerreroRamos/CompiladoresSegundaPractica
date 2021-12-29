@@ -96,24 +96,6 @@ void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_el
 int calculateSizeType(char *type);
 
 /**
- * Dados dos nombres de tensores y una operación (suma o resta) realiza la operación y la almacena en un entrada de la symtab
- * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
- *  0 -> EJECUCIÓN CORRECTA, SE HAN CALCULADO LAS MATRICES Y LA ALMACENA EN SYMTAB
- * -1 -> ERROR, SE INTENTA SUMAR TENSOR CON VALOR
- * -2 -> NO SON TENSORES NINGUNO DE LOS DOS
- * -3 -> ERROR, ALGUN TENSOR NO ESTA DEFINIDO EN LA SYMTAB
- * -4 -> ERROR, LOS TENSORES SON DE DIFERENTE DIMENSION
- * -5 -> ERROR, NO SE HA PODIDO GUARDAR EL RESULTADO TEMPORAL
- */
-int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation);
-
-/**
- * Dados dos nombres de tensores y una operación (solo se admite producto) realiza la operación y la almacena en un entrada de la symtab
- * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
- */
-int doTensorProduct(char *nameVar1, char *nameVar2, char *operation);
-
-/**
  * Comprueba si las dimensiones de los tensores son compatibles para poder hacer el prodcto.
  * Si algo va mal devolverá alguno de los mensajes de error.
  * 0 -> EJECUCIÓN CORRECTA, TENSORES MULTIPLICABLES
@@ -121,23 +103,6 @@ int doTensorProduct(char *nameVar1, char *nameVar2, char *operation);
  * -2 -> ERROR, NO ESTA IMPLEMENTADO EL PRODUCTO DE TENSORES DE MÁS DE 2 DIMENSIONES
  */
 int isPossibleTensorProduct(int *elemDims1, int numDims1, int *elemDims2, int numDims2);
-
-/**
- * Realiza el producto de un número por un tensor.
- */
-int doNumberProductTensor(char *number, char *type, char *nameTensor);
-
-/**
- * Realiza el producto de dos tensores.
- * Teniendo en cuenta la dificultad del diseño de la operación,
- * únicamente se pueden multiplicar los tensores de una y de dos dimensiones.
- * En consecuencia, hay cuatro posibilidades:
- * 	- Producto de dos vectores.
- * 	- Producto de un vector por un matriz.
- * 	- Producto de una matriz por un vector.
- * 	- Producto de dos matrices.
- */
-int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp);
 
 /**
  *
@@ -166,6 +131,11 @@ void printSymValueType(sym_value_type entry);
  */
 int getAcumElemDim(int *elem_dim, int num_dim);
 
+void saveTmpTensorInSymTab(value_info *val, char *type1, char *type2, sym_value_type entry);
+
+char *generateTmpTensorId();
+
+void clearTmpTensorId();
 // FUNCIONES DE CONTROL DE ERRORES
 
 /**
@@ -215,5 +185,39 @@ int floatOperations(float num1, float num2, char *op, float *res);
  * en la tabla de símbolos de un error distinto a no encontrado se devolverá -1.
  **/
 int lenght(char *key);
+
+/**
+ * Dados dos nombres de tensores y una operación (suma o resta) realiza la operación y la almacena en un entrada de la symtab
+ * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
+ *  0 -> EJECUCIÓN CORRECTA, SE HAN CALCULADO LAS MATRICES Y LA ALMACENA EN SYMTAB
+ * -1 -> ERROR, SE INTENTA SUMAR TENSOR CON VALOR
+ * -2 -> NO SON TENSORES NINGUNO DE LOS DOS
+ * -3 -> ERROR, ALGUN TENSOR NO ESTA DEFINIDO EN LA SYMTAB
+ * -4 -> ERROR, LOS TENSORES SON DE DIFERENTE DIMENSION
+ */
+int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation, sym_value_type *tmp);
+
+/**
+ * Dados dos nombres de tensores y una operación (solo se admite producto) realiza la operación y la almacena en un entrada de la symtab
+ * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
+ */
+int doTensorProductInit(char *nameVar1, char *nameVar2, char *operation, sym_value_type *tmp);
+
+/**
+ * Realiza el producto de un número por un tensor.
+ */
+int doNumberProductTensor(char *number, char *type, char *nameTensor, sym_value_type *tmp);
+
+/**
+ * Realiza el producto de dos tensores.
+ * Teniendo en cuenta la dificultad del diseño de la operación,
+ * únicamente se pueden multiplicar los tensores de una y de dos dimensiones.
+ * En consecuencia, hay cuatro posibilidades:
+ * 	- Producto de dos vectores.
+ * 	- Producto de un vector por un matriz.
+ * 	- Producto de una matriz por un vector.
+ * 	- Producto de dos matrices.
+ */
+int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp);
 
 #endif
