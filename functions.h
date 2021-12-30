@@ -88,7 +88,7 @@ void castValueToVoidPointer(void *ptr, char *value, char *type);
  * Dadas dos listas  y el tipo de cada una las une en una sola lista que tendrá el tipo
  * prioritario (1.Float 2.Int).
  **/
-void castTensorToVoidPointer(void *ptr, void *elements1, char *type1, int num_element1, void *elements2, char *type2, int num_element2);
+void castTensorToVoidPointer(void *ptr, char *type1, int num_element1, void *elements2, char *type2, int num_element2);
 
 /**
  * Dado un tipo devuelve el tamaño en bytes.
@@ -107,7 +107,7 @@ int isPossibleTensorProduct(int *elemDims1, int numDims1, int *elemDims2, int nu
 /**
  *
  **/
-int asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_info v2, char *op);
+void asignacionTensor(sym_value_type *result, int posicion, value_info v1, value_info v2, char *op);
 
 /**
  * Dados dos numeros devuelve 1 si el primero es más grande, 0 si son iguales o -1 si es más pequeño.
@@ -211,7 +211,7 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation, sym_value_typ
  * Dados dos nombres de tensores y una operación (solo se admite producto) realiza la operación y la almacena en un entrada de la symtab
  * con el nombre "tmp_for_tesor_result". Si algo va mal devolverá alguno de los mensajes de error.
  **/
-int doTensorProductInit(char *nameVar1, char *nameVar2, char *operation, sym_value_type *tmp);
+int doTensorProductInit(char *nameVar1, char *nameVar2, sym_value_type *tmp);
 
 /**
  * Realiza el producto de un número por un tensor.
