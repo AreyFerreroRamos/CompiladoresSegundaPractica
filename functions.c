@@ -506,7 +506,6 @@ void saveTmpTensorInSymTab(value_info *val, char *type1, char *type2, sym_value_
 	}
 	else
 	{
-		val->lexema = id;
 		if (isSameType(type1, FLOAT64_T) || isSameType(type2, FLOAT64_T))
 		{
 			val->type = FLOAT64_T;
@@ -516,6 +515,7 @@ void saveTmpTensorInSymTab(value_info *val, char *type1, char *type2, sym_value_
 			val->type = INT32_T;
 		}
 		val->value = NULL;
+		val->lexema = id;
 	}
 }
 
@@ -759,13 +759,20 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation, sym_value_typ
 			if (entry1.num_dim == entry2.num_dim)
 			{	// Si los dos tensores tienen el mismo numero de dimensiones.
 				for (int i = 0; i < entry1.num_dim; i++)
-				{
+				{	// Si los dos tensores tienen el mismo número de elementos en cada dimension.
 					if (entry1.elem_dims[i] != entry2.elem_dims[i])
-					{	// Si los dos tensores tienen el mismo numero de delementos en cada dimension.
+					{
 						return -5;
 					}
 				}
-				tmp->num_dim = entry1.num_dim;
+				if (isSameType(entry1.type, FLOAT64_T) || isSameType(entry2.type, FLOAT64_T))
+				{	// Si alguno de los dos tipos es float.
+					tmp->type = FLOAT64_T;
+				}
+				else
+				{
+					tmp->type = INT32_T;
+				}
 				tmp->value = NULL;
 				if (entry1.size == entry2.size)
 				{	// Si tienen el mismo tamaño (son del mismo tipo).
@@ -782,16 +789,9 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation, sym_value_typ
 						tmp->size = entry2.size;
 					}
 				}
-				if (isSameType(entry1.type, FLOAT64_T) || isSameType(entry2.type, FLOAT64_T))
-				{	// Si alguno de los dos tipos es float.
-					tmp->type = FLOAT64_T;
-				}
-				else
-				{
-					tmp->type = INT32_T;
-				}
-				tmp->elements = malloc(tmp->size);
+				tmp->num_dim = entry1.num_dim;
 				tmp->elem_dims = entry1.elem_dims;
+				tmp->elements = malloc(tmp->size);
 
 				int cont = tmp->size / calculateSizeType(tmp->type);
 				for (int i = 0; i < cont; i++)
@@ -805,8 +805,6 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation, sym_value_typ
 					v2.type = entry2.type;
 					v2.value = iota(i);
 					asignacionTensor(&(*tmp), i, v1, v2, operation);
-					printf("TODO BIEN ");
-					fflush(stdout);
 				}
 				return 0;
 			}
@@ -822,11 +820,14 @@ int doTensorCalcs(char *nameVar1, char *nameVar2, char *operation, sym_value_typ
 			return -3;
 		}
 	}
-	if (nameVar1 == NULL && nameVar2 == NULL)
+	else if (nameVar1 == NULL && nameVar2 == NULL)
 	{	// Si las dos variables son numeros.
 		return -2;
 	}
-	return -1;
+	else 
+	{	// Si una de las variables es un número y la otra un tensor.
+		return -1;
+	}
 }
 
 int doTensorProductInit(char *nameVar1, char *nameVar2, sym_value_type *tmp)

@@ -279,14 +279,14 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 									}
 									else if (response == -1)
 									{
-										yyerror("No se puede sumar un tensor con un numero.");
+										yyerror("No se puede sumar un tensor con un número.");
 									}
 									else if (response == -2)
 									{
 										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
 										if (!doAritmeticOperation($1, $2, $3, &$$))
 										{
-											yyerror("Something wrong with operation 1");
+											yyerror("Something wrong with operation 1.");
 										}
 									}
 									else if (response == -3)
@@ -295,9 +295,8 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 									}	
 									else if (response == -4)
 									{
-										yyerror("No se pueden sumar o restar tensores con diferentes dimensiones");
-									}
-									
+										yyerror("No se pueden sumar o restar tensores con diferentes dimensiones.");
+									}	
 								}
 								else
 								{
