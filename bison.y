@@ -128,14 +128,6 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 								int response = sym_lookup($1.lexema, &entry);
 								if (response == SYMTAB_OK)
 								{
-									if (isSameType(entry.type,FLOAT64_T) || isSameType(entry.type,FLOAT64_T))
-									{
-										entry.type = FLOAT64_T;
-									}
-									else
-									{
-										entry.type = INT32_T;
-									}
 									if (isSameType(entry.type,INT32_T))
 									{	
 										if (isSameType($3.type,INT32_T))
@@ -144,7 +136,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 										}
 										else
 										{
-											((int *) entry.elements)[$1.calcIndex] = atof($3.value);
+											((int *) entry.elements)[$1.calcIndex] = (int) atof($3.value);
 										}
 									}
 									else if (isSameType(entry.type,FLOAT64_T))
