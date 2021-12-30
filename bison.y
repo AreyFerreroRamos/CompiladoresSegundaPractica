@@ -51,7 +51,7 @@
 %token <ident> ID 
 %token <operand> ID_ARIT
 
-%type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base literal_aritmetic literal_boolea id_arit
+%type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base terminal_aritmetic terminal_boolea id_arit
 %type <tensor_info> id lista_indices lista_indices_arit
 %type <tensor_ini_info> tensor componente lista_componentes lista_valores
 %type <cadena> op_arit_p2 concatenacion
@@ -128,9 +128,9 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 								int response = sym_lookup($1.lexema, &entry);
 								if (response == SYMTAB_OK)
 								{
-									if (isSameType(entry.type,INT32_T))
+									if (isSameType(entry.type, INT32_T))
 									{	
-										if (isSameType($3.type,INT32_T))
+										if (isSameType($3.type, INT32_T))
 										{
 											((int *) entry.elements)[$1.calcIndex] = atoi($3.value);
 										}
@@ -139,7 +139,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 											((int *) entry.elements)[$1.calcIndex] = (int) atof($3.value);
 										}
 									}
-									else if (isSameType(entry.type,FLOAT64_T))
+									else if (isSameType(entry.type, FLOAT64_T))
 									{
 										if (isSameType($3.type,INT32_T))
 										{
@@ -411,7 +411,7 @@ op_arit_p2: OP_ARIT_P2	{
 				$$ = strdup($1);
 			}
 
-lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
+lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetic	{
 									if (isNumberType($3.type))
 									{
 										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
@@ -427,7 +427,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 										yyerror(error);
 									}
 								}
-		| literal_aritmetic	{
+		| terminal_aritmetic	{
 						if (isNumberType($1.type))
 						{
 							$$ = createValueInfo($1.value, $1.type, $1.lexema);
@@ -440,7 +440,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 literal_aritmetic	{
 						}
 					}
 
-literal_aritmetic : INTEGER	{
+termial_aritmetic : INTEGER	{
 					$$ = createValueInfo(iota($1), INT32_T, NULL);
 				}
 	| FLOAT		{
@@ -578,7 +578,7 @@ expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
 										yyerror(error);
 									}
 								}
-			| literal_boolea	{
+			| terminal_boolea	{
 							if (isSameType($1.type, BOOLEAN_T))
 							{
 								$$ = createValueInfo($1.value, $1.type, $1.lexema);
@@ -591,7 +591,7 @@ expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
 							}
 						}
 
-literal_boolea : BOOLEAN	{	
+terminal_boolea : BOOLEAN	{	
 					$$ = createValueInfo(iota($1), BOOLEAN_T, NULL);
 				}
 		| PARENTESIS_ABIERTO expresion_booleana PARENTESIS_CERRADO	{
