@@ -239,7 +239,7 @@ int getDim(char *key, int index_dim)
 	}
 }
 
-void convert_invert_vector(int *vector, int dim)
+void invertVector(int *vector, int dim)
 {
 
 	int aux;
@@ -696,7 +696,7 @@ int intOperations(int num1, int num2, char *operand, int *res)
 	else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
 	{
 		simpleDebug("Estoy en la potencia\n", 1);
-		*res = (int)pow((double)num1, (double)num2);
+		*res = (int) pow((double) num1, (double) num2);
 	}
 	return 1;
 }
@@ -728,7 +728,7 @@ int floatOperations(float num1, float num2, char *operand, float *res)
 	}
 	else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
 	{
-		*res = (float)pow((double)num1, (double)num2);
+		*res = (float) pow((double) num1, (double) num2);
 	}
 	return 1;
 }

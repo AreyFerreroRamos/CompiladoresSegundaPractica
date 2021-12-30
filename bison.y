@@ -17,7 +17,7 @@
 
   //Variables para controlar el flujo de variables temporales en la symtab
   char **list_tmp_variables_symtab;
-  int num_tmp_variable=0;
+  int num_tmp_variable = 0;
 
 %}
 
@@ -128,26 +128,34 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 								int response = sym_lookup($1.lexema, &entry);
 								if (response == SYMTAB_OK)
 								{
-									if(isSameType(entry.type,FLOAT64_T) || isSameType(entry.type,FLOAT64_T)){
+									if (isSameType(entry.type,FLOAT64_T) || isSameType(entry.type,FLOAT64_T))
+									{
 										entry.type = FLOAT64_T;
-									}else{
+									}
+									else
+									{
 										entry.type = INT32_T;
 									}
-									
 									if (isSameType(entry.type,INT32_T))
 									{	
-										if(isSameType($3.type,INT32_T)){
-											((int*) entry.elements)[$1.calcIndex] = atoi($3.value);
-										}else{
-											((int*) entry.elements)[$1.calcIndex] = atof($3.value);
+										if (isSameType($3.type,INT32_T))
+										{
+											((int *) entry.elements)[$1.calcIndex] = atoi($3.value);
+										}
+										else
+										{
+											((int *) entry.elements)[$1.calcIndex] = atof($3.value);
 										}
 									}
-									else if(isSameType(entry.type,FLOAT64_T))
+									else if (isSameType(entry.type,FLOAT64_T))
 									{
-										if(isSameType($3.type,INT32_T)){
-											((float*) entry.elements)[$1.calcIndex] = atoi($3.value);
-										}else{
-											((float*) entry.elements)[$1.calcIndex] = atof($3.value);
+										if (isSameType($3.type,INT32_T))
+										{
+											((float *) entry.elements)[$1.calcIndex] = atoi($3.value);
+										}
+										else
+										{
+											((float *) entry.elements)[$1.calcIndex] = atof($3.value);
 										}
 									}
 									response = sym_enter($1.lexema, &entry);
@@ -155,7 +163,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 									{
 										yyerror("Error al guardar en symtab.");
 									}
-									fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n",$1.lexema,(char*) $3.value,$1.calcIndex);
+									fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n", $1.lexema, (char *) $3.value, $1.calcIndex);
 								}
 								else
 								{
@@ -179,7 +187,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						{
 							yyerror("Error al guardar en symtab.");
 						}
-						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema,(char*) entry.value);
+						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, (char *) entry.value);
 					}
 	| ID ASSIGN concatenacion	{
 						sym_value_type entry;
@@ -193,7 +201,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						{
 							yyerror("Error al guardar en symtab.");
 						}
-						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema,(char*) entry.value);
+						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, (char *) entry.value);
 					}
 	| ID ASSIGN tensor	{	
 					sym_value_type entry;
@@ -201,7 +209,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					entry.value = NULL;
 					entry.size = calculateSizeType($3.type) * $3.num_elem;
 					entry.num_dim = $3.dim;
-					convert_invert_vector(vector_dims_tensor, $3.dim);
+					invertVector(vector_dims_tensor, $3.dim);
 					entry.elem_dims = vector_dims_tensor;
 					entry.elements = $3.elements;
 					int message = sym_enter($1.lexema, &entry);
@@ -240,7 +248,7 @@ lista_indices : lista_indices COMA lista_sumas	{
 							}
 						}
 		| ID CORCHETE_ABIERTO lista_sumas	{
-		      						if (isSameType($3.type, INT32_T)) 
+		      						if (isSameType($3.type, INT32_T))
 								{
 									$$ = createTensorInfo(1, atoi($3.value), $1.lexema);
 								}
@@ -249,7 +257,7 @@ lista_indices : lista_indices COMA lista_sumas	{
 									char * error = allocateSpaceForMessage();
 									sprintf(error, "Index %s is not type Int32", $3.type);
 									yyerror(error);
-								}	
+								}
 		     					}
 
 concatenacion : concatenacion ASTERISCO STRING 	{
@@ -277,7 +285,8 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 									{
 										saveTmpTensorInSymTab(&$$, $1.type, $3.type, tmp);
 									}
-									else if(response == -1){
+									else if (response == -1)
+									{
 										yyerror("No se puede sumar un tensor con un numero.");
 									}
 									else if (response == -2)
@@ -288,7 +297,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 											yyerror("Something wrong with operation 1");
 										}
 									}
-									else if(response == -3)
+									else if (response == -3)
 									{
 										yyerror("Ha habido un error buscando una variable en la symtab.");
 									}	
@@ -319,55 +328,77 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 					}
 
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
-
-																	if (isNumberType($3.type)){
-																		int response = -4;
-																		sym_value_type tmp;
-																		if(strcmp($2,OP_ARIT_MULT)==0){
-																			response = doTensorProductInit($1.lexema,$3.lexema,&tmp);
-																		}
-																		if(response==0){
-																			int res = doTensorProductTensor($1.lexema,$3.lexema,&tmp);
-																			if(res!=0){
-																				yyerror("Alguna variable no se ha encontrado en la symtab.");
-																			}else{
-																				saveTmpTensorInSymTab(&$$,$1.type,$3.type,tmp);
-																			}
-																		}else if(response==-1){
-																			yyerror("Los indices de los tensores no son válidos para el producto.");
-																		}else if(response==-2){
-																			yyerror("No esta permitido hacer el producto de un tensor +2 dim.");
-																		}else if(response==-3){
-																			int res;
-																			if($1.value!=NULL){
-																				res = doNumberProductTensor($1.value,$1.type,$3.lexema,&tmp);
-																			}else{
-																				res = doNumberProductTensor($3.value,$3.type,$1.lexema,&tmp);
-																			}
-																			if(res!=0){
-																				yyerror("Alguna variable no se ha encontrado en la symtab.");
-																			}else{
-																				saveTmpTensorInSymTab(&$$,$1.type,$3.type,tmp);
-																			}
-																		}else if(response==-4){
-																			if($1.lexema==NULL && $3.lexema==NULL){
-																				$$.value = (char *) malloc(sizeof(char)*FLOAT_MAX_LENGTH_STR);
-																				if (!doAritmeticOperation($1, $2, $3, &$$))
-																				{
-																					yyerror("Algún problema durante la operación.");
-																				}
-																			}else{
-																				yyerror("Los tensores no admiten la división.");
-																			}
-																		}
-																	}
-																	else
-																	{
-																		char * error = allocateSpaceForMessage();
-																		sprintf(error, "Cannot do operation with %s", $3.value);
-																		yyerror(error);
-																	}
-																}		
+									if (isNumberType($3.type))
+									{
+										int response = -4;
+										sym_value_type tmp;
+										if (strcmp($2, OP_ARIT_MULT) == 0)
+										{
+											response = doTensorProductInit($1.lexema, $3.lexema, &tmp);
+										}
+										if (response == 0)
+										{
+											int res = doTensorProductTensor($1.lexema, $3.lexema, &tmp);
+											if (res != 0)
+											{
+												yyerror("Alguna variable no se ha encontrado en la symtab.");
+											}
+											else
+											{
+												saveTmpTensorInSymTab(&$$, $1.type, $3.type, tmp);
+											}
+										}
+										else if (response == -1)
+										{
+											yyerror("Los indices de los tensores no son válidos para el producto.");
+										}
+										else if (response == -2)
+										{
+											yyerror("No esta permitido hacer el producto de un tensor +2 dim.");
+										}
+										else if (response == -3)
+										{
+											int res;
+											if ($1.value != NULL)
+											{
+												res = doNumberProductTensor($1.value, $1.type, $3.lexema, &tmp);
+											}
+											else
+											{
+												res = doNumberProductTensor($3.value, $3.type, $1.lexema, &tmp);
+											}
+											if (res != 0)
+											{
+												yyerror("Alguna variable no se ha encontrado en la symtab.");
+											}
+											else
+											{
+												saveTmpTensorInSymTab(&$$, $1.type, $3.type, tmp);
+											}
+										}
+										else if (response == -4)
+										{
+											if ($1.lexema == NULL && $3.lexema == NULL)
+											{
+												$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+												if (!doAritmeticOperation($1, $2, $3, &$$))
+												{
+													yyerror("Algún problema durante la operación.");
+												}
+											}
+											else
+											{
+												yyerror("Los tensores no admiten la división.");
+											}
+										}
+									}
+									else
+									{
+										char * error = allocateSpaceForMessage();
+										sprintf(error, "Cannot do operation with %s", $3.value);
+										yyerror(error);
+									}
+								}
 		| lista_potencias	{
 						if (isNumberType($1.type))
 						{
@@ -607,11 +638,10 @@ lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
 									}
 									$$.num_elem = $1.num_elem + $3.num_elem;
 									$$.elements = realloc($1.elements, ($1.num_elem + $3.num_elem) * calculateSizeType($$.type));
-									castTensorToVoidPointer($$.elements,
-									 $1.type, $1.num_elem, $3.elements, $3.type, $3.num_elem);	
+									castTensorToVoidPointer($$.elements, $1.type, $1.num_elem, $3.elements, $3.type, $3.num_elem);	
 									if (ampliar_vector_dims[$1.dim])
 									{
-										vector_dims_tensor[$$.dim] += 1;
+										vector_dims_tensor[$1.dim] += 1;
 									}
 								}
 		| componente	{
