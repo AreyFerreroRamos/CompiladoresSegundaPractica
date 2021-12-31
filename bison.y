@@ -341,11 +341,11 @@ lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 										}
 										else if (response == -1)
 										{
-											yyerror("Los indices de los tensores no son válidos para el producto.");
+											yyerror("Los indices de los tensores no son compatibles y no se puede realizar el producto.");
 										}
 										else if (response == -2)
 										{
-											yyerror("No esta permitido hacer el producto de un tensor +2 dim.");
+											yyerror("No esta permitido multiplicar tensores de dimensión superior a 2.");
 										}
 										else if (response == -3)
 										{

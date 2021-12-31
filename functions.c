@@ -398,14 +398,7 @@ int isPossibleTensorProduct(int *elemDims1, int numDims1, int *elemDims2, int nu
 		{
 			nColsMatrix1 = elemDims1[1];
 		}
-		if (numDims2 == 1)
-		{
-			nRowsMatrix2 = elemDims2[0];
-		}
-		else
-		{
-			nRowsMatrix2 = elemDims2[0];
-		}
+		nRowsMatrix2 = elemDims2[0];
 		if (nColsMatrix1 == nRowsMatrix2)
 		{
 			return 0;
@@ -840,8 +833,7 @@ int doTensorProductInit(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 		sym_lookup(nameVar2, &entry2);
 		int response = isPossibleTensorProduct(entry1.elem_dims, entry1.num_dim, entry2.elem_dims, entry2.num_dim);
 		if (response == 0)
-		{
-			// Los tensores se pueden multiplicar.
+		{	// Los tensores se pueden multiplicar.
 			if (isSameType(entry1.type, FLOAT64_T) || isSameType(entry2.type, FLOAT64_T))
 			{
 				tmp->type = FLOAT64_T;
@@ -871,7 +863,7 @@ int doTensorProductInit(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 			tmp->num_dim = rowsM1 == 1 || colsM2 == 1 ? 1 : 2;
 			if (tmp->num_dim == 1)
 			{
-				tmp->elem_dims = malloc(calculateSizeType(tmp->type));
+				tmp->elem_dims = malloc(4);
 				if (maxNum((float) rowsM1, (float) colsM2) == 1)
 				{
 					tmp->elem_dims[0] = rowsM1;
@@ -883,7 +875,7 @@ int doTensorProductInit(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 			}
 			else
 			{
-				tmp->elem_dims = malloc(2 * calculateSizeType(tmp->type));
+				tmp->elem_dims = malloc(8);
 				tmp->elem_dims[0] = rowsM1;
 				tmp->elem_dims[1] = colsM2;
 			}
@@ -918,13 +910,13 @@ int doNumberProductTensor(char *number, char *type, char *nameTensor, sym_value_
 		for (int i = 0; i < (entry.size / calculateSizeType(entry.type)); i++)
 		{
 			value_info v1;
-			v1.lexema = NULL;
 			v1.type = type;
 			v1.value = number;
+			v1.lexema = NULL;
 			value_info v2;
-			v2.lexema = nameTensor;
 			v2.type = entry.type;
 			v2.value = iota(i);
+			v2.lexema = nameTensor;
 			asignacionTensor(&(*tmp), i, v1, v2, "*");
 		}
 		return 0;
@@ -968,8 +960,7 @@ int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 			for (int i = 0; i < rowsM1; i++)
 			{
 				for (int j = 0; j < colsM2; j++)
-				{
-					// Si transponemos el vector para poder multiplicarlo hay que trasponer los índices.
+				{	// Si transponemos el vector para poder multiplicarlo hay que trasponer los índices.
 					rFinal = colsM2 == 1 ? j : i;
 					cFinal = colsM2 == 1 ? i : j;
 					if (isSameType(tmp->type, INT32_T))
@@ -983,13 +974,13 @@ int doTensorProductTensor(char *nameVar1, char *nameVar2, sym_value_type *tmp)
 					for (int k = 0; k < colsM1; k++)
 					{
 						value_info v1;
-						v1.lexema = nameVar1;
 						v1.type = matrix1.type;
 						v1.value = iota(i * colsM1 + k);
+						v1.lexema = nameVar1;
 						value_info v2;
-						v2.lexema = nameVar2;
 						v2.type = matrix2.type;
 						v2.value = iota(k * colsM2 + j);
+						v2.lexema = nameVar2;
 						asignacionTensor(tmp, rFinal * colsM2 + cFinal, v1, v2, "*");
 						if (isSameType(tmp->type, INT32_T))
 						{
