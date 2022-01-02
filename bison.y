@@ -51,7 +51,7 @@
 %token <ident> ID 
 %token <operand> ID_ARIT
 
-%type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base terminal_aritmetic terminal_boolea id_arit
+%type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base terminal_aritmetico terminal_booleano id_arit
 %type <tensor_info> id lista_indices lista_indices_arit
 %type <tensor_ini_info> tensor componente lista_componentes lista_valores
 %type <cadena> op_arit_p2 concatenacion
@@ -410,7 +410,7 @@ op_arit_p2: OP_ARIT_P2	{
 				$$ = strdup($1);
 			}
 
-lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetic	{
+lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico	{
 									if (isNumberType($3.type))
 									{
 										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
@@ -426,7 +426,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetic	{
 										yyerror(error);
 									}
 								}
-		| terminal_aritmetic	{
+		| terminal_aritmetico	{
 						if (isNumberType($1.type))
 						{
 							$$ = createValueInfo($1.value, $1.type, $1.lexema);
@@ -439,7 +439,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetic	{
 						}
 					}
 
-termial_aritmetic : INTEGER	{
+terminal_aritmetico : INTEGER	{
 					$$ = createValueInfo(iota($1), INT32_T, NULL);
 				}
 	| FLOAT		{
@@ -577,7 +577,7 @@ expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
 										yyerror(error);
 									}
 								}
-			| terminal_boolea	{
+			| terminal_booleano	{
 							if (isSameType($1.type, BOOLEAN_T))
 							{
 								$$ = createValueInfo($1.value, $1.type, $1.lexema);
@@ -590,7 +590,7 @@ expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
 							}
 						}
 
-terminal_boolea : BOOLEAN	{	
+terminal_booleano : BOOLEAN	{	
 					$$ = createValueInfo(iota($1), BOOLEAN_T, NULL);
 				}
 		| PARENTESIS_ABIERTO expresion_booleana PARENTESIS_CERRADO	{
