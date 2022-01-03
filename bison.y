@@ -46,15 +46,14 @@
 %token <no_definit> ASSIGN
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> STRING OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 OP_RELACIONAL OP_BOOL NEGACION PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV LENGTH COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA
-%token <boolea> BOOLEAN
+%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA
 %token <ident> ID 
 %token <operand> ID_ARIT
 
-%type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias expresion_booleana expresion_booleana_base terminal_aritmetico terminal_booleano id_arit
+%type <operand> expresion_aritmetica lista_sumas lista_productos lista_potencias terminal_aritmetico id_arit
 %type <tensor_info> id lista_indices lista_indices_arit
 %type <tensor_ini_info> tensor componente lista_componentes lista_valores
-%type <cadena> op_arit_p2 concatenacion
+%type <cadena> op_arit_p2
 
 %start programa
 
@@ -69,10 +68,6 @@ lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 sentencia : asignacion 
 	| expresion_aritmetica 	{
 					fprintf(yyout, "El resultado es %s\n", $1.value);
-				} 
-	| expresion_booleana 	{
-					char * boolValue = atoi($1.value) ? "true" : "false";
-					fprintf(yyout, "La expresion booleana es %s\n", boolValue);
 				}
 	| ID	{
 			sym_value_type entry;
@@ -167,34 +162,6 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 								yyerror("No se puede asignar un tensor a un indice de un tensor.");
 							}
 						}
-	| ID ASSIGN expresion_booleana	{
-						sym_value_type entry;
-						entry.type = $3.type;
-						entry.value = $3.value;
-						entry.size = 1;
-						entry.num_dim = 0;
-						entry.elem_dims = NULL;
-						int message = sym_enter($1.lexema, &entry);
-						if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
-						{
-							yyerror("Error al guardar en symtab.");
-						}
-						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, (char *) entry.value);
-					}
-	| ID ASSIGN concatenacion	{
-						sym_value_type entry;
-						entry.type = STRING_T;
-						entry.value = $3;
-						entry.size = strlen($3);
-						entry.num_dim = 0;
-						entry.elem_dims = NULL;
-						int message = sym_enter($1.lexema, &entry);
-						if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE)
-						{
-							yyerror("Error al guardar en symtab.");
-						}
-						fprintf(yyout, "ID: %s pren per valor: %s\n", $1.lexema, (char *) entry.value);
-					}
 	| ID ASSIGN tensor	{	
 					sym_value_type entry;
 					entry.type = $3.type;
@@ -251,20 +218,6 @@ lista_indices : lista_indices COMA lista_sumas	{
 									yyerror(error);
 								}
 		     					}
-
-concatenacion : concatenacion ASTERISCO STRING 	{
-							$$ = allocateSpaceForMessage(strlen($1) + strlen($3) - 2);
-							char * var = allocateSpaceForMessage(strlen($1));
-							strlcpy(var, &$1[0], strlen($1));
-							strcat($$, var);
-							free(var);
-							var = allocateSpaceForMessage(strlen($3));
-							strlcpy(var, &$3[1], strlen($3));
-							strcat($$, var);
-						}
-		| STRING 	{
-					$$ = strdup($1);
-				}
 
 expresion_aritmetica : lista_sumas
 
@@ -410,7 +363,7 @@ op_arit_p2: OP_ARIT_P2	{
 				$$ = strdup($1);
 			}
 
-lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico	{
+lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico {
 									if (isNumberType($3.type))
 									{
 										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
@@ -476,9 +429,6 @@ terminal_aritmetico : INTEGER	{
 										yyerror(error);
 									}
 								}
-	| LENGTH STRING PARENTESIS_CERRADO	{
-							$$ = createValueInfo(iota(lenght($2)), INT32_T, NULL);
-						}
 
 id_arit : ID_ARIT	{ 
 				$$ = $1; 
@@ -530,81 +480,6 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 									yyerror(error);
 								}
 							}
-
-expresion_booleana : expresion_booleana OP_BOOL expresion_booleana_base	{
-										if (strcmp($2, OP_BOOL_AND) == 0)
-										{
-											if( ! atoi($1.value) || ! atoi($3.value))
-											{
-												$$ = createValueInfo(iota(0), BOOLEAN_T, $1.lexema);
-											}
-											else
-											{
-												$$ = createValueInfo(iota(1), BOOLEAN_T, $1.lexema);
-											}
-										}
-										else
-										{
-											if( atoi($1.value) || atoi($3.value))
-											{
-												$$ = createValueInfo(iota(1), BOOLEAN_T, $1.lexema);
-											}
-											else
-											{
-												$$ = createValueInfo(iota(0), BOOLEAN_T, $1.lexema);
-											}
-											
-										}
-									}
-		| NEGACION expresion_booleana_base	{
-								int res = negateBoolean(atoi($2.value));
-								$$ = createValueInfo(iota(res), BOOLEAN_T, $2.lexema);
-							}
-		| expresion_booleana_base	{ 
-							$$ = createValueInfo($1.value, BOOLEAN_T, $1.lexema);
-						}
-
-expresion_booleana_base : lista_sumas OP_RELACIONAL lista_sumas {
-									if(isNumberType($1.type) && isNumberType($3.type) && isSameType($1.type, $3.type))
-									{
-										int res = doRelationalOperation(atof($1.value), $2, atof($3.value));
-										$$ = createValueInfo(iota(res), BOOLEAN_T, $1.lexema);
-									}
-									else
-									{
-										char * error = allocateSpaceForMessage();
-										sprintf(error, "Cannot do comparation %s %s %s", $1.value, $2, $3.value);
-										yyerror(error);
-									}
-								}
-			| terminal_booleano	{
-							if (isSameType($1.type, BOOLEAN_T))
-							{
-								$$ = createValueInfo($1.value, $1.type, $1.lexema);
-							}
-							else
-							{
-								char * error = allocateSpaceForMessage();
-								sprintf(error, "%s is not valid for boolean expression", $1.value);
-								yyerror(error);
-							}
-						}
-
-terminal_booleano : BOOLEAN	{	
-					$$ = createValueInfo(iota($1), BOOLEAN_T, NULL);
-				}
-		| PARENTESIS_ABIERTO expresion_booleana PARENTESIS_CERRADO	{
-											if (isSameType($2.type, BOOLEAN_T))
-											{
-												$$ = createValueInfo($2.value, BOOLEAN_T, $2.lexema);
-											}
-											else
-											{
-												char * error = allocateSpaceForMessage();
-												sprintf(error, "Cannot do operation with %s", $2.value);
-												yyerror(error);
-											}
-										}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
        									if (ampliar_vector_dims[$2.dim])

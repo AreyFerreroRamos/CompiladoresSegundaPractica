@@ -42,12 +42,6 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 							return FLOAT;						
 						}
 
-(true|false)	{
-			debug("%s\n", yytext, 0);
-			yylval.boolea = strcmp(yytext,"true") ? false : true;
-			return BOOLEAN;
-		}
-
 (#(.)*|#=(.|\n)*=#) 	{
 				debug("COMMENT: %s\n", yytext, 0);
 			}
@@ -76,23 +70,6 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			return OP_ARIT_P3;
 		}
 
-(">"|">="|"=="|"<="|"<"|"!=")	{
-					debug("%s\n", yytext, 0);
-					yylval.cadena = strdup(yytext);
-					return OP_RELACIONAL;
-				}
-
-(&&|"||")	{
-			debug("%s\n", yytext, 0);
-			yylval.cadena = strdup(yytext);
-			return OP_BOOL;
-		}
-
-"!"	{
-		debug("%s\n", yytext, 0);
-		return NEGACION;
-	}
-
 "("	{
 		debug("%s\n", yytext, 0);
 		return PARENTESIS_ABIERTO;
@@ -112,12 +89,6 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		debug("%s\n", yytext, 0);
 		return DIV;
 	}
-
-"length("	{
-			debug("%s\n", yytext, 0);
-			return LENGTH;
-		}	
-
 
 "="	{
 		debug("%s\n", yytext, 0);
@@ -169,20 +140,10 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 				{
 					v = createValueInfo(entry.value, entry.type, NULL);
 				}				
-				if(isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
+				if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
 				{
 					yylval.operand = v;
 					return ID_ARIT;
-				}
-				else if (isSameType(v.type, STRING_T))
-				{
-					yylval.cadena = v.value;
-					return STRING;
-				}
-				else
-				{
-					yylval.boolea = atoi(v.value);
-					return BOOLEAN;
 				}
 			}
 			else
@@ -193,12 +154,6 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			}
 		}	
 	}
-
-\"(\\.|[^\"])*\"	{
-				debug("%s\n", yytext, 0);
-				yylval.cadena = strdup(yytext);
-				return STRING;
-			}
 
 \n	{
 		debug("%s\n", yytext, 0);
