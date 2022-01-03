@@ -24,7 +24,7 @@ SRCY = bison.tab.c
 BIN = executable
 LFLAGS = -n 
 YFLAGS = -d -v
-OTHERS = bison.tab.h bison.output sortida.txt
+OTHERS = bison.tab.h bison.output sortida-c3a.txt
 
 ######################################################################
 
