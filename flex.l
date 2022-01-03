@@ -17,6 +17,7 @@
   extern void yyerror(char *);
   bool assignFounded = false;
   bool corcheteOpenFounded = false;
+  bool insideFunction = false;
 %}
 
 %option yylineno
@@ -112,6 +113,18 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		return PUNTO_Y_COMA;
 	}
 
+"function"	{
+			debug("%s\n", yytext, 0);
+			insideFunction = true;
+			return START;
+		}
+
+"end"	{
+		debug("%s\n", yytext, 0);
+		insideFunction = false;
+		return END;
+	}
+
 {id}	{
 		if (assignFounded == false && corcheteOpenFounded == false)
 		{
@@ -128,18 +141,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			int response =  sym_lookup(yytext, &entry);
 			if (response == SYMTAB_OK)
 			{
-				
-				value_info v;
-					//SI EL ID_ARIT ES TENSOR
-				if (entry.value == NULL) 
-				{
-					v = createValueInfo(NULL, entry.type, yytext);
-				}
-					//SI EL ID_ARIT ES DE DIM 0
-				else 
-				{
-					v = createValueInfo(entry.value, entry.type, NULL);
-				}				
+				value_info v = createValueInfo(NULL, entry.type, yytext);				
 				if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
 				{
 					yylval.operand = v;
@@ -149,7 +151,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			else
 			{
 				char * error = allocateSpaceForMessage();
-				sprintf(error, "The id %s is not initialized", yytext);
+				sprintf(error, "The id %s doesn't exist.", yytext);
 				yyerror(error);	
 			}
 		}	

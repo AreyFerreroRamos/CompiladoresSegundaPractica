@@ -137,11 +137,6 @@ void saveTmpTensorInSymTab(value_info *val, char *type1, char *type2, sym_value_
 /**
  *
  **/
-char *generateTmpTensorId();
-
-/**
- *
- **/
 void clearTmpTensorId();
 
 // FUNCIONES DE CONTROL DE ERRORES

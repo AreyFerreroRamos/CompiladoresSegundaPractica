@@ -30,8 +30,29 @@
 #define OP_BOOL_AND "&&"
 #define OP_BOOL_OR "||"
 
-#define TMP_BASE_ID "_tmp_"
+#define TMP_BASE_ID "$t"
 #define TMP_ID_MAX_LENGTH 10
+
+// TIPOS DE INSTRUCCIÓN.
+
+#define INSTR_START
+#define INSTR_END
+#define INSTR_ADD
+#define INSTR_SUB
+#define INSTR_MUL
+#define INSTR_DIV
+#define INSTR_MOD
+#define INSTR_I2D
+#define INSTR_D2I
+#define INSTR_COPY		// Se asigna el contenido de una variable a otra variable.
+#define INSTR_CONSULT		// Se asigna el contenido de una posición de un tensor a una variable.
+#define INSTR_ASSIGN		// Se asigna el contenido de una variable en una posición del tensor.
+#define INSTR_PARAM
+#define INSTR_CALL
+#define INSTR_PUT
+#define INSTR_HALT
+#define INSTR_RETURN
+
 
 typedef struct
 {
