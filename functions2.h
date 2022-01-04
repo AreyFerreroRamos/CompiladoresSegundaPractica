@@ -15,11 +15,64 @@ void yyerror(char *);
 // FUNCIONES DE UTILIDAD
 
 /**
-*
-**/
+ * Genera un nuevo Id de forma incremental con la forma $tXXXXXXXX (donde las X son números)
+ * para una variable temporal dentro del c3a
+ **/
 char *generateTmpId();
 
 /**
-*
-**/
-void emet(char * type, value_info v1, value_info v2, value_info v3);
+ *  Dado un tipo de instrucción y los posibles valores dentro de ella, se encarga de gestionar
+ *  como se escribe la instruccion o conjunto de intrucciones y añadirla al c3a
+ **/
+void emet(char *type, value_info v1, value_info v2, value_info v3);
+
+/**
+ *  Dada una linea y un string, se encarga de añadir de añadir el string dentro del c3a
+ */
+void writeLine(int line, char *instruction);
+
+/**
+ *  Escribe el c3a por consola y en el fichero de salida
+ */
+void printCode3Adresses();
+
+/**
+ * Dados dos tipos comprueba que son iguales y en ese caso devuelve 1,
+ * en caso contrario 0.
+ **/
+int isSameType(char *type1, char *type2);
+
+/**
+ * Convierte un entero a string.
+ **/
+char *itos(int num);
+
+/**
+ * Convierte un float a string.
+ **/
+char *ftos(float num);
+
+/**
+ * Reserva espacio en una variable char * para 200 carácteres como máximo y la devuleve.
+ **/
+char *allocateSpaceForMessage();
+
+/**
+ * Función que hace un printf del texto pasado con una variable como parametro.
+ * typeFile identificara si pertenece a flex (0) o bison/funciones (1).
+ **/
+void debug(char *text, char *var, int typeFile);
+
+/**
+ * Función que hace un printf del texto pasado.
+ * typeFile identificara si pertenece a flex (0) o bison/funciones (1).
+ **/
+void simpleDebug(char *text, int typeFile);
+
+/**
+ * Dado un texto con "%s donde quiera poner un argumento, el numero de argumentos, y los argumentos
+ * devuelve un string con los argumentos dentro del mensaje
+ */
+char *generateString(char *message, int nArgs, ...);
+
+#endif

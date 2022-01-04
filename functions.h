@@ -3,43 +3,7 @@
 #include "tipus.h"
 #include "symtab.h"
 
-// FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR
-
-int init_analisi_lexic(char *);
-int init_analisi_sintactic(char *);
-int analisi_semantic();
-int end_analisi_lexic();
-int end_analisi_sintactic();
-void yyerror(char *);
-
 // FUNCIONES DE UTILIDAD
-
-/**
- * Función que hace un printf del texto pasado con una variable como parametro.
- * typeFile identificara si pertenece a flex (0) o bison/funciones (1).
- **/
-void debug(char *text, char *var, int typeFile);
-
-/**
- * Función que hace un printf del texto pasado.
- * typeFile identificara si pertenece a flex (0) o bison/funciones (1).
- **/
-void simpleDebug(char *text, int typeFile);
-
-/**
- * Convierte un entero a string.
- **/
-char *iota(int num);
-
-/**
- * Convierte un float a string.
- **/
-char *fota(float num);
-
-/**
- * Reserva espacio en una variable char * para 200 carácteres como máximo y la devuleve.
- **/
-char *allocateSpaceForMessage();
 
 /**
  * Dado un booleano (0/1) devuelve su contrario.

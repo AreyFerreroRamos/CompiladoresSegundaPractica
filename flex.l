@@ -12,7 +12,7 @@
   #include <stdbool.h>
   #include <string.h> 
   #include "bison.tab.h"
-  #include "functions.h"
+  #include "functions2.h"
 
   extern void yyerror(char *);
   bool assignFounded = false;
@@ -114,18 +114,21 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 	}
 
 "function"	{
-			debug("%s\n", yytext, 0);
+			/*debug("%s\n", yytext, 0);
 			insideFunction = true;
-			return START;
+			return START;*/
 		}
 
 "end"	{
-		debug("%s\n", yytext, 0);
+		/*debug("%s\n", yytext, 0);
 		insideFunction = false;
-		return END;
+		return END;*/
 	}
 
 {id}	{
+		if(strlen(yytext)>ID_MAX_LENGTH){
+			yyerror(generateString("ID -> %s demasiado largo",1,yytext));
+		}
 		if (assignFounded == false && corcheteOpenFounded == false)
 		{
 			debug("ID POINTER: %s\n", yytext, 0);
@@ -141,7 +144,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			int response =  sym_lookup(yytext, &entry);
 			if (response == SYMTAB_OK)
 			{
-				value_info v = createValueInfo(NULL, entry.type, yytext);				
+				value_info v;//createValueInfo(NULL, entry.type, yytext);				
 				if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
 				{
 					yylval.operand = v;
@@ -150,9 +153,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			}
 			else
 			{
-				char * error = allocateSpaceForMessage();
-				sprintf(error, "The id %s doesn't exist.", yytext);
-				yyerror(error);	
+				yyerror(generateString("ID -> %s no existe",1,yytext));
 			}
 		}	
 	}

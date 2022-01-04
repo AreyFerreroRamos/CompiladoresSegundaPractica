@@ -18,13 +18,15 @@ YACC = bison
 ELEX = flex.l
 EYACC = bison.y
 OBJ = main.o bison.o flex.o
-SRC = main.c functions.c symtab.c
+SRC = main.c functions2.c symtab.c
 SRCL = lex.yy.c
 SRCY = bison.tab.c
 BIN = executable
 LFLAGS = -n 
 YFLAGS = -d -v
-OTHERS = bison.tab.h bison.output sortida-c3a.txt
+OTHERS = bison.tab.h bison.output
+TEST_FILE = fitxerDeProves.jl 
+EXIT_FILE = sortida-c3a.txt
 
 ######################################################################
 
@@ -38,5 +40,8 @@ $(SRCY) : $(EYACC)
 	$(YACC) $(YFLAGS) $<
 
 clean : 
-	rm -f *~ $(BIN) $(OBJ) $(SRCL) $(SRCY) $(OTHERS)
+	rm -f *~ $(BIN) $(OBJ) $(SRCL) $(SRCY) $(OTHERS) $(EXIT_FILE)
+
+run : 
+	./$(BIN).exe $(TEST_FILE) $(EXIT_FILE)
 
