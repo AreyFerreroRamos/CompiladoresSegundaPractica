@@ -127,7 +127,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 
 {id}	{
 		if(strlen(yytext)>ID_MAX_LENGTH){
-			yyerror(generateString("ID -> %s demasiado largo",1,yytext));
+			yyerror(generateString("ID -> %s demasiado largo",2,yytext));
 		}
 		if (assignFounded == false && corcheteOpenFounded == false)
 		{
@@ -144,7 +144,8 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			int response =  sym_lookup(yytext, &entry);
 			if (response == SYMTAB_OK)
 			{
-				value_info v;//createValueInfo(NULL, entry.type, yytext);				
+
+				value_info v = createValueInfo(NULL, entry.type, yytext,entry.entryType,-1);				
 				if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
 				{
 					yylval.operand = v;

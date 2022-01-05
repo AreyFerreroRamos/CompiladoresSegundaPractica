@@ -11,12 +11,6 @@
 int negateBoolean(int boolean);
 
 /**
- * Dados los datos necesarios para crear una entrada en la symtab,
- * genera un objeto que contiene todos ellos y lo devuele.
- **/
-value_info createValueInfo(char *value, char *type, char *lexema);
-
-/**
  * Dados los parámetros necesarios para crear una estructura de tipo tensor_info (dim,
  * calcIndex y lexema) se crea dicha estructura.
  **/
@@ -51,11 +45,6 @@ void castValueToVoidPointer(void *ptr, char *value, char *type);
  * prioritario (1.Float 2.Int).
  **/
 void castTensorToVoidPointer(void *ptr, char *type1, int num_element1, void *elements2, char *type2, int num_element2);
-
-/**
- * Dado un tipo devuelve el tamaño en bytes.
- **/
-int calculateSizeType(char *type);
 
 /**
  * Comprueba si las dimensiones de los tensores son compatibles para poder hacer el prodcto.
@@ -110,12 +99,6 @@ void clearTmpTensorId();
  * en caso contrario 0.
  **/
 int isSameType(char *type1, char *type2);
-
-/**
- * Dado un tipo controla si es entero o float y devuelve 1 en caso de serlo
- * o 0 si no lo es.
- **/
-int isNumberType(char *type);
 
 // FUNCIONES PARA REALIZAR OPERACIONES
 

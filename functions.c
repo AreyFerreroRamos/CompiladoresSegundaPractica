@@ -23,29 +23,6 @@ int negateBoolean(int boolean)
 	return 0;
 }
 
-value_info createValueInfo(char *value, char *type, char *lexema)
-{
-	value_info aux;
-	if (value != NULL)
-	{
-		aux.value = strdup(value);
-	}
-	else
-	{
-		aux.value = NULL;
-	}
-	aux.type = strdup(type);
-	if (lexema != NULL)
-	{
-		aux.lexema = strdup(lexema);
-	}
-	else
-	{
-		aux.lexema = NULL;
-	}
-	return aux;
-}
-
 tensor_info createTensorInfo(int index_dim, int calcIndex, char *lexema)
 {
 	tensor_info aux;
@@ -170,22 +147,6 @@ void castTensorToVoidPointer(void *ptr, char *type1, int num_element1, void *ele
 				((float *)ptr)[i++] = ((float *)elements2)[j];
 			}
 		}
-	}
-}
-
-int calculateSizeType(char *type)
-{
-	if (isSameType(type, FLOAT64_T))
-	{
-		return 8;
-	}
-	else if (isSameType(type, INT32_T))
-	{
-		return 4;
-	}
-	else
-	{
-		return 1;
 	}
 }
 
@@ -390,11 +351,6 @@ void clearTmpTensorId()
 }
 
 // FUNCIONES DE CONTROL DE ERRORES
-
-int isNumberType(char *type)
-{
-	return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
-}
 
 // FUNCIONES PARA REALIZAR OPERACIONES
 

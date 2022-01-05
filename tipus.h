@@ -6,7 +6,7 @@
 #define INT_MAX_LENGTH_STR 10
 #define FLOAT_MAX_LENGTH_STR 12
 #define ID_MAX_LENGTH 10
-#define INSTR_MAX_LENGTH 10
+#define INSTR_MAX_LENGTH 200
 
 #define TMP_BASE_ID "$t"
 #define INT32_T "Int32"

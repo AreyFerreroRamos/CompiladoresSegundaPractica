@@ -37,6 +37,12 @@ void writeLine(int line, char *instruction);
 void printCode3Adresses();
 
 /**
+ * Dado un tipo controla si es entero o float y devuelve 1 en caso de serlo
+ * o 0 si no lo es.
+ **/
+int isNumberType(char *type);
+
+/**
  * Dados dos tipos comprueba que son iguales y en ese caso devuelve 1,
  * en caso contrario 0.
  **/
@@ -68,6 +74,23 @@ void debug(char *text, char *var, int typeFile);
  * typeFile identificara si pertenece a flex (0) o bison/funciones (1).
  **/
 void simpleDebug(char *text, int typeFile);
+
+/**
+ * Dados los datos necesarios para crear una entrada en la symtab,
+ * genera un objeto que contiene todos ellos y lo devuele.
+ **/
+sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDims, void *elements, char *entryType);
+
+/**
+ * Dados los datos necesarios para crear una unidad de datos para bison,
+ * genera un objeto que contiene todos ellos y lo devuele.
+ **/
+value_info createValueInfo(char *value, char *type, char *lexema, char *valueInfoType, int index);
+
+/**
+ * Dado un tipo devuelve el tamaño en bytes.
+ **/
+int calculateSizeType(char *type);
 
 /**
  * Dado un texto con "%s donde quiera poner un argumento, el numero de argumentos, y los argumentos

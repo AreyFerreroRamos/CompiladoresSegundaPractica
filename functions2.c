@@ -113,26 +113,29 @@ char *generateTmpId()
 
 void emet(char *type, value_info v1, value_info v2, value_info v3)
 {
-	char instruction;
+	char *instruction;
 	if (isSameType(type, INSTR_COPY))
 	{
-		// var := var // var := 9999999999 // var := var[9999999999] // var[9999999999] := var ...
 		if (isSameType(v1.valueInfoType, TENS_T))
 		{
 			if (isSameType(v2.valueInfoType, VAR_T))
 			{
+				// var[9999999999] := var
 				instruction = generateString("%s[%s] := %s", 3, v1.lexema, itos(v1.index), v2.lexema);
 			}
 			else if (isSameType(v2.valueInfoType, TENS_T))
 			{
+				// var[9999999999] := var[9999999999]
 				instruction = generateString("%s[%s] := %s[%s]", 4, v1.lexema, itos(v1.index), v2.lexema, itos(v2.index));
 			}
 			else if (isSameType(v2.valueInfoType, LIT_T))
 			{
+				// var[9999999999] := 9999999999
 				instruction = generateString("%s[%s] := %s", 3, v1.lexema, itos(v1.index), v2.value);
 			}
 			else if (isSameType(v2.valueInfoType, FUNC_T))
 			{
+				// var[9999999999] := CALL func, arg0, arg1, ...
 				instruction = generateString("%s[%s] := CALL %s", 3, v1.lexema, itos(v1.index), v2.lexema);
 				// TODO añadir parámetros de la función
 			}
@@ -141,18 +144,22 @@ void emet(char *type, value_info v1, value_info v2, value_info v3)
 		{
 			if (isSameType(v2.valueInfoType, VAR_T))
 			{
+				// var := var
 				instruction = generateString("%s := %s", 3, v1.lexema, v2.lexema);
 			}
 			else if (isSameType(v2.valueInfoType, TENS_T))
 			{
+				// var := var[9999999999]
 				instruction = generateString("%s := %s[%s]", 4, v1.lexema, v2.lexema, itos(v2.index));
 			}
 			else if (isSameType(v2.valueInfoType, LIT_T))
 			{
+				// var := 9999999999
 				instruction = generateString("%s := %s", 3, v1.lexema, v2.value);
 			}
 			else if (isSameType(v2.valueInfoType, FUNC_T))
 			{
+				// var := CALL func, arg0, arg1, ...
 				instruction = generateString("%s := CALL %s", 3, v1.lexema, v2.lexema);
 				// TODO añadir parámetros de la función
 			}
@@ -180,13 +187,19 @@ void writeLine(int line, char *instruction)
 
 void printCode3Adresses()
 {
-	printf("---------------------------------");
+	printf("---------------------------------\n");
 	for (int i = 0; i < lengthCode; i++)
 	{
 		printf(c3a[i]);
+		printf("\n");
 		fprintf(yyout, c3a[i]);
 	}
-	printf("---------------------------------");
+	printf("---------------------------------\n");
+}
+
+int isNumberType(char *type)
+{
+	return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
 }
 
 int isSameType(char *type1, char *type2)
@@ -243,6 +256,59 @@ void simpleDebug(char *text, int typeFile)
 	}
 }
 
+value_info createValueInfo(char *value, char *type, char *lexema, char *valueInfoType, int index)
+{
+	value_info aux;
+	if (value != NULL)
+	{
+		aux.value = strdup(value);
+	}
+	else
+	{
+		aux.value = NULL;
+	}
+	aux.type = strdup(type);
+	if (lexema != NULL)
+	{
+		aux.lexema = strdup(lexema);
+	}
+	else
+	{
+		aux.lexema = NULL;
+	}
+	aux.valueInfoType = strdup(valueInfoType);
+	aux.index = index;
+	return aux;
+}
+
+sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDims, void *elements, char *entryType)
+{
+	sym_value_type aux;
+	aux.type = strdup(type);
+	aux.entryType = strdup(entryType);
+	aux.size = size;
+	aux.num_dim = numDim;
+	aux.elem_dims = elemDims;
+	aux.elements = elements;
+	return aux;
+}
+
+int calculateSizeType(char *type)
+{
+	if (isSameType(type, FLOAT64_T))
+	{
+		return 8;
+	}
+	else if (isSameType(type, INT32_T))
+	{
+		return 4;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
 char *generateString(char *message, int nArgs, ...)
 {
 	va_list ap;
@@ -283,7 +349,7 @@ char *generateString(char *message, int nArgs, ...)
 		break;
 
 	default:
-		yyerror("ERROR. using bad function generateInstruction(),, bad nArgs (0 to 7 both included)");
+		yyerror("Estas usando mal la función generateString(), nArgs debe estar entre 0 y 7");
 	}
 	return strdup(string);
 }
