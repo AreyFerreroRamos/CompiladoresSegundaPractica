@@ -62,7 +62,7 @@ typedef struct
 	char *value;		 // Valor del elemento.
 	char *lexema;		 // Nombre de var en caso de ser ID_ARIT
 	char *valueInfoType; // variable, tensor, funcion, literal
-	int index;			 // indice de acceso en caso de ser un tensor;
+	value_info index;	 // indice de acceso en caso de ser un tensor, como el indice puede estar expresado dentro de una variable;
 } value_info;
 
 typedef struct

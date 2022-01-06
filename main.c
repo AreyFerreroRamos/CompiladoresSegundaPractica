@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
 				error = analisi_semantic();
 				if (error == EXIT_SUCCESS)
 				{
-
 					printCode3Adresses();
 					printf("The compilation has been successful\n");
 				}

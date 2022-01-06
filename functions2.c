@@ -104,7 +104,6 @@ void yyerror(char *explanation)
 char *generateTmpId()
 {
 	char *id;
-
 	id = (char *)malloc(sizeof(char) * ID_MAX_LENGTH);
 	sprintf(id, "%s%i", TMP_BASE_ID, num_tmp_variable);
 	num_tmp_variable++;
