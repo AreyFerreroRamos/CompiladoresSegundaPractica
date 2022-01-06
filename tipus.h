@@ -40,11 +40,15 @@
 
 #define INSTR_START "_I_START"
 #define INSTR_END "_I_END"
-#define INSTR_ADD "_I_ADD"
-#define INSTR_SUB "_I_SUB"
-#define INSTR_MUL "_I_MUL"
-#define INSTR_DIV "_I_DIV"
-#define INSTR_MOD "_I_MOD"
+#define INSTR_ADDI "ADDI"
+#define INSTR_ADDD "ADDD"
+#define INSTR_SUBI "SUBI"
+#define INSTR_SUBD "SUBD"
+#define INSTR_MULI "MULI"
+#define INSTR_MULD "MULD"
+#define INSTR_DIVI "DIVI"
+#define INSTR_DIVD "DIVD"
+#define INSTR_MODI "MODI"
 #define INSTR_I2D "_I_I2D"
 #define INSTR_D2I "_I_D2I"
 #define INSTR_COPY "_I_COPY"	   // Se asigna el contenido de una variable a otra variable.
@@ -62,7 +66,7 @@ typedef struct
 	char *value;		 // Valor del elemento.
 	char *lexema;		 // Nombre de var en caso de ser ID_ARIT
 	char *valueInfoType; // variable, tensor, funcion, literal
-	value_info index;	 // indice de acceso en caso de ser un tensor, como el indice puede estar expresado dentro de una variable;
+	char *index;		 // indice de acceso en caso de ser un tensor, como el indice puede estar expresado dentro de una variable;
 } value_info;
 
 typedef struct

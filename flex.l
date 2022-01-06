@@ -12,7 +12,8 @@
   #include <stdbool.h>
   #include <string.h> 
   #include "bison.tab.h"
-  #include "functions2.h"
+  #include "functions.h"
+  #include "utils.h"
 
   extern void yyerror(char *);
   bool assignFounded = false;
@@ -127,7 +128,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 
 {id}	{
 		if(strlen(yytext)>ID_MAX_LENGTH){
-			yyerror(generateString("ID -> %s demasiado largo",2,yytext));
+			yyerror(generateString("ID -> %s demasiado largo",1,yytext));
 		}
 		if (assignFounded == false && corcheteOpenFounded == false)
 		{
@@ -145,7 +146,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 			if (response == SYMTAB_OK)
 			{
 
-				value_info v = createValueInfo(NULL, entry.type, yytext,entry.entryType,-1);				
+				value_info v = createValueInfo(NULL, entry.type, yytext,entry.entryType,NULL);				
 				if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
 				{
 					yylval.operand = v;

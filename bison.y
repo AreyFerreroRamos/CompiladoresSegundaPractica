@@ -24,7 +24,8 @@
 %}
 
 %code requires {
-  #include "functions2.h"
+  #include "utils.h"
+  #include "functions.h"
   #include "tipus.h"
 }
 
@@ -89,9 +90,9 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 								entry = createSymValueType($3.type,size,0,NULL,NULL,VAR_T);
 								int message = sym_enter($1.lexema, &entry);
 								if (message != SYMTAB_OK && message != SYMTAB_DUPLICATE){ yyerror("Error al guardar en symtab");}
-								value_info v1 = createValueInfo(NULL,$3.type,$1.lexema,VAR_T,-1);
-								value_info v3;
-								emet(INSTR_COPY,v1,$3,v3);
+								value_info null;
+								value_info v1 = createValueInfo(NULL,$3.type,$1.lexema,VAR_T,NULL);
+								emet(INSTR_COPY,v1,$3,null);
 							}
 							/*else if(isSameType($3.valueInfoType,TENS_T))
 							{
@@ -180,18 +181,22 @@ lista_indices : lista_indices COMA lista_sumas	{
 expresion_aritmetica : lista_sumas
 
 lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
-	    							
 								if (isNumberType($3.type))
 								{	
-									$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
-									if (isSameType($1.valueInfoType, _LIT_T)) {
-										
-										if (!doAritmeticOperation($1, $2, $3, &$$)) { 
-											yyerror("Algún problema durante la operación.");
-										}
-										
+									if (isSameType($1.valueInfoType, LIT_T) && isSameType($3.valueInfoType, LIT_T))
+									{
+										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+										doAritmeticOperation($1, $2, $3, &$$);
+									}
+									else
+									{
+										//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
+										$$ = createValueInfo(NULL,getNewType($1.type,$3.type),generateTmpId(),VAR_T,NULL);
+										classifyOperation($2,$$,$1,$3);
+										//GUARDAR VARIABLE TMP EN SYMTAB?
+									}
 								}
-								else{ yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type); }
+								else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type)); }
 							}	
 		| lista_productos	{ 	
 						if (isNumberType($1.type)){ $$ = $1;}
@@ -199,41 +204,22 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 					}
 
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
-								/*	if (isNumberType($3.type))
+									if (isNumberType($3.type))
 									{
-										int response = -4;
-										sym_value_type tmp;
-										if (strcmp($2, OP_ARIT_MULT) == 0){ response = doTensorProductInit($1.lexema, $3.lexema, &tmp);}
-										if (response == 0)
-										{
-											int res = doTensorProductTensor($1.lexema, $3.lexema, &tmp);
-
-											if (res != 0){ yyerror("Alguna variable no se ha encontrado en la symtab");}
-											else{ saveTmpTensorInSymTab(&$$, $1.type, $3.type, tmp);}
-										}
-										else if (response == -1){ yyerror("Los indices de los tensores no son compatibles y no se puede realizar el producto");}
-										else if (response == -2){ yyerror("No esta permitido multiplicar tensores de dimensión superior a 2");}
-										else if (response == -3)
-										{
-											int res;
-
-											if ($1.value != NULL){ res = doNumberProductTensor($1.value, $1.type, $3.lexema, &tmp);}
-											else{ res = doNumberProductTensor($3.value, $3.type, $1.lexema, &tmp);}
-
-											if (res != 0){ yyerror("Alguna variable no se ha encontrado en la symtab.");}
-											else{ saveTmpTensorInSymTab(&$$, $1.type, $3.type, tmp);}
-										}
-										else if (response == -4)
-										{
-											if ($1.lexema == NULL && $3.lexema == NULL)
+											if (isSameType($1.valueInfoType, LIT_T) && isSameType($3.valueInfoType, LIT_T))
 											{
 												$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
-												if (!doAritmeticOperation($1, $2, $3, &$$)){ yyerror("Algún problema durante la operación.");}
+												doAritmeticOperation($1, $2, $3, &$$);
 											}
-											else{ yyerror("Los tensores no admiten la división.");}
-										}
+											else
+											{ 
+												//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
+												$$ = createValueInfo(NULL,getNewType($1.type,$3.type),generateTmpId(),VAR_T,NULL);
+												classifyOperation($2,$$,$1,$3);
+												//GUARDAR VARIABLE TMP EN SYMTAB?
+											}
 									}
-									else{ yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type); }*/
+									else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type)); }
 								}
 		| lista_potencias	{
 						if (isNumberType($1.type)){ $$ = $1;}
@@ -241,19 +227,29 @@ lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 					}
 
 op_arit_p2: OP_ARIT_P2	{
-				//$$ = strdup($1);
+				$$ = strdup($1);
 			} 
 	| ASTERISCO	{
-				//$$ = strdup($1);
+				$$ = strdup($1);
 			}
 
 lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico {
-									/*if (isNumberType($3.type))
+									if (isNumberType($3.type))
 									{
-										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
-										if (!doAritmeticOperation($1, $2, $3, &$$)){ yyerror("Ha habido algun problema realizando la operación");}
+										if (isSameType($1.valueInfoType, LIT_T) && isSameType($3.valueInfoType, LIT_T))
+										{
+											$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+											doAritmeticOperation($1, $2, $3, &$$);
+										}
+										else
+										{ 
+											//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
+											$$ = createValueInfo(NULL,getNewType($1.type,$3.type),generateTmpId(),VAR_T,NULL);
+											classifyOperation($2,$$,$1,$3);
+											//GUARDAR VARIABLE TMP EN SYMTAB?
+										}
 									}
-									else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type)); }*/
+									else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type)); }
 								}
 		| terminal_aritmetico	{
 						if (isNumberType($1.type)){ $$ = $1;}
@@ -261,17 +257,17 @@ lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico {
 					}
 
 terminal_aritmetico : INTEGER	{
-					$$ = createValueInfo(itos($1), INT32_T, NULL,LIT_T,-1);
+					$$ = createValueInfo(itos($1), INT32_T, NULL,LIT_T,NULL);
 				}
 	| FLOAT		{
-				$$ = createValueInfo(ftos($1), FLOAT64_T, NULL,LIT_T,-1);
+				$$ = createValueInfo(ftos($1), FLOAT64_T, NULL,LIT_T,NULL);
 			}
 	| id_arit 	{
 				$$ = $1;
 			}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
-									/*if (isNumberType($2.type)){ $$ = createValueInfo($2.value, $2.type, $2.lexema);}
-									else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type));}	*/
+									if (isNumberType($2.type)){ $$ = $2;}
+									else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type));}
 								}
 	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
 								/*	if ((isNumberType($2.type)) && (isNumberType($4.type)))
