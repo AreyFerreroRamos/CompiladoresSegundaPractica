@@ -180,22 +180,18 @@ lista_indices : lista_indices COMA lista_sumas	{
 expresion_aritmetica : lista_sumas
 
 lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
-								/*if (isNumberType($3.type))
+	    							
+								if (isNumberType($3.type))
 								{	
-									sym_value_type tmp;
-									int response = doTensorCalcs($1.lexema, $3.lexema, $2, &tmp);
-
-									if (response == 0){ saveTmpTensorInSymTab(&$$, $1.type, $3.type, tmp);}
-									else if (response == -1){ yyerror("No se puede sumar un tensor con un número");}
-									else if (response == -2)
-									{
-										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
-										if (!doAritmeticOperation($1, $2, $3, &$$)){ yyerror("Algún problema durante la operación.");}
-									}
-									else if (response == -3){ yyerror("Ha habido un error buscando una variable en la symtab");}	
-									else if (response == -4){ yyerror("No se pueden sumar o restar tensores con diferentes dimensiones");}	
+									$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+									if (isSameType($1.valueInfoType, _LIT_T)) {
+										
+										if (!doAritmeticOperation($1, $2, $3, &$$)) { 
+											yyerror("Algún problema durante la operación.");
+										}
+										
 								}
-								else{ yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type); }*/
+								else{ yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type); }
 							}	
 		| lista_productos	{ 	
 						if (isNumberType($1.type)){ $$ = $1;}
