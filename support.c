@@ -111,9 +111,9 @@ void printCode3Adresses()
     printf("---------------------------------\n");
     for (int i = 0; i < lengthCode; i++)
     {
-        printf(c3a[i]);
+        printf("%s", c3a[i]);
         printf("\n");
-        fprintf(yyout, c3a[i]);
+        fprintf(yyout, "%s", c3a[i]);
     }
     printf("---------------------------------\n");
 }
