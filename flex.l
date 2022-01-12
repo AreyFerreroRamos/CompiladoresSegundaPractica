@@ -127,38 +127,39 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 	}
 
 {id}	{
-		if(strlen(yytext)>ID_MAX_LENGTH){
-			yyerror(generateString("ID -> %s demasiado largo",1,yytext));
-		}
-		if (assignFounded == false && corcheteOpenFounded == false)
-		{
-			debug("ID POINTER: %s\n", yytext, 0);
-			yylval.ident.lexema = strdup(yytext);
-			yylval.ident.lenght = strlen(yytext);
-			yylval.ident.line = yylineno;
-			return ID;
-		}
-		else
-		{
-			debug("ID ARIT: %s\n", yytext, 0);
-			sym_value_type entry;
-			int response =  sym_lookup(yytext, &entry);
-			if (response == SYMTAB_OK)
-			{
+            if (strlen(yytext) > ID_MAX_LENGTH)
+            {
+                yyerror(generateString("ID -> %s demasiado largo", 1, yytext));
+            }
+            if (assignFounded == false && corcheteOpenFounded == false)
+            {
+                debug("ID POINTER: %s\n", yytext, 0);
+                yylval.ident.lexema = strdup(yytext);
+                yylval.ident.lenght = strlen(yytext);
+                yylval.ident.line = yylineno;
+                return ID;
+            }
+            else
+            {
+                debug("ID ARIT: %s\n", yytext, 0);
+                sym_value_type entry;
+                int response =  sym_lookup(yytext, &entry);
+                if (response == SYMTAB_OK)
+                {
 
-				value_info v = createValueInfo(NULL, entry.type, yytext,entry.entryType,NULL);				
-				if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
-				{
-					yylval.operand = v;
-					return ID_ARIT;
-				}
-			}
-			else
-			{
-				yyerror(generateString("ID -> %s no existe",1,yytext));
-			}
-		}	
-	}
+                    value_info v = createValueInfo(NULL, entry.type, yytext,entry.entryType,NULL);
+                    if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
+                    {
+                        yylval.operand = v;
+                        return ID_ARIT;
+                    }
+                }
+                else
+                {
+                    yyerror(generateString("ID -> %s no existe",1,yytext));
+                }
+            }
+        }
 
 \n	{
 		debug("%s\n", yytext, 0);

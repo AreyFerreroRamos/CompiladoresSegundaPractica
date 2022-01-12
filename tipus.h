@@ -65,14 +65,14 @@ typedef struct
 	char *type;			 // Tipo del elemenento.
 	char *value;		 // Valor del elemento.
 	char *lexema;		 // Nombre de var en caso de ser ID_ARIT
-	char *valueInfoType; // variable, tensor, funcion, literal
-	char *index;		 // indice de acceso en caso de ser un tensor, como el indice puede estar expresado dentro de una variable;
+	char *valueInfoType; // Variable, tensor, función o literal.
+	char *index;		 // Índice de acceso en caso de ser un tensor, como el indice puede estar expresado dentro de una variable;
 } value_info;
 
 typedef struct
 {
 	int index_dim; // Posición actual del vector de dimensiones del tensor.
-	int calcIndex; // Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor demandada.
+	int calcIndex; // Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor tratándolo como si fuera un vector.
 	char *lexema;  // Nombre de la variable tensor.
 } tensor_info;
 
