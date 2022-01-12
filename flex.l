@@ -115,16 +115,16 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 	}
 
 "function"	{
-			/*debug("%s\n", yytext, 0);
-			insideFunction = true;
-			return START;*/
-		}
+                /*debug("%s\n", yytext, 0);
+                insideFunction = true;
+                return START;*/
+            }
 
 "end"	{
-		/*debug("%s\n", yytext, 0);
-		insideFunction = false;
-		return END;*/
-	}
+            /*debug("%s\n", yytext, 0);
+            insideFunction = false;
+            return END;*/
+        }
 
 {id}	{
             if (strlen(yytext) > ID_MAX_LENGTH)
@@ -142,21 +142,12 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             else
             {
                 debug("ID ARIT: %s\n", yytext, 0);
-                sym_value_type entry;
-                int response =  sym_lookup(yytext, &entry);
-                if (response == SYMTAB_OK)
+                sym_value_type entry = getEntry(yytext);
+                value_info v = createValueInfo(yytext, entry.type,entry.entryType,NULL);
+                if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
                 {
-
-                    value_info v = createValueInfo(NULL, entry.type, yytext,entry.entryType,NULL);
-                    if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
-                    {
-                        yylval.operand = v;
-                        return ID_ARIT;
-                    }
-                }
-                else
-                {
-                    yyerror(generateString("ID -> %s no existe",1,yytext));
+                    yylval.operand = v;
+                    return ID_ARIT;
                 }
             }
         }

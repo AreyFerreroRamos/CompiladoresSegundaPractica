@@ -47,11 +47,11 @@ char *addV1(value_info v1)
     // Añadimos v1
     if (isSameType(v1.valueInfoType, TENS_T))
     {
-        instr = generateString("%s[%s] := ", 2, v1.lexema, v1.index);
+        instr = generateString("%s[%s] := ", 2, v1.value, v1.index);
     }
     else
     {
-        instr = generateString("%s := ", 1, v1.lexema);
+        instr = generateString("%s := ", 1, v1.value);
     }
     return strdup(instr);
 }
@@ -61,11 +61,11 @@ char *addV2(char *instruction, value_info v2)
     char *instr = strdup(instruction);
     if (isSameType(v2.valueInfoType, VAR_T))
     {
-        instr = generateString("%s%s ", 2, instr, v2.lexema);
+        instr = generateString("%s%s ", 2, instr, v2.value);
     }
     else if (isSameType(v2.valueInfoType, TENS_T))
     {
-        instr = generateString("%s%s[%s] ", 3, instr, v2.lexema, v2.index);
+        instr = generateString("%s%s[%s] ", 3, instr, v2.value, v2.index);
     }
     else if (isSameType(v2.valueInfoType, LIT_T))
     {
@@ -75,7 +75,7 @@ char *addV2(char *instruction, value_info v2)
     {
         // var[9999999999] := CALL func, numArgs
         int numParams = 1;
-        instr = generateString("%sCALL %s,%s", 3, instr, v2.lexema, itos(numParams));
+        instr = generateString("%sCALL %s,%s", 3, instr, v2.value, itos(numParams));
         // TODO añadir parámetros de la función
     }
     return strdup(instr);
@@ -91,11 +91,11 @@ char *addV3(char *instruction, value_info v3)
     char *instr = strdup(instruction);
     if (isSameType(v3.valueInfoType, VAR_T))
     {
-        instr = generateString("%s%s", 2, instr, v3.lexema);
+        instr = generateString("%s%s", 2, instr, v3.value);
     }
     else if (isSameType(v3.valueInfoType, TENS_T))
     {
-        instr = generateString("%s%s[%s]", 3, instr, v3.lexema, v3.index);
+        instr = generateString("%s%s[%s]", 3, instr, v3.value, v3.index);
     }
     else if (isSameType(v3.valueInfoType, LIT_T))
     {

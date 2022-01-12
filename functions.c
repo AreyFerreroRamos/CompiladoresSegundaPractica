@@ -163,3 +163,36 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 	finish_val->valueInfoType = LIT_T;
 	finish_val->index = NULL;
 }
+
+
+value_info_base *castValueInfoToTensorIniInfo(value_info v){
+    value_info_base *aux = malloc(sizeof(value_info_base));
+    aux->valueInfoType = _strdup(v.valueInfoType);
+    aux->type = _strdup(v.type);
+    aux->value = _strdup(v.value);
+    return aux;
+}
+
+value_info_base *joinElementsVectors(value_info_base * vec1,value_info_base * vec2,int numElemVec1,int numElemVec2){
+    int totalElem = numElemVec1+numElemVec2;
+    value_info_base *aux = realloc(vec1,totalElem*sizeof(value_info_base));
+    int cont = numElemVec1;
+    for(int i = 0;i<numElemVec2;i++){
+        aux[cont++] = vec2[i];
+    }
+    return aux;
+}
+
+void invertVector(int *vector, int dim)
+{
+
+    int aux;
+    int i;
+
+    for (i = 0; i < dim / 2; i++)
+    { // Invertir el vector.
+        aux = vector[i];
+        vector[i] = vector[dim - i - 1];
+        vector[dim - i - 1] = aux;
+    }
+}

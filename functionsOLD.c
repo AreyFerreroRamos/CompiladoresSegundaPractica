@@ -78,19 +78,7 @@ int getDim(char *key, int index_dim)
 	}
 }
 
-void invertVector(int *vector, int dim)
-{
 
-	int aux;
-	int i;
-
-	for (i = 0; i < dim / 2; i++)
-	{ // Invertir el vector.
-		aux = vector[i];
-		vector[i] = vector[dim - i - 1];
-		vector[dim - i - 1] = aux;
-	}
-}
 
 void castValueToVoidPointer(void *ptr, char *value, char *type)
 {

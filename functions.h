@@ -46,4 +46,20 @@ int calculateSizeType(char *type);
  **/
 void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val);
 
+/**
+ * Dado un value_info que llegará como valor de un tensor devuelve un string de una posición
+ * con los datos pasados
+ */
+value_info_base *castValueInfoToTensorIniInfo(value_info v);
+
+/**
+ * Dados dos arrays de value_info_base devuelve un nuevo array con la union de los dos anteriores
+ */
+value_info_base *joinElementsVectors(value_info_base * vec1,value_info_base * vec2,int numElemVec1,int numElemVec2);
+
+/**
+ * Dado un vector, se invierte el orden de los elementos que lo componen.
+ **/
+void invertVector(int *vector, int dim);
+
 #endif

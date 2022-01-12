@@ -17,10 +17,38 @@ void yyerror(char *);
 char *generateString(char *message, int nArgs, ...);
 
 /**
+ *
+ * @param valueInfoType
+ * @param type
+ * @param value
+ * @return
+ */
+value_info_base createValueInfoBase(char *valueInfoType, char *type, char *value );
+
+/**
  * Dados los datos necesarios para crear una unidad de datos para bison,
  * genera un objeto que contiene todos ellos y lo devuele.
  **/
-value_info createValueInfo(char *value, char *type, char *lexema, char *valueInfoType, char *index);
+value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base *index);
+
+/**
+ *
+ * @param index_dim
+ * @param calcIndex
+ * @param lexema
+ * @return
+ */
+tensor_info createTensorInfo(int index_dim, value_info_base calcIndex, char *lexema);
+
+/**
+ *
+ * @param dim
+ * @param type
+ * @param elements
+ * @param num_elem
+ * @return
+ */
+tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elements, int num_elem);
 
 /**
  * Dados los datos necesarios para crear una entrada en la symtab,

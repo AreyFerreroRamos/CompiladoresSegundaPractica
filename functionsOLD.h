@@ -29,10 +29,7 @@ char *getIdName(char *idWithAssign);
  **/
 int getDim(char *key, int num_dims);
 
-/**
- * Dado un vector, se invierte el orden de los elementos que lo componen.
- **/
-void invertVector(int *vector, int dim);
+
 
 /**
  * Dado un valor en formato caracter y el tipo de este valor lo convierte a
