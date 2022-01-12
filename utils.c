@@ -152,3 +152,20 @@ void simpleDebug(char *text, int typeFile)
         // printf(text);
     }
 }
+
+sym_value_type getEntry(char* key){
+    sym_value_type entry;
+    int response = sym_lookup(key, &entry);
+    if (response == SYMTAB_OK){return entry;}
+    else if(response == SYMTAB_NOT_FOUND){yyerror(generateString("No se ha encontrado la clave %s en la symtab",1,key));}
+    else{yyerror("Algun problema buscando el valor en la symtab");}
+}
+
+
+void addOrUpdateEntry(char* key, sym_value_type entry){
+    int response = sym_enter(key, &entry);
+    if(response == SYMTAB_NOT_FOUND){yyerror(generateString("No se ha encontrado la clave %s en la symtab",1,key));}
+    else if(response == SYMTAB_NO_MEMORY){yyerror("No hay más memoria");}
+    else if(response != SYMTAB_OK && response != SYMTAB_DUPLICATE ){yyerror("Algun problema guardando el valor en la symtab");}
+}
+

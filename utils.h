@@ -67,4 +67,16 @@ void debug(char *text, char *var, int typeFile);
  **/
 void simpleDebug(char *text, int typeFile);
 
+/**
+* La función busca en la symtab la variable y la devuelve. Si se produce algún error
+* se lanzará un yyerror()
+**/
+sym_value_type getEntry(char* key);
+
+/**
+* La función añade o actualiza (si ya existía) una entrada en la symtab. Si se produce algún error
+* se lanzará un yyerror()
+**/
+void addOrUpdateEntry(char* key, sym_value_type entry);
+
 #endif
