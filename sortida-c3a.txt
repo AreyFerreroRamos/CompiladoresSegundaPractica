@@ -1,1 +1,0 @@
-var := 7 $t0 := 8 MULI var$t1 := var ADDI $t0$t2 := var MODI 2$t3 := $t1 SUBI $t2var2 := $t3 

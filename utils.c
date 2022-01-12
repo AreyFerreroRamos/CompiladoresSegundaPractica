@@ -27,7 +27,7 @@ char *generateString(char *message, int nArgs, ...)
     switch (nArgs)
     {
     case 0:
-        sprintf(string, message);
+        sprintf(string, "%s", message);
         break;
     case 1:
         sprintf(string, message, params[0]);
