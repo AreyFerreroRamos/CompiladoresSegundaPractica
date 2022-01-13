@@ -57,27 +57,6 @@ char *getIdName(char *idWithAssign)
 	return var;
 }
 
-int getDim(char *key, int index_dim)
-{
-	sym_value_type entry;
-	int error = sym_lookup(key, &entry);
-	if (error == SYMTAB_OK)
-	{
-		if (index_dim < entry.num_dim)
-		{
-			return entry.elem_dims[index_dim];
-		}
-		else
-		{
-			return -1;
-		}
-	}
-	else
-	{
-		return -1;
-	}
-}
-
 
 
 void castValueToVoidPointer(void *ptr, char *value, char *type)

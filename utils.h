@@ -30,6 +30,8 @@ value_info_base generateEmptyValueInfoBase();
  **/
 value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base index);
 
+value_info generateEmptyValueInfo()
+
 /**
  * Dados los campos necesarios para gestionar un tensor durante su uso en el programa,
  * se genera una estructura que contiene dichos campos y se devuelve.

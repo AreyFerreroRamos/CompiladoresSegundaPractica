@@ -82,6 +82,12 @@ value_info createValueInfo(char *value, char *type, char *valueInfoType, value_i
     return aux;
 }
 
+value_info generateEmptyValueInfo()
+{
+    value_info aux;
+    return aux;
+}
+
 tensor_info createTensorInfo(int index_dim, value_info_base calcIndex, char *lexema)
 {
     tensor_info aux;

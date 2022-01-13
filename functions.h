@@ -64,4 +64,6 @@ value_info_base *joinElementsVectors(value_info_base * vec1,value_info_base * ve
  **/
 void invertVector(int *vector, int dim);
 
+int getDim(char *key, int index_dim);
+
 #endif

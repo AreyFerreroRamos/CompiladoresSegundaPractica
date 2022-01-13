@@ -69,8 +69,8 @@
  typedef struct
 {
     char *type;             // Tipo del elemenento.
-    char *value;            // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable, tensor o función.
-    char *valueInfoType;    // Variable, tensor, función o literal.
+    char *value;            // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable.
+    char *valueInfoType;    // Variable o literal.
 } value_info_base;
 
  /**
