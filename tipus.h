@@ -82,7 +82,7 @@ typedef struct
 	char *type;                 // Tipo del elemenento.
 	char *value;                // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable, tensor o función.
 	char *valueInfoType;        // Variable, tensor, función o literal.
-	value_info_base *index;     // Índice de acceso en caso de ser un tensor. Si el elemento no es un tensor, este campo será nulo.
+	value_info_base index;     // Índice de acceso en caso de ser un tensor. Si el elemento no es un tensor, este campo será nulo.
 } value_info;
 
 /**

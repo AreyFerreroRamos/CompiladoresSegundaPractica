@@ -20,13 +20,15 @@ char *generateString(char *message, int nArgs, ...);
  * Dados los campos necesarios para gestionar un índice (literal, variable, tensor o función) para acceder a la posición de un tensor,
  * se genera una estructura (value_info_base) que contiene dichos campos y se devuelve.
  */
-value_info_base createValueInfoBase(char *valueInfoType, char *type, char *value );
+value_info_base createValueInfoBase(char *value, char *type, char *valueInfoType);
+
+value_info_base generateEmptyValueInfoBase();
 
 /**
  * Dados los campos necesarios para gestionar un elemento (literal, variable, tensor o función),
  * se genera una estructura (value_info) que contiene dichos campos y se devuelve.
  **/
-value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base *index);
+value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base index);
 
 /**
  * Dados los campos necesarios para gestionar un tensor durante su uso en el programa,

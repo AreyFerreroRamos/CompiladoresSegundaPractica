@@ -47,7 +47,7 @@ char *addV1(value_info v1)
     // Añadimos v1
     if (isSameType(v1.valueInfoType, TENS_T))
     {
-        instr = generateString("%s[%s] := ", 2, v1.value, v1.index);
+        instr = generateString("%s[%s] := ", 2, v1.value, v1.index.value);
     }
     else
     {

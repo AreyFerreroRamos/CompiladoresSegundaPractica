@@ -17,61 +17,6 @@ char *generateTmpId()
 	return id;
 }
 
-void classifyOperation(char *operation, value_info v1, value_info v2, value_info v3)
-{
-	if (isSameType(operation, OP_ARIT_SUMA))
-	{
-		if (isSameType(v1.type, INT32_T))
-		{
-			emet(INSTR_ADDI, v1, v2, v3);
-		}
-		else
-		{
-			emet(INSTR_ADDD, v1, v2, v3);
-		}
-	}
-	else if (isSameType(operation, OP_ARIT_RESTA))
-	{
-		if (isSameType(v1.type, INT32_T))
-		{
-			emet(INSTR_SUBI, v1, v2, v3);
-		}
-		else
-		{
-			emet(INSTR_SUBD, v1, v2, v3);
-		}
-	}
-	else if (isSameType(operation, OP_ARIT_MULT))
-	{
-		if (isSameType(v1.type, INT32_T))
-		{
-			emet(INSTR_MULI, v1, v2, v3);
-		}
-		else
-		{
-			emet(INSTR_MULD, v1, v2, v3);
-		}
-	}
-	else if (isSameType(operation, OP_ARIT_DIV))
-	{
-		if (isSameType(v1.type, INT32_T))
-		{
-			emet(INSTR_DIVI, v1, v2, v3);
-		}
-		else
-		{
-			emet(INSTR_DIVD, v1, v2, v3);
-		}
-	}
-	else if (isSameType(operation, OP_ARIT_MOD))
-	{
-		emet(INSTR_MODI, v1, v2, v3);
-	}
-	else if (isSameType(operation, OP_ARIT_POTENCIA))
-	{
-	}
-}
-
 void emet(char *type, value_info v1, value_info v2, value_info v3)
 {
 	char *instruction;
@@ -89,6 +34,74 @@ void emet(char *type, value_info v1, value_info v2, value_info v3)
 		instruction = emetOperation(type, v1, v2, v3);
 		writeLine(sq, instruction);
 	}
+}
+
+void emetTensor(char *lexema, tensor_ini_info tensor)
+{
+    value_info v1, v2, v3;
+    int pos = 0, desp = calculateSizeType(tensor.type);
+    for (int i = 0; i < tensor.num_elem; i++)
+    {
+        v1 = createValueInfo(lexema, tensor.type, TENS_T, createValueInfoBase(itos(pos), INT32_T, LIT_T));
+        v2 = createValueInfo(tensor.elements[i].value, tensor.elements[i].type, tensor.elements[i].valueInfoType,generateEmptyValueInfoBase());
+        emet(INSTR_COPY, v1, v2, v3);
+        pos += desp;
+    }
+}
+
+void classifyOperation(char *operation, value_info v1, value_info v2, value_info v3)
+{
+    if (isSameType(operation, OP_ARIT_SUMA))
+    {
+        if (isSameType(v1.type, INT32_T))
+        {
+            emet(INSTR_ADDI, v1, v2, v3);
+        }
+        else
+        {
+            emet(INSTR_ADDD, v1, v2, v3);
+        }
+    }
+    else if (isSameType(operation, OP_ARIT_RESTA))
+    {
+        if (isSameType(v1.type, INT32_T))
+        {
+            emet(INSTR_SUBI, v1, v2, v3);
+        }
+        else
+        {
+            emet(INSTR_SUBD, v1, v2, v3);
+        }
+    }
+    else if (isSameType(operation, OP_ARIT_MULT))
+    {
+        if (isSameType(v1.type, INT32_T))
+        {
+            emet(INSTR_MULI, v1, v2, v3);
+        }
+        else
+        {
+            emet(INSTR_MULD, v1, v2, v3);
+        }
+    }
+    else if (isSameType(operation, OP_ARIT_DIV))
+    {
+        if (isSameType(v1.type, INT32_T))
+        {
+            emet(INSTR_DIVI, v1, v2, v3);
+        }
+        else
+        {
+            emet(INSTR_DIVD, v1, v2, v3);
+        }
+    }
+    else if (isSameType(operation, OP_ARIT_MOD))
+    {
+        emet(INSTR_MODI, v1, v2, v3);
+    }
+    else if (isSameType(operation, OP_ARIT_POTENCIA))
+    {
+    }
 }
 
 void writeLine(int line, char *instruction)
@@ -120,22 +133,6 @@ char *getNewType(char *type1, char *type2)
 	}
 }
 
-int calculateSizeType(char *type)
-{
-	if (isSameType(type, FLOAT64_T))
-	{
-		return 8;
-	}
-	else if (isSameType(type, INT32_T))
-	{
-		return 4;
-	}
-	else
-	{
-		return 1;
-	}
-}
-
 void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val)
 {
 	if (strcmp(v1.type, "Int32") == 0 && strcmp(v2.type, "Int32") == 0)
@@ -160,7 +157,7 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 		}
 	}
 	finish_val->valueInfoType = LIT_T;
-	finish_val->index = NULL;
+	finish_val->index = generateEmptyValueInfoBase();
 }
 
 

@@ -100,7 +100,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 								entry = createSymValueType($3.type, size, 0, NULL, NULL, VAR_T);
 								addOrUpdateEntry($1.lexema, entry);
 								value_info null;
-								value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, NULL);
+								value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, generateEmptyValueInfoBase());
 								emet(INSTR_COPY, v1, $3, null);
 							}
 							/*else if (isSameType($3.valueInfoType, TENS_T))
@@ -171,7 +171,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					sym_value_type entry = createSymValueType($3.type, calculateSizeType($3.type) * $3.num_elem, $3.dim, vector_dims_tensor, $3.elements, TENS_T);
 					addOrUpdateEntry($1.lexema, entry);
 
-					//printTensor($1.lexema, entry, 1);
+					emetTensor($1.lexema, $3);
 					vector_dims_tensor = NULL;
 					ampliar_vector_dims = NULL;
 					num_dims_tensor = 0;
@@ -237,7 +237,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 									else
 									{
 										//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
-										$$ = createValueInfo(generateTmpId(), getNewType($1.type,$3.type), VAR_T, NULL);
+										$$ = createValueInfo(generateTmpId(), getNewType($1.type,$3.type), VAR_T, generateEmptyValueInfoBase());
 										classifyOperation($2, $$, $1, $3);
 										//GUARDAR VARIABLE TMP EN SYMTAB?
 									}
@@ -269,7 +269,7 @@ lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 										else
 										{
 											//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
-											$$ = createValueInfo(generateTmpId(), getNewType($1.type, $3.type), VAR_T, NULL);
+											$$ = createValueInfo(generateTmpId(), getNewType($1.type, $3.type), VAR_T, generateEmptyValueInfoBase());
 											classifyOperation($2, $$, $1, $3);
 											//GUARDAR VARIABLE TMP EN SYMTAB?
 										}
@@ -308,7 +308,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico {
 										else
 										{ 
 											//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
-											$$ = createValueInfo(generateTmpId(),getNewType($1.type,$3.type),VAR_T,NULL);
+											$$ = createValueInfo(generateTmpId(),getNewType($1.type,$3.type),VAR_T,generateEmptyValueInfoBase());
 											classifyOperation($2,$$,$1,$3);
 											//GUARDAR VARIABLE TMP EN SYMTAB?
 										}
@@ -330,10 +330,10 @@ lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico {
 					}
 
 terminal_aritmetico : INTEGER	{
-					$$ = createValueInfo(itos($1), INT32_T, LIT_T, NULL);
+					$$ = createValueInfo(itos($1), INT32_T, LIT_T, generateEmptyValueInfoBase());
 				}
 	| FLOAT		{
-				$$ = createValueInfo(ftos($1), FLOAT64_T, LIT_T, NULL);
+				$$ = createValueInfo(ftos($1), FLOAT64_T, LIT_T, generateEmptyValueInfoBase());
 			}
 	| id_arit 	{
 				$$ = $1;

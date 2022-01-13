@@ -24,6 +24,8 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
  **/
 void emet(char *type, value_info v1, value_info v2, value_info v3);
 
+void emetTensor(char *lexema, tensor_ini_info tensor);
+
 /**
  *  Dada una linea y un string, se encarga de añadir de añadir el string dentro del c3a
  */

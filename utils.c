@@ -27,7 +27,7 @@ char *generateString(char *message, int nArgs, ...)
     switch (nArgs)
     {
         case 0:
-            sprintf(string, "%s", message);
+            sprintf(string, message);
             break;
         case 1:
             sprintf(string, message, params[0]);
@@ -57,7 +57,7 @@ char *generateString(char *message, int nArgs, ...)
     return _strdup(string);
 }
 
-value_info_base createValueInfoBase(char *valueInfoType, char *type, char *value )
+value_info_base createValueInfoBase(char *value, char *type, char *valueInfoType)
 {
     value_info_base aux;
     aux.valueInfoType = _strdup(valueInfoType);
@@ -66,7 +66,13 @@ value_info_base createValueInfoBase(char *valueInfoType, char *type, char *value
     return aux;
 }
 
-value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base *index)
+value_info_base generateEmptyValueInfoBase()
+{
+    value_info_base aux;
+    return aux;
+}
+
+value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base index)
 {
     value_info aux;
     aux.value = _strdup(value);
@@ -129,6 +135,22 @@ char *ftos(float num)
     char *string = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
     sprintf(string, "%.2f", num);
     return string;
+}
+
+int calculateSizeType(char *type)
+{
+    if (isSameType(type, FLOAT64_T))
+    {
+        return 8;
+    }
+    else if (isSameType(type, INT32_T))
+    {
+        return 4;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 char *allocateSpaceForMessage()
