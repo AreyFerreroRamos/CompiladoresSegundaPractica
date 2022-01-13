@@ -50,25 +50,25 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 
 "^" {
         debug("%s\n", yytext, 0);
-        yylval.cadena = _strdup(yytext);
+        yylval.cadena = strdup(yytext);
         return OP_ARIT_P1;
     }
 
 ("/"|"%")   {
                 debug("%s\n", yytext, 0);
-                yylval.cadena = _strdup(yytext);
+                yylval.cadena = strdup(yytext);
                 return OP_ARIT_P2;
             }
 
 "*" {
 		debug("%s\n", yytext, 0);
-		yylval.cadena = _strdup(yytext);
+		yylval.cadena = strdup(yytext);
 		return ASTERISCO;
 	}
 
 ("+"|"-")   {
                 debug("%s\n", yytext, 0);
-                yylval.cadena = _strdup(yytext);
+                yylval.cadena = strdup(yytext);
                 return OP_ARIT_P3;
             }
 
@@ -134,7 +134,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             else if (assignFounded == false && corcheteOpenFounded == false)
             {
                 debug("ID POINTER: %s\n", yytext, 0);
-                yylval.ident.lexema = _strdup(yytext);
+                yylval.ident.lexema = strdup(yytext);
                 yylval.ident.lenght = strlen(yytext);
                 yylval.ident.line = yylineno;
                 return ID;
