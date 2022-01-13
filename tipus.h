@@ -60,21 +60,35 @@
 #define INSTR_HALT "HALT"
 #define INSTR_RETURN "RETURN"
 
-typedef struct
+/**
+ * Esta estructura contiene los campos necesarios para gestionar un elemento (literal, variable, tensor o función)
+ * en un punto del programa en que dicho elemento se utiliza como índice para acceder a un tensor.
+ * En consecuencia, esta estructura contiene los mismos campos que la estructura value_info (definida justo después) con excepción del índice.
+ * En lenguajes de programación que permitiesen recursividad en el tratamiento de registros, esta estructura no sería necesaria.
+ */
+ typedef struct
 {
-    char *valueInfoType;    // Variable, tensor, función o literal.
     char *type;             // Tipo del elemenento.
-    char *value;            // Valor del elemento.
+    char *value;            // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable, tensor o función.
+    char *valueInfoType;    // Variable, tensor, función o literal.
 } value_info_base;
 
+ /**
+  * Esta estructura contiene los campos necesarios para gestionar un elemento (literal, variable, tensor o función)
+  * en cualquier punto del programa en el que sea usado, salvo cuando se utiliza como índice para acceder a un tensor.
+  */
 typedef struct
 {
 	char *type;                 // Tipo del elemenento.
-	char *value;                // Valor del elemento.
+	char *value;                // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable, tensor o función.
 	char *valueInfoType;        // Variable, tensor, función o literal.
-	value_info_base *index;     // Índice de acceso en caso de ser un tensor, como el indice puede estar expresado dentro de una variable.
+	value_info_base *index;     // Índice de acceso en caso de ser un tensor. Si el elemento no es un tensor, este campo será nulo.
 } value_info;
 
+/**
+ * Esta estructura contiene los campos necesarios para gestionar un tensor
+ * en el punto del programa en el que se accede a una posición del mismo.
+ */
 typedef struct
 {
 	int index_dim;              // Posición actual del vector de dimensiones del tensor.
@@ -82,6 +96,10 @@ typedef struct
 	char *lexema;               // Nombre de la variable tensor.
 } tensor_info;
 
+/**
+ * Esta estructura contiene los campos necesarios para gestionar un tensor elemento a elemento
+ * en el punto del programa en el que este es definido.
+ */
 typedef struct
 {
 	int dim;                    // Dimension concreta que se esta evaluando actualmente.

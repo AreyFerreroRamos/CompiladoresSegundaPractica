@@ -17,29 +17,32 @@ void yyerror(char *);
 char *generateString(char *message, int nArgs, ...);
 
 /**
- *
+ * Dados los campos necesarios para gestionar un índice (literal, variable, tensor o función) para acceder a la posición de un tensor,
+ * se genera una estructura (value_info_base) que contiene dichos campos y se devuelve.
  */
 value_info_base createValueInfoBase(char *valueInfoType, char *type, char *value );
 
 /**
- * Dados los datos necesarios para crear una unidad de datos para bison,
- * genera un objeto que contiene todos ellos y lo devuele.
+ * Dados los campos necesarios para gestionar un elemento (literal, variable, tensor o función),
+ * se genera una estructura (value_info) que contiene dichos campos y se devuelve.
  **/
 value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base *index);
 
 /**
- *
+ * Dados los campos necesarios para gestionar un tensor durante su uso en el programa,
+ * se genera una estructura que contiene dichos campos y se devuelve.
  */
 tensor_info createTensorInfo(int index_dim, value_info_base calcIndex, char *lexema);
 
 /**
- *
+ * Dado los campos necesarios para gestionar un tensor durante su definición como variable del programa,
+ * se genera una estructura que contiene dichos campos y se devuelve.
  */
 tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elements, int num_elem);
 
 /**
- * Dados los datos necesarios para crear una entrada en la symtab,
- * genera un objeto que contiene todos ellos y lo devuele.
+ * Dados los campos necesarios para crear una entrada en la tabla de símbolos,
+ * se genera una estructura (sym_value_type) que contiene dichos campos y se devuele.
  **/
 sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDims, void *elements, char *entryType);
 
