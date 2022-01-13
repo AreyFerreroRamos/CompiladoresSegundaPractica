@@ -18,10 +18,6 @@ char *generateString(char *message, int nArgs, ...);
 
 /**
  *
- * @param valueInfoType
- * @param type
- * @param value
- * @return
  */
 value_info_base createValueInfoBase(char *valueInfoType, char *type, char *value );
 
@@ -33,20 +29,11 @@ value_info createValueInfo(char *value, char *type, char *valueInfoType, value_i
 
 /**
  *
- * @param index_dim
- * @param calcIndex
- * @param lexema
- * @return
  */
 tensor_info createTensorInfo(int index_dim, value_info_base calcIndex, char *lexema);
 
 /**
  *
- * @param dim
- * @param type
- * @param elements
- * @param num_elem
- * @return
  */
 tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elements, int num_elem);
 

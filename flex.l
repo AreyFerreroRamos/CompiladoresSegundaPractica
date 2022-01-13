@@ -32,52 +32,52 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 %%
 
 
-({digit})+	{
-			debug("%s\n", yytext, 0);
-			yylval.enter = atoi(yytext);
-			return INTEGER;
-		}
+({digit})+  {
+                debug("%s\n", yytext, 0);
+                yylval.enter = atoi(yytext);
+                return INTEGER;
+            }
 
-({digit})+"."({digit})+(e(-)?({digit})+)?	{
-							debug("%s\n", yytext, 0);
-							yylval.real = atof(yytext);
-							return FLOAT;						
-						}
+({digit})+"."({digit})+(e(-)?({digit})+)?   {
+                                                debug("%s\n", yytext, 0);
+                                                yylval.real = atof(yytext);
+                                                return FLOAT;
+                                            }
 
-(#(.)*|#=(.|\n)*=#) 	{
-				debug("COMMENT: %s\n", yytext, 0);
-			}
+(#(.)*|#=(.|\n)*=#) {
+                        debug("COMMENT: %s\n", yytext, 0);
+                    }
 
-"^"	{
+"^" {
+        debug("%s\n", yytext, 0);
+        yylval.cadena = _strdup(yytext);
+        return OP_ARIT_P1;
+    }
+
+("/"|"%")   {
+                debug("%s\n", yytext, 0);
+                yylval.cadena = _strdup(yytext);
+                return OP_ARIT_P2;
+            }
+
+"*" {
 		debug("%s\n", yytext, 0);
-		yylval.cadena = strdup(yytext);
-		return OP_ARIT_P1;
-	}
-
-("/"|"%")	{
-			debug("%s\n", yytext, 0);
-			yylval.cadena = strdup(yytext);
-			return OP_ARIT_P2;
-		}
-
-"*"	{
-		debug("%s\n", yytext, 0);
-		yylval.cadena = strdup(yytext);
+		yylval.cadena = _strdup(yytext);
 		return ASTERISCO;
 	}
 
-("+"|"-")	{
-			debug("%s\n", yytext, 0);
-			yylval.cadena = strdup(yytext);
-			return OP_ARIT_P3;
-		}
+("+"|"-")   {
+                debug("%s\n", yytext, 0);
+                yylval.cadena = _strdup(yytext);
+                return OP_ARIT_P3;
+            }
 
-"("	{
+"(" {
 		debug("%s\n", yytext, 0);
 		return PARENTESIS_ABIERTO;
 	}
 
-")"	{
+")" {
 		debug("%s\n", yytext, 0);
 		return PARENTESIS_CERRADO;
 	}
@@ -87,12 +87,12 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		return COMA;
 	}
 
-"div("	{
-		debug("%s\n", yytext, 0);
-		return DIV;
-	}
+"div("  {
+            debug("%s\n", yytext, 0);
+            return DIV;
+        }
 
-"="	{
+"=" {
 		debug("%s\n", yytext, 0);
 		assignFounded = true;
 		return ASSIGN;
@@ -109,12 +109,12 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		return CORCHETE_CERRADO;
 	}
 
-;	{
+;   {
 		debug("%s\n", yytext, 0);
 		return PUNTO_Y_COMA;
 	}
 
-"function"	{
+"function"  {
                 /*debug("%s\n", yytext, 0);
                 insideFunction = true;
                 return START;*/
@@ -134,7 +134,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             if (assignFounded == false && corcheteOpenFounded == false)
             {
                 debug("ID POINTER: %s\n", yytext, 0);
-                yylval.ident.lexema = strdup(yytext);
+                yylval.ident.lexema = _strdup(yytext);
                 yylval.ident.lenght = strlen(yytext);
                 yylval.ident.line = yylineno;
                 return ID;
@@ -143,7 +143,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             {
                 debug("ID ARIT: %s\n", yytext, 0);
                 sym_value_type entry = getEntry(yytext);
-                value_info v = createValueInfo(yytext, entry.type,entry.entryType,NULL);
+                value_info v = createValueInfo(yytext, entry.type, entry.entryType, NULL);
                 if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
                 {
                     yylval.operand = v;

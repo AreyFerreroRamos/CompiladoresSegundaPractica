@@ -14,10 +14,10 @@ extern char **c3a;
 char *emetCopy(value_info v1, value_info v2)
 {
     char *instr;
-    // Añadimos v1
+        // Añadimos v1.
     instr = addV1(v1);
 
-    // Añadimos primer operando
+        // Añadimos primer operando.
     instr = addV2(instr, v2);
 
     return instr;
@@ -26,16 +26,16 @@ char *emetCopy(value_info v1, value_info v2)
 char *emetOperation(char *op, value_info v1, value_info v2, value_info v3)
 {
     char *instr;
-    // Añadimos v1
+        // Añadimos v1.
     instr = addV1(v1);
 
-    // Añadimos primer operando
+        // Añadimos primer operando.
     instr = addV2(instr, v2);
 
-    // Añadimos operación
+        // Añadimos operación.
     instr = addOperation(instr, op);
 
-    // Añadimos segundo operando
+        // Añadimos segundo operando.
     instr = addV3(instr, v3);
 
     return instr;
@@ -53,12 +53,12 @@ char *addV1(value_info v1)
     {
         instr = generateString("%s := ", 1, v1.value);
     }
-    return strdup(instr);
+    return _strdup(instr);
 }
 
 char *addV2(char *instruction, value_info v2)
 {
-    char *instr = strdup(instruction);
+    char *instr = _strdup(instruction);
     if (isSameType(v2.valueInfoType, VAR_T))
     {
         instr = generateString("%s%s ", 2, instr, v2.value);
@@ -78,17 +78,17 @@ char *addV2(char *instruction, value_info v2)
         instr = generateString("%sCALL %s,%s", 3, instr, v2.value, itos(numParams));
         // TODO añadir parámetros de la función
     }
-    return strdup(instr);
+    return _strdup(instr);
 }
 
 char *addOperation(char *instruction, char *op)
 {
-    return strdup(generateString("%s%s ", 2, instruction, op));
+    return _strdup(generateString("%s%s ", 2, instruction, op));
 }
 
 char *addV3(char *instruction, value_info v3)
 {
-    char *instr = strdup(instruction);
+    char *instr = _strdup(instruction);
     if (isSameType(v3.valueInfoType, VAR_T))
     {
         instr = generateString("%s%s", 2, instr, v3.value);
@@ -101,7 +101,7 @@ char *addV3(char *instruction, value_info v3)
     {
         instr = generateString("%s%s", 2, instr, v3.value);
     }
-    return strdup(instr);
+    return _strdup(instr);
 }
 
 //-------------------------------------------------------------------
@@ -122,29 +122,29 @@ void intOperations(int num1, int num2, char *operand, int *res)
 {
     if (strcmp(operand, OP_ARIT_SUMA) == 0)
     {
-        simpleDebug("Estoy en suma\n", 1);
+        simpleDebug("Estoy en suma.\n", 1);
         *res = num1 + num2;
     }
     else if (strcmp(operand, OP_ARIT_RESTA) == 0)
     {
-        simpleDebug("Estoy en resta\n", 1);
+        simpleDebug("Estoy en resta.\n", 1);
         *res = num1 - num2;
     }
     else if (strcmp(operand, OP_ARIT_MULT) == 0)
     {
-        simpleDebug("Estoy en producto\n", 1);
+        simpleDebug("Estoy en producto.\n", 1);
         *res = num1 * num2;
     }
     else if (strcmp(operand, OP_ARIT_DIV) == 0)
     {
-        simpleDebug("Estoy en division\n", 1);
+        simpleDebug("Estoy en division.\n", 1);
         if (num2 != 0)
         {
             *res = num1 / num2;
         }
         else
         {
-            yyerror("No esta permitido dividir por 0");
+            yyerror("No esta permitido dividir por 0.");
         }
     }
     else if (strcmp(operand, OP_ARIT_MOD) == 0)
@@ -156,13 +156,13 @@ void intOperations(int num1, int num2, char *operand, int *res)
         }
         else
         {
-            yyerror("No esta permitido dividir por 0");
+            yyerror("No esta permitido dividir por 0.");
         }
     }
     else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
     {
-        simpleDebug("Estoy en la potencia\n", 1);
-        *res = (int)pow((double)num1, (double)num2);
+        simpleDebug("Estoy en la potencia.\n", 1);
+        *res = (int) pow((double) num1, (double) num2);
     }
 }
 
@@ -188,12 +188,12 @@ void floatOperations(float num1, float num2, char *operand, float *res)
         }
         else
         {
-            yyerror("No esta permitido dividir por 0");
+            yyerror("No esta permitido dividir por 0.");
         }
     }
     else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
     {
-        *res = (float)pow((double)num1, (double)num2);
+        *res = (float) pow((double) num1, (double) num2);
     }
 }
 

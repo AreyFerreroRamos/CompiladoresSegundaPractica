@@ -4,7 +4,7 @@
 #include "tipus.h"
 #include "utils.h"
 
-/* FUNCIONES QUE SE USAN SOLAMENTE EN EL ARCHIVO FUNCTIONS O EN LA FUNCIÓN MAIN */
+/* FUNCIONES QUE SOLAMENTE SON LLAMADAS DESDE EL FICHERO FUNCTIONS.C O DESDE EL MAIN */
 
 //-------------------------EMET FUNCTIONS----------------------------
 
@@ -71,4 +71,5 @@ int init_analisi_sintactic(char *);
 int analisi_semantic();
 int end_analisi_lexic();
 int end_analisi_sintactic();
+
 #endif

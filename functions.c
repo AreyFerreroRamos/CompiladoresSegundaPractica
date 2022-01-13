@@ -11,7 +11,7 @@ extern char **c3a;	   // Conjunto de lineas que formarán el codigo de 3 adreces
 char *generateTmpId()
 {
 	char *id;
-	id = (char *)malloc(sizeof(char) * ID_MAX_LENGTH);
+	id = (char *) malloc(sizeof(char) * ID_MAX_LENGTH);
 	sprintf(id, "%s%i", TMP_BASE_ID, num_tmp_variable);
 	num_tmp_variable++;
 	return id;
@@ -81,10 +81,10 @@ void emet(char *type, value_info v1, value_info v2, value_info v3)
 		writeLine(sq, instruction);
 	}
 	else if (isSameType(type, INSTR_ADDI) || isSameType(type, INSTR_ADDD) 
-	|| isSameType(type, INSTR_SUBI) || isSameType(type, INSTR_SUBD) 
-	|| isSameType(type, INSTR_MULI) || isSameType(type, INSTR_MULD) 
-	|| isSameType(type, INSTR_DIVI) || isSameType(type, INSTR_DIVD) 
-	|| isSameType(type, INSTR_MODI))
+	        || isSameType(type, INSTR_SUBI) || isSameType(type, INSTR_SUBD)
+	        || isSameType(type, INSTR_MULI) || isSameType(type, INSTR_MULD)
+	        || isSameType(type, INSTR_DIVI) || isSameType(type, INSTR_DIVD)
+	        || isSameType(type, INSTR_MODI))
 	{
 		instruction = emetOperation(type, v1, v2, v3);
 		writeLine(sq, instruction);
@@ -105,7 +105,7 @@ void writeLine(int line, char *instruction)
 		lengthCode++;
 		sq++;
 	}
-	c3a[line] = strdup(instruction);
+	c3a[line] = _strdup(instruction);
 }
 
 char *getNewType(char *type1, char *type2)
@@ -138,7 +138,6 @@ int calculateSizeType(char *type)
 
 void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val)
 {
-
 	if (strcmp(v1.type, "Int32") == 0 && strcmp(v2.type, "Int32") == 0)
 	{
 		finish_val->type = "Int32";
@@ -157,7 +156,7 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 		}
 		else
 		{
-			yyerror("No se puede hacer módulo con floats");
+			yyerror("No es posible realizar la operación módulo entre dos números reales.");
 		}
 	}
 	finish_val->valueInfoType = LIT_T;
@@ -165,7 +164,8 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 }
 
 
-value_info_base *castValueInfoToTensorIniInfo(value_info v){
+value_info_base *castValueInfoToTensorIniInfo(value_info v)
+{
     value_info_base *aux = malloc(sizeof(value_info_base));
     aux->valueInfoType = _strdup(v.valueInfoType);
     aux->type = _strdup(v.type);
@@ -173,11 +173,13 @@ value_info_base *castValueInfoToTensorIniInfo(value_info v){
     return aux;
 }
 
-value_info_base *joinElementsVectors(value_info_base * vec1,value_info_base * vec2,int numElemVec1,int numElemVec2){
+value_info_base *joinElementsVectors(value_info_base * vec1, value_info_base * vec2, int numElemVec1, int numElemVec2)
+{
     int totalElem = numElemVec1+numElemVec2;
-    value_info_base *aux = realloc(vec1,totalElem*sizeof(value_info_base));
+    value_info_base *aux = realloc(vec1,totalElem * sizeof(value_info_base));
     int cont = numElemVec1;
-    for(int i = 0;i<numElemVec2;i++){
+    for (int i = 0; i < numElemVec2; i++)
+    {
         aux[cont++] = vec2[i];
     }
     return aux;
@@ -185,12 +187,9 @@ value_info_base *joinElementsVectors(value_info_base * vec1,value_info_base * ve
 
 void invertVector(int *vector, int dim)
 {
-
     int aux;
-    int i;
-
-    for (i = 0; i < dim / 2; i++)
-    { // Invertir el vector.
+    for (int i = 0; i < dim / 2; i++)
+    {   // Invertir el vector.
         aux = vector[i];
         vector[i] = vector[dim - i - 1];
         vector[dim - i - 1] = aux;

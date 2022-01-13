@@ -26,33 +26,33 @@ char *generateString(char *message, int nArgs, ...)
     char *string = allocateSpaceForMessage();
     switch (nArgs)
     {
-    case 0:
-        sprintf(string, "%s", message);
-        break;
-    case 1:
-        sprintf(string, message, params[0]);
-        break;
-    case 2:
-        sprintf(string, message, params[0], params[1]);
-        break;
-    case 3:
-        sprintf(string, message, params[0], params[1], params[2]);
-        break;
-    case 4:
-        sprintf(string, message, params[0], params[1], params[2], params[3]);
-        break;
-    case 5:
-        sprintf(string, message, params[0], params[1], params[2], params[3], params[4]);
-        break;
-    case 6:
-        sprintf(string, message, params[0], params[1], params[2], params[3], params[4], params[5]);
-        break;
-    case 7:
-        sprintf(string, message, params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
-        break;
-
-    default:
-        yyerror("Estas usando mal la función generateString(), nArgs debe estar entre 0 y 7");
+        case 0:
+            sprintf(string, "%s", message);
+            break;
+        case 1:
+            sprintf(string, message, params[0]);
+            break;
+        case 2:
+            sprintf(string, message, params[0], params[1]);
+            break;
+        case 3:
+            sprintf(string, message, params[0], params[1], params[2]);
+            break;
+        case 4:
+            sprintf(string, message, params[0], params[1], params[2], params[3]);
+            break;
+        case 5:
+            sprintf(string, message, params[0], params[1], params[2], params[3], params[4]);
+            break;
+        case 6:
+            sprintf(string, message, params[0], params[1], params[2], params[3], params[4], params[5]);
+            break;
+        case 7:
+            sprintf(string, message, params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
+            break;
+        default:
+            yyerror("Estas usando mal la función generateString(), nArgs debe estar entre 0 y 7");
+            break;
     }
     return _strdup(string);
 }
@@ -126,7 +126,7 @@ char *itos(int num)
 
 char *ftos(float num)
 {
-    char *string = (char *)malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+    char *string = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
     sprintf(string, "%.2f", num);
     return string;
 }
@@ -134,7 +134,7 @@ char *ftos(float num)
 char *allocateSpaceForMessage()
 {
     char *message;
-    message = (char *)malloc(sizeof(char) * MESSAGE_MAX_LENGTH);
+    message = (char *) malloc(sizeof(char) * MESSAGE_MAX_LENGTH);
     return message;
 }
 
@@ -166,19 +166,39 @@ void simpleDebug(char *text, int typeFile)
     }
 }
 
-sym_value_type getEntry(char* key){
+sym_value_type getEntry(char* key)
+{
     sym_value_type entry;
     int response = sym_lookup(key, &entry);
-    if (response == SYMTAB_OK){return entry;}
-    else if(response == SYMTAB_NOT_FOUND){yyerror(generateString("No se ha encontrado la clave %s en la symtab",1,key));}
-    else{yyerror("Algun problema buscando el valor en la symtab");}
+    if (response == SYMTAB_OK)
+    {
+        return entry;
+    }
+    else if (response == SYMTAB_NOT_FOUND)
+    {
+        yyerror(generateString("No se ha encontrado la clave %s en la symtab",1, key));
+    }
+    else
+    {
+        yyerror("Algun problema buscando el valor en la symtab");
+    }
 }
 
 
-void addOrUpdateEntry(char* key, sym_value_type entry){
+void addOrUpdateEntry(char* key, sym_value_type entry)
+{
     int response = sym_enter(key, &entry);
-    if(response == SYMTAB_NOT_FOUND){yyerror(generateString("No se ha encontrado la clave %s en la symtab",1,key));}
-    else if(response == SYMTAB_NO_MEMORY){yyerror("No hay más memoria");}
-    else if(response != SYMTAB_OK && response != SYMTAB_DUPLICATE ){yyerror("Algun problema guardando el valor en la symtab");}
+    if (response == SYMTAB_NOT_FOUND)
+    {
+        yyerror(generateString("No se ha encontrado la clave %s en la symtab",1, key));
+    }
+    else if (response == SYMTAB_NO_MEMORY)
+    {
+        yyerror("No hay más memoria");
+    }
+    else if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
+    {
+        yyerror("Algun problema guardando el valor en la symtab");
+    }
 }
 

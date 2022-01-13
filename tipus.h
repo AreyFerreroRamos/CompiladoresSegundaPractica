@@ -51,7 +51,7 @@
 #define INSTR_MODI "MODI"
 #define INSTR_I2D "I2D"
 #define INSTR_D2I "D2I"
-#define INSTR_COPY "COPY"	   // Se asigna el contenido de una variable a otra variable.
+#define INSTR_COPY "COPY"       // Se asigna el contenido de una variable a otra variable.
 #define INSTR_CONSULT "CONSULT" // Se asigna el contenido de una posición de un tensor a una variable.
 #define INSTR_ASSIGN "ASSIGN"   // Se asigna el contenido de una variable en una posición del tensor.
 #define INSTR_PARAM "PARAM"
@@ -63,31 +63,31 @@
 typedef struct
 {
     char *valueInfoType;    // Variable, tensor, función o literal.
-    char *type;     // Tipo del elemenento.
-    char *value;    // Valor del elemento.
-}value_info_base;
+    char *type;             // Tipo del elemenento.
+    char *value;            // Valor del elemento.
+} value_info_base;
 
 typedef struct
 {
-	char *type;			 // Tipo del elemenento.
-	char *value;		 // Valor del elemento.
-	char *valueInfoType; // Variable, tensor, función o literal.
-	value_info_base *index;		 // Índice de acceso en caso de ser un tensor, como el indice puede estar expresado dentro de una variable;
+	char *type;                 // Tipo del elemenento.
+	char *value;                // Valor del elemento.
+	char *valueInfoType;        // Variable, tensor, función o literal.
+	value_info_base *index;     // Índice de acceso en caso de ser un tensor, como el indice puede estar expresado dentro de una variable.
 } value_info;
 
 typedef struct
 {
-	int index_dim; // Posición actual del vector de dimensiones del tensor.
-	value_info_base calcIndex; // Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor tratándolo como si fuera un vector.
-	char *lexema;  // Nombre de la variable tensor.
+	int index_dim;              // Posición actual del vector de dimensiones del tensor.
+	value_info_base calcIndex;  // Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor tratándolo como si fuera un vector.
+	char *lexema;               // Nombre de la variable tensor.
 } tensor_info;
 
 typedef struct
 {
-	int dim;		// Dimension concreta que se esta evaluando actualmente.
-	char *type;		// Tipo concreto que se esta evaluando actualmente.
-	value_info_base *elements; // Valores dentro del componente.
-	int num_elem;	// Número de elementos del tensor.
+	int dim;                    // Dimension concreta que se esta evaluando actualmente.
+	char *type;                 // Tipo concreto que se esta evaluando actualmente.
+	value_info_base *elements;  // Valores dentro del componente.
+	int num_elem;               // Número de elementos del tensor.
 } tensor_ini_info;
 
 #endif

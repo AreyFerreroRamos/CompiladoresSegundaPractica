@@ -1,36 +1,39 @@
 %{
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <stdbool.h>
-	#include <string.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <stdbool.h>
+  #include <string.h>
 
-	#define YYLMAX 100
+  #define YYLMAX 100
 
-	extern FILE *yyout;
-	extern int yylex();
-	extern void yyerror(char *);
+  extern FILE *yyout;
+  extern int yylex();
+  extern void yyerror(char *);
 
-	//Variables necesarias para la inicialización de un tensor
-	int *vector_dims_tensor;	// Vector con el número de elementos de cada dimensión del tensor.
-	int num_dims_tensor = 0;	// Número de dimensiones del tensor.
-	bool *ampliar_vector_dims; 	// Vector de booleanos para limitar la ampliación de memoria del vector de dimensiones a una sola por dimensión.
+  	// Variables necesarias para la inicialización de un tensor.
+  int *vector_dims_tensor;	// Vector con el número de elementos de cada dimensión del tensor.
+  int num_dims_tensor = 0;	// Número de dimensiones del tensor.
+  bool *ampliar_vector_dims; 	// Vector de booleanos para limitar la ampliación de memoria del vector de dimensiones a una sola por dimensión.
 
 	//Variables para controlar el flujo de variables temporales en la symtab
-	char **list_tmp_variables_symtab;
-	int num_tmp_variable = 0;
-	int sq = 0;	
-	int lengthCode = 0;
-	char **c3a;
+  char **list_tmp_variables_symtab;
+  int num_tmp_variable = 0;
+  int sq = 0;
+  int lengthCode = 0;
+  char **c3a;
 %}
 
-%code requires {
+%code requires
+{
   #include "utils.h"
   #include "functions.h"
   #include "tipus.h"
 }
 
-%union {
-	struct {
+%union
+{
+	struct
+	{
 		char *lexema;
 		int lenght;
 		int line;
@@ -77,29 +80,39 @@ sentencia : asignacion
 			int response = sym_lookup($1.lexema, &entry);
 			if (response == SYMTAB_OK) 
 			{
-				if (entry.num_dim > 0){ printTensor($1.lexema, entry, 1);}
-				else{ fprintf(yyout, "ID: %s val:%s\n", $1.lexema, (char *) entry.value);}
+				if (entry.num_dim > 0)
+				{
+					printTensor($1.lexema, entry, 1);
+				}
+				else
+				{
+					fprintf(yyout, "ID: %s val:%s\n", $1.lexema, (char *) entry.value);
+				}
 			}*/
 		}
 
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
-							int size=0;
-							if (isSameType($3.valueInfoType,LIT_T) || isSameType($3.valueInfoType,VAR_T)) {
+							int size = 0;
+							if (isSameType($3.valueInfoType, LIT_T) || isSameType($3.valueInfoType, VAR_T))
+							{
 								size = isSameType($3.type,INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
-								entry = createSymValueType($3.type,size,0,NULL,NULL,VAR_T);
+								entry = createSymValueType($3.type, size, 0, NULL, NULL, VAR_T);
 								addOrUpdateEntry($1.lexema, entry);
 								value_info null;
-								value_info v1 = createValueInfo($1.lexema,$3.type,VAR_T,NULL);
-								emet(INSTR_COPY,v1,$3,null);
+								value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, NULL);
+								emet(INSTR_COPY, v1, $3, null);
 							}
-							/*else if(isSameType($3.valueInfoType,TENS_T))
+							/*else if (isSameType($3.valueInfoType, TENS_T))
 							{
 								int response = sym_lookup($3.lexema, &entry);
 								if (response == SYMTAB_OK)
 								{
 									response = sym_enter($1.lexema, &entry);
-									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE){ yyerror("Error al guardar en symtab");}
+									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
+									{
+										yyerror("Error al guardar en symtab");
+									}
 									printTensor($1.lexema, entry, 1);
 									clearTmpTensorId();
 								}
@@ -114,28 +127,48 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 								{
 									if (isSameType(entry.type, INT32_T))
 									{	
-										if (isSameType($3.type, INT32_T)){ ((int *) entry.elements)[$1.calcIndex] = atoi($3.value);}
-										else{ ((int *) entry.elements)[$1.calcIndex] = (int) atof($3.value);}
+										if (isSameType($3.type, INT32_T))
+										{
+											((int *) entry.elements)[$1.calcIndex] = atoi($3.value);
+										}
+										else
+										{
+											((int *) entry.elements)[$1.calcIndex] = (int) atof($3.value);
+										}
 									}
 									else if (isSameType(entry.type, FLOAT64_T))
 									{
-										if (isSameType($3.type,INT32_T)){ ((float *) entry.elements)[$1.calcIndex] = atoi($3.value);}
-										else{ ((float *) entry.elements)[$1.calcIndex] = atof($3.value);}
+										if (isSameType($3.type,INT32_T))
+										{
+											((float *) entry.elements)[$1.calcIndex] = atoi($3.value);
+										}
+										else
+										{
+											((float *) entry.elements)[$1.calcIndex] = atof($3.value);
+										}
 									}
 									response = sym_enter($1.lexema, &entry);
 
-									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE){ yyerror("Error al guardar en symtab");}
+									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
+									{
+										yyerror("Error al guardar en symtab");
+									}
 
 									fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n", $1.lexema, (char *) $3.value, $1.calcIndex);
 								}
-								else{ yyerror("Error al cargar variable de la symtab");}
+								else
+								{
+									yyerror("Error al cargar variable de la symtab");
+								}
 							}
-							else{ yyerror("No se puede asignar un tensor a un indice de un tensor");}*/
+							else
+							{
+								yyerror("No se puede asignar un tensor a un indice de un tensor");
+							}*/
 						}
 	| ID ASSIGN tensor	{
-
 					invertVector(vector_dims_tensor, $3.dim);
-					sym_value_type entry = createSymValueType($3.type,calculateSizeType($3.type) * $3.num_elem,$3.dim,vector_dims_tensor,$3.elements,TENS_T);
+					sym_value_type entry = createSymValueType($3.type, calculateSizeType($3.type) * $3.num_elem, $3.dim, vector_dims_tensor, $3.elements, TENS_T);
 					addOrUpdateEntry($1.lexema, entry);
 
 					//printTensor($1.lexema, entry, 1);
@@ -152,21 +185,42 @@ lista_indices : lista_indices COMA lista_sumas	{
 							/*if (isSameType($3.type, INT32_T)) 
 							{
 								int dim = getDim($1.lexema, $1.index_dim);
-								if (dim != -1){ $$ = createTensorInfo($1.index_dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);}
-								else{ yyerror(generateString("Mal acceso a la variable %s",1,$1.lexema);}
+								if (dim != -1)
+								{
+									$$ = createTensorInfo($1.index_dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);
+								}
+								else
+								{
+									yyerror(generateString("Mal acceso a la variable %s",1,$1.lexema);
+								}
 							}
 							else
 							{
-								if(isSameType($3.valueInfoType,LIT_T)){ yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));}
-									else{ yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));}
+								if (isSameType($3.valueInfoType,LIT_T))
+								{
+									yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));
+								}
+								else
+								{
+									yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));
+								}
 							}*/
 						}
 		| ID CORCHETE_ABIERTO lista_sumas	{
-		      					/*	if (isSameType($3.type, INT32_T)){ $$ = createTensorInfo(1, atoi($3.value), $1.lexema);}
+		      					/*	if (isSameType($3.type, INT32_T))
+		      						{
+		      							$$ = createTensorInfo(1, atoi($3.value), $1.lexema);
+		      						}
 								else
 								{
-									if(isSameType($3.valueInfoType,LIT_T)){ yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));}
-									else{ yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));}
+									if (isSameType($3.valueInfoType,LIT_T))
+									{
+										yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));
+									}
+									else
+									{
+										yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));
+									}
 								}*/
 		     					}
 
@@ -183,39 +237,57 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 									else
 									{
 										//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
-										$$ = createValueInfo(generateTmpId(),getNewType($1.type,$3.type),VAR_T,NULL);
-										classifyOperation($2,$$,$1,$3);
+										$$ = createValueInfo(generateTmpId(), getNewType($1.type,$3.type), VAR_T, NULL);
+										classifyOperation($2, $$, $1, $3);
 										//GUARDAR VARIABLE TMP EN SYMTAB?
 									}
 								}
-								else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type)); }
+								else
+								{
+									yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $3.type));
+								}
 							}	
-		| lista_productos	{ 	
-						if (isNumberType($1.type)){ $$ = $1;}
-						else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));}
+		| lista_productos	{
+						if (isNumberType($1.type))
+						{
+							$$ = $1;
+						}
+						else
+						{
+							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));
+						}
 					}
 
 lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 									if (isNumberType($3.type))
 									{
-											if (isSameType($1.valueInfoType, LIT_T) && isSameType($3.valueInfoType, LIT_T))
-											{
-												$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
-												doAritmeticOperation($1, $2, $3, &$$);
-											}
-											else
-											{ 
-												//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
-												$$ = createValueInfo(generateTmpId(),getNewType($1.type,$3.type),VAR_T,NULL);
-												classifyOperation($2,$$,$1,$3);
-												//GUARDAR VARIABLE TMP EN SYMTAB?
-											}
+										if (isSameType($1.valueInfoType, LIT_T) && isSameType($3.valueInfoType, LIT_T))
+										{
+											$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
+											doAritmeticOperation($1, $2, $3, &$$);
+										}
+										else
+										{
+											//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
+											$$ = createValueInfo(generateTmpId(), getNewType($1.type, $3.type), VAR_T, NULL);
+											classifyOperation($2, $$, $1, $3);
+											//GUARDAR VARIABLE TMP EN SYMTAB?
+										}
 									}
-									else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type)); }
+									else
+									{
+										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $3.type));
+									}
 								}
 		| lista_potencias	{
-						if (isNumberType($1.type)){ $$ = $1;}
-						else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));}
+						if (isNumberType($1.type))
+						{
+							$$ = $1;
+						}
+						else
+						{
+							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));
+						}
 					}
 
 op_arit_p2: OP_ARIT_P2	{
@@ -241,45 +313,71 @@ lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico {
 											//GUARDAR VARIABLE TMP EN SYMTAB?
 										}
 									}
-									else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type)); }
+									else
+									{
+										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type));
+									}
 								}
 		| terminal_aritmetico	{
-						if (isNumberType($1.type)){ $$ = $1;}
-						else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));}
+						if (isNumberType($1.type))
+						{
+							$$ = $1;
+						}
+						else
+						{
+							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));
+						}
 					}
 
 terminal_aritmetico : INTEGER	{
-					$$ = createValueInfo(itos($1), INT32_T,LIT_T,NULL);
+					$$ = createValueInfo(itos($1), INT32_T, LIT_T, NULL);
 				}
 	| FLOAT		{
-				$$ = createValueInfo(ftos($1), FLOAT64_T,LIT_T,NULL);
+				$$ = createValueInfo(ftos($1), FLOAT64_T, LIT_T, NULL);
 			}
 	| id_arit 	{
 				$$ = $1;
 			}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
-									if (isNumberType($2.type)){ $$ = $2;}
-									else{ yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type));}
+									if (isNumberType($2.type))
+									{
+										$$ = $2;
+									}
+									else
+									{
+										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type));
+									}
 								}
 	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
 								/*	if ((isNumberType($2.type)) && (isNumberType($4.type)))
 									{
 										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
-										if (!doAritmeticOperation($2, "/", $4, &$$)){ yyerror("Ha habido algun problema realizando la operación");}
+										if (!doAritmeticOperation($2, "/", $4, &$$))
+										{
+											yyerror("Ha habido algun problema realizando la operación");
+										}
 									}
-									else{ yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type);}*/
+									else
+									{
+										yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type);
+									}*/
 								}
 
-id_arit : ID_ARIT	{ 
+id_arit : ID_ARIT	{
 			//	$$ = $1; 
 			}	
 	| lista_indices_arit CORCHETE_CERRADO	{
 						/*	sym_value_type res;
 							sym_lookup($1.lexema, &res);
 
-							if (isSameType(res.type, INT32_T)){ $$.value = iota(((int *) res.elements)[$1.calcIndex]);}
-							else{ $$.value = fota(((float *) res.elements)[$1.calcIndex]);}
-
+							if (isSameType(res.type, INT32_T))
+							{
+								$$.value = iota(((int *) res.elements)[$1.calcIndex]);
+							}
+							else
+							{
+								$$.value = fota(((float *) res.elements)[$1.calcIndex]);
+							}
 							$$.type = res.type;
 							$$.lexema = NULL;*/
 						}
@@ -289,13 +387,25 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 									{
 										int dim = getDim($1.lexema, $1.index_dim);
 
-										if (dim != -1){ $$ = createTensorInfo($1.index_dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);}
-										else{yyerror(generateString("Mal acceso a la variable %s",1,$1.lexema);}
+										if (dim != -1)
+										{
+											$$ = createTensorInfo($1.index_dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);
+										}
+										else
+										{
+											yyerror(generateString("Mal acceso a la variable %s",1,$1.lexema);
+										}
 									}
 									else
 									{
-										if(isSameType($3.valueInfoType,LIT_T)){ yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));}
-										else yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));}
+										if(isSameType($3.valueInfoType,LIT_T))
+										{
+											yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));
+										}
+										else
+										{
+											yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));
+										}
 									}			*/		
 								}
 		| ID_ARIT CORCHETE_ABIERTO lista_sumas	{
@@ -305,21 +415,32 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 								}
 								else
 								{
-									if(isSameType($3.valueInfoType,LIT_T)){ yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));}
-									else{ yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));}
+									if (isSameType($3.valueInfoType,LIT_T))
+									{
+										yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));
+									}
+									else
+									{
+										yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));
+									}
 								}*/
 							}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
-       									if (ampliar_vector_dims[$2.dim]) { ampliar_vector_dims[$2.dim] = false; }
+       									if (ampliar_vector_dims[$2.dim])
+       									{
+       										ampliar_vector_dims[$2.dim] = false;
+       									}
        					                		$2.dim++;
        					                		$$ = $2;
 								}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
-									$$ = createTensorIniInfo($1.dim,getNewType($1.type,$3.type),joinElementsVectors($1.elements,$3.elements,$1.num_elem,$3.num_elem),$1.num_elem + $3.num_elem);
-
-									if (ampliar_vector_dims[$1.dim]){ vector_dims_tensor[$1.dim] += 1;}
+									$$ = createTensorIniInfo($1.dim, getNewType($1.type, $3.type), joinElementsVectors($1.elements, $3.elements, $1.num_elem, $3.num_elem), $1.num_elem + $3.num_elem);
+									if (ampliar_vector_dims[$1.dim])
+									{
+										vector_dims_tensor[$1.dim] += 1;
+									}
 								}
 		| componente	{
 					$$ = $1;
@@ -340,9 +461,11 @@ componente : lista_valores	{
 			}
 
 lista_valores : lista_valores COMA lista_sumas	{
-							$$ = createTensorIniInfo(0,getNewType($1.type,$3.type),joinElementsVectors($1.elements,castValueInfoToTensorIniInfo($3),$1.num_elem,1),$1.num_elem + 1);
-
-							if (ampliar_vector_dims[0]){ vector_dims_tensor[0] += 1; }
+							$$ = createTensorIniInfo(0, getNewType($1.type, $3.type), joinElementsVectors($1.elements, castValueInfoToTensorIniInfo($3), $1.num_elem, 1), $1.num_elem + 1);
+							if (ampliar_vector_dims[0])
+							{
+								vector_dims_tensor[0] += 1;
+							}
 						}
 		| lista_sumas	{
 					$$ = createTensorIniInfo(0, $1.type, castValueInfoToTensorIniInfo($1), 1);
