@@ -176,11 +176,11 @@ sym_value_type getEntry(char* key)
     }
     else if (response == SYMTAB_NOT_FOUND)
     {
-        yyerror(generateString("No se ha encontrado la clave %s en la symtab",1, key));
+        yyerror(generateString("No se ha encontrado el elemento '%s' en la symtab.",1, key));
     }
     else
     {
-        yyerror("Algun problema buscando el valor en la symtab");
+        yyerror("Algun problema buscando el elemento en la symtab.");
     }
 }
 

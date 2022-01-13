@@ -1,7 +1,7 @@
 /***************** ESPECIFICACIO LEX ***************/
 
 /*
- 
+
 */
 
 /***************************************************/
@@ -131,7 +131,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             {
                 yyerror(generateString("ID -> %s demasiado largo", 1, yytext));
             }
-            if (assignFounded == false && corcheteOpenFounded == false)
+            else if (assignFounded == false && corcheteOpenFounded == false)
             {
                 debug("ID POINTER: %s\n", yytext, 0);
                 yylval.ident.lexema = _strdup(yytext);
