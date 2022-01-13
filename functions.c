@@ -118,7 +118,7 @@ void writeLine(int line, char *instruction)
 		lengthCode++;
 		sq++;
 	}
-	c3a[line] = _strdup(instruction);
+	c3a[line] = strdup(instruction);
 }
 
 char *getNewType(char *type1, char *type2)
@@ -164,9 +164,9 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 value_info_base *castValueInfoToTensorIniInfo(value_info v)
 {
     value_info_base *aux = malloc(sizeof(value_info_base));
-    aux->valueInfoType = _strdup(v.valueInfoType);
-    aux->type = _strdup(v.type);
-    aux->value = _strdup(v.value);
+    aux->valueInfoType = strdup(v.valueInfoType);
+    aux->type = strdup(v.type);
+    aux->value = strdup(v.value);
     return aux;
 }
 

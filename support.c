@@ -53,12 +53,12 @@ char *addV1(value_info v1)
     {
         instr = generateString("%s := ", 1, v1.value);
     }
-    return _strdup(instr);
+    return strdup(instr);
 }
 
 char *addV2(char *instruction, value_info v2)
 {
-    char *instr = _strdup(instruction);
+    char *instr = strdup(instruction);
     if (isSameType(v2.valueInfoType, VAR_T))
     {
         instr = generateString("%s%s ", 2, instr, v2.value);
@@ -78,17 +78,17 @@ char *addV2(char *instruction, value_info v2)
         instr = generateString("%sCALL %s,%s", 3, instr, v2.value, itos(numParams));
         // TODO añadir parámetros de la función
     }
-    return _strdup(instr);
+    return strdup(instr);
 }
 
 char *addOperation(char *instruction, char *op)
 {
-    return _strdup(generateString("%s%s ", 2, instruction, op));
+    return strdup(generateString("%s%s ", 2, instruction, op));
 }
 
 char *addV3(char *instruction, value_info v3)
 {
-    char *instr = _strdup(instruction);
+    char *instr = strdup(instruction);
     if (isSameType(v3.valueInfoType, VAR_T))
     {
         instr = generateString("%s%s", 2, instr, v3.value);
@@ -101,7 +101,7 @@ char *addV3(char *instruction, value_info v3)
     {
         instr = generateString("%s%s", 2, instr, v3.value);
     }
-    return _strdup(instr);
+    return strdup(instr);
 }
 
 //-------------------------------------------------------------------

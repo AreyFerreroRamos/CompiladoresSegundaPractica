@@ -54,15 +54,15 @@ char *generateString(char *message, int nArgs, ...)
             yyerror("Estas usando mal la función generateString(), nArgs debe estar entre 0 y 7");
             break;
     }
-    return _strdup(string);
+    return strdup(string);
 }
 
 value_info_base createValueInfoBase(char *value, char *type, char *valueInfoType)
 {
     value_info_base aux;
-    aux.valueInfoType = _strdup(valueInfoType);
-    aux.type = _strdup(type);
-    aux.value = _strdup(value);
+    aux.valueInfoType = strdup(valueInfoType);
+    aux.type = strdup(type);
+    aux.value = strdup(value);
     return aux;
 }
 
@@ -75,9 +75,9 @@ value_info_base generateEmptyValueInfoBase()
 value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base index)
 {
     value_info aux;
-    aux.value = _strdup(value);
-    aux.type = _strdup(type);
-    aux.valueInfoType = _strdup(valueInfoType);
+    aux.value = strdup(value);
+    aux.type = strdup(type);
+    aux.valueInfoType = strdup(valueInfoType);
     aux.index = index;
     return aux;
 }
@@ -87,7 +87,7 @@ tensor_info createTensorInfo(int index_dim, value_info_base calcIndex, char *lex
     tensor_info aux;
     aux.index_dim = index_dim;
     aux.calcIndex = calcIndex;
-    aux.lexema = _strdup(lexema);
+    aux.lexema = strdup(lexema);
     return aux;
 }
 
@@ -95,7 +95,7 @@ tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elemen
 {
     tensor_ini_info aux;
     aux.dim = dim;
-    aux.type = _strdup(type);
+    aux.type = strdup(type);
     aux.elements = elements;
     aux.num_elem = num_elem;
     return aux;
@@ -104,8 +104,8 @@ tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elemen
 sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDims, void *elements, char *entryType)
 {
     sym_value_type aux;
-    aux.type = _strdup(type);
-    aux.entryType = _strdup(entryType);
+    aux.type = strdup(type);
+    aux.entryType = strdup(entryType);
     aux.size = size;
     aux.num_dim = numDim;
     aux.elem_dims = elemDims;
