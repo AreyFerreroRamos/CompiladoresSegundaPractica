@@ -29,8 +29,6 @@ char *getIdName(char *idWithAssign);
  **/
 int getDim(char *key, int num_dims);
 
-
-
 /**
  * Dado un valor en formato caracter y el tipo de este valor lo convierte a
  * un void* interpretado como el tipo.

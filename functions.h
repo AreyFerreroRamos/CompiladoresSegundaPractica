@@ -1,5 +1,7 @@
 #ifndef FUNCTIONS_H
+
 #define FUNCTIONS_H
+
 #include "tipus.h"
 #include "utils.h"
 #include "support.h"
@@ -24,6 +26,11 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
  **/
 void emet(char *type, value_info v1, value_info v2, value_info v3);
 
+/**
+ * Dada una variable de tipo tensor y la estructura necesaria para gestionarlo durante su definición,
+ * se generará el c3a necesario para imprimir, línea a línea, la inicialización de cada posición del vector,
+ * Para lograrlo, se llama a la función anterior para cada posición del tensor.
+ */
 void emetTensor(char *lexema, tensor_ini_info tensor);
 
 /**
@@ -32,8 +39,7 @@ void emetTensor(char *lexema, tensor_ini_info tensor);
 void writeLine(int line, char *instruction);
 
 /**
- * Given two numeric type returns the new one that result to
- * operate them
+ * Dados dos tipos númericos, se devuelve el tipo que resulta de operar ambos números.
  */
 char *getNewType(char *type1, char *type2);
 
@@ -64,6 +70,10 @@ value_info_base *joinElementsVectors(value_info_base * vec1,value_info_base * ve
  **/
 void invertVector(int *vector, int dim);
 
+/**
+ * Dado el nombre de una variable de tipo tensor y la posición de una dimensión en el vector de dimensiones del tensor,
+ * se comprueba si el índice es válido y, en caso afirmativo, se recupera dicha dimensión.
+ */
 int getDim(char *key, int index_dim);
 
 #endif

@@ -1,5 +1,7 @@
 #ifndef UTILS_H
+
 #define UTILS_H
+
 #include "tipus.h"
 #include "symtab.h"
 
@@ -22,6 +24,9 @@ char *generateString(char *message, int nArgs, ...);
  */
 value_info_base createValueInfoBase(char *value, char *type, char *valueInfoType);
 
+/**
+ * Genera una estructura de tipo value_info_base con todos los campos vacíos y la devuelve.
+ */
 value_info_base generateEmptyValueInfoBase();
 
 /**
@@ -30,6 +35,9 @@ value_info_base generateEmptyValueInfoBase();
  **/
 value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base index);
 
+/**
+ * Genera una estructura de tipo value_info con todos los campos vacíos y la devuelve.
+ */
 value_info generateEmptyValueInfo()
 
 /**

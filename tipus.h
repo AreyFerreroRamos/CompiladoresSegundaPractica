@@ -61,16 +61,18 @@
 #define INSTR_RETURN "RETURN"
 
 /**
- * Esta estructura contiene los campos necesarios para gestionar un elemento (literal, variable, tensor o función)
+ * Esta estructura contiene los campos necesarios para gestionar un elemento (literal o una variable)
  * en un punto del programa en que dicho elemento se utiliza como índice para acceder a un tensor.
- * En consecuencia, esta estructura contiene los mismos campos que la estructura value_info (definida justo después) con excepción del índice.
- * En lenguajes de programación que permitiesen recursividad en el tratamiento de registros, esta estructura no sería necesaria.
+ * Los tensores y las funciones también pueden comportarse como índices de otro tensor,
+ * pero serán convertidos en variables temporales durante el proceso de generación del código intermedio (tiempo de compilación).
+ * Esta estructura contiene los mismos campos que la estructura value_info (definida justo después) con excepción del índice.
+ * Si las estructuras de tipo 'typedef struct' permitiesen acceso recursivo, este registro no sería necesario.
  */
  typedef struct
 {
     char *type;             // Tipo del elemenento.
     char *value;            // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable.
-    char *valueInfoType;    // Variable o literal.
+    char *valueInfoType;    // Indica si el elemento es una variable o un literal.
 } value_info_base;
 
  /**
@@ -80,9 +82,9 @@
 typedef struct
 {
 	char *type;                 // Tipo del elemenento.
-	char *value;                // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable, tensor o función.
-	char *valueInfoType;        // Variable, tensor, función o literal.
-	value_info_base index;     // Índice de acceso en caso de ser un tensor. Si el elemento no es un tensor, este campo será nulo.
+	char *value;                // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable, un tensor o una función.
+	char *valueInfoType;        // Indica si el elemento es un literal, una variable, un tensor o una función.
+	value_info_base index;      // Índice de acceso en caso de ser un tensor. Si el elemento no es un tensor, este campo será nulo.
 } value_info;
 
 /**

@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 				if (error == EXIT_SUCCESS)
 				{
 					printCode3Adresses();
-					printf("The compilation has been successful\n");
+					printf("The compilation has been successful.\n");
 				}
 				else
 				{
@@ -27,27 +27,27 @@ int main(int argc, char *argv[])
 				error = end_analisi_sintactic();
 				if (error == EXIT_FAILURE)
 				{
-					printf("The output file can not be closed\n");
+					printf("The output file can not be closed.\n");
 				}
 				error = end_analisi_lexic();
 				if (error == EXIT_FAILURE)
 				{
-					printf("The input file can not be closed\n");
+					printf("The input file can not be closed.\n");
 				}
 			}
 			else
 			{
-				printf("The output file %s can not be created\n", argv[2]);
+				printf("The output file %s can not be created.\n", argv[2]);
 			}
 		}
 		else
 		{
-			printf("The input file %s can not be opened\n", argv[1]);
+			printf("The input file %s can not be opened.\n", argv[1]);
 		}
 	}
 	else
 	{
-		printf("\nUsage: %s INPUT_FILE OUTPUT_FILE\n", argv[0]);
+		printf("\nUsage: %s INPUT_FILE OUTPUT_FILE.\n", argv[0]);
 	}
 	return EXIT_SUCCESS;
 }

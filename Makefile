@@ -3,11 +3,11 @@
 #
 #                           Compiladors I 
 #             
-#			 Jordi Castella Roca
+#			 			Jordi Castella Roca
 #
 #                            Makefile
 #            
-#		            Curs 06/07
+#		            		Curs 06/07
 #  
 ######################################################################
 

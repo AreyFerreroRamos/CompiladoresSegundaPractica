@@ -57,8 +57,6 @@ char *getIdName(char *idWithAssign)
 	return var;
 }
 
-
-
 void castValueToVoidPointer(void *ptr, char *value, char *type)
 {
 	if (isSameType(type, INT32_T))
