@@ -58,6 +58,13 @@ char *generateString(char *message, int nArgs, ...)
     return strdup(string);
 }
 
+int isValueInfoBaseNull(value_info_base v){
+    if(v.value==NULL || v.type==NULL || v.valueInfoType==NULL){
+        return 1;
+    }
+    return 0;
+}
+
 value_info_base createValueInfoBase(char *value, char *type, char *valueInfoType)
 {
     value_info_base aux;
@@ -70,6 +77,9 @@ value_info_base createValueInfoBase(char *value, char *type, char *valueInfoType
 value_info_base generateEmptyValueInfoBase()
 {
     value_info_base aux;
+    aux.value=NULL;
+    aux.type=NULL;
+    aux.valueInfoType=NULL;
     return aux;
 }
 
@@ -79,13 +89,22 @@ value_info createValueInfo(char *value, char *type, char *valueInfoType, value_i
     aux.value = strdup(value);
     aux.type = strdup(type);
     aux.valueInfoType = strdup(valueInfoType);
-    aux.index = index;
+    if(isValueInfoBaseNull(index)==0)
+    {
+        aux.index = createValueInfoBase(index.value,index.type,index.valueInfoType);
+    }else{
+        aux.index = index;
+    }
     return aux;
 }
 
 value_info generateEmptyValueInfo()
 {
     value_info aux;
+    aux.value=NULL;
+    aux.type=NULL;
+    aux.valueInfoType=NULL;
+    aux.index = generateEmptyValueInfoBase();
     return aux;
 }
 
@@ -199,20 +218,17 @@ sym_value_type getEntry(char* key)
 {
     sym_value_type entry;
     int response = sym_lookup(key, &entry);
-    if (response == SYMTAB_OK)
-    {
-        return entry;
-    }
-    else if (response == SYMTAB_NOT_FOUND)
+    if (response == SYMTAB_NOT_FOUND)
     {
         yyerror(generateString("No se ha encontrado el elemento '%s' en la symtab.",1, key));
+        
     }
-    else
+    else if (response != SYMTAB_OK)
     {
         yyerror("Algun problema buscando el elemento en la symtab.");
     }
+    return entry;
 }
-
 
 void addOrUpdateEntry(char* key, sym_value_type entry)
 {

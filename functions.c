@@ -197,12 +197,20 @@ void invertVector(int *vector, int dim)
 int getDim(char *key, int index_dim)
 {
     sym_value_type entry = getEntry(key);
-    if (index_dim < entry.num_dim)
-    {
-        return entry.elem_dims[index_dim];
-    }
-    else
+    if (index_dim >= entry.num_dim)
     {
         yyerror("Estas accediendo a una dimension no válida");
+        
     }
+    return entry.elem_dims[index_dim];
+}
+
+int getAcumElemDim(int *elem_dim, int num_dim)
+{
+	int acum = 1;
+	for (int i = 0; i < num_dim; i++)
+	{
+		acum *= elem_dim[i];
+	}
+	return acum;
 }

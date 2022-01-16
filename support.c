@@ -66,7 +66,7 @@ char *addV2(char *instruction, value_info v2)
     }
     else if (isSameType(v2.valueInfoType, TENS_T))
     {
-        instr = generateString("%s%s[%s] ", 3, instr, v2.value, v2.index);
+        instr = generateString("%s%s[%s] ", 3, instr, v2.value, v2.index.value);
     }
     else if (isSameType(v2.valueInfoType, LIT_T))
     {
@@ -94,10 +94,6 @@ char *addV3(char *instruction, value_info v3)
     {
         instr = generateString("%s%s", 2, instr, v3.value);
     }
-    else if (isSameType(v3.valueInfoType, TENS_T))
-    {
-        instr = generateString("%s%s[%s]", 3, instr, v3.value, v3.index);
-    }
     else if (isSameType(v3.valueInfoType, LIT_T))
     {
         instr = generateString("%s%s", 2, instr, v3.value);
@@ -112,9 +108,8 @@ void printCode3Adresses()
     printf("---------------------------------\n");
     for (int i = 0; i < lengthCode; i++)
     {
-        printf("%s", c3a[i]);
-        printf("\n");
-        fprintf(yyout, "%s", c3a[i]);
+        printf("%s\n", c3a[i]);
+        fprintf(yyout, "%s\n", c3a[i]);
     }
     printf("---------------------------------\n");
 }

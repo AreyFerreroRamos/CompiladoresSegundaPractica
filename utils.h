@@ -19,6 +19,11 @@ void yyerror(char *);
 char *generateString(char *message, int nArgs, ...);
 
 /**
+ * Dado un value_info_base comprueba que los parametros no esten a NULL
+ */
+int isValueInfoBaseNull(value_info_base v);
+
+/**
  * Dados los campos necesarios para gestionar un índice (literal, variable, tensor o función) para acceder a la posición de un tensor,
  * se genera una estructura (value_info_base) que contiene dichos campos y se devuelve.
  */
@@ -38,7 +43,7 @@ value_info createValueInfo(char *value, char *type, char *valueInfoType, value_i
 /**
  * Genera una estructura de tipo value_info con todos los campos vacíos y la devuelve.
  */
-value_info generateEmptyValueInfo()
+value_info generateEmptyValueInfo();
 
 /**
  * Dados los campos necesarios para gestionar un tensor durante su uso en el programa,

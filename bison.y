@@ -94,77 +94,21 @@ sentencia : asignacion
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
 							int size = 0;
-							if (isSameType($3.valueInfoType, LIT_T) || isSameType($3.valueInfoType, VAR_T))
-							{
-								size = isSameType($3.type,INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
-								entry = createSymValueType($3.type, size, 0, NULL, NULL, VAR_T);
-								addOrUpdateEntry($1.lexema, entry);
-								value_info null;
-								value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, generateEmptyValueInfoBase());
-								emet(INSTR_COPY, v1, $3, null);
-							}
-							/*else if (isSameType($3.valueInfoType, TENS_T))
-							{
-								int response = sym_lookup($3.lexema, &entry);
-								if (response == SYMTAB_OK)
-								{
-									response = sym_enter($1.lexema, &entry);
-									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
-									{
-										yyerror("Error al guardar en symtab");
-									}
-									printTensor($1.lexema, entry, 1);
-									clearTmpTensorId();
-								}
-							}*/
+							size = isSameType($3.type,INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
+							entry = createSymValueType($3.type, size, 0, NULL, NULL, VAR_T);
+							addOrUpdateEntry($1.lexema, entry);
+							value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, generateEmptyValueInfoBase());
+							emet(INSTR_COPY, v1, $3, generateEmptyValueInfo());
 						}
 	| id ASSIGN expresion_aritmetica	{	
-							/*if ($3.value != NULL)
-							{
-								sym_value_type entry;
-								int response = sym_lookup($1.lexema, &entry);
-								if (response == SYMTAB_OK)
-								{
-									if (isSameType(entry.type, INT32_T))
-									{	
-										if (isSameType($3.type, INT32_T))
-										{
-											((int *) entry.elements)[$1.calcIndex] = atoi($3.value);
-										}
-										else
-										{
-											((int *) entry.elements)[$1.calcIndex] = (int) atof($3.value);
-										}
-									}
-									else if (isSameType(entry.type, FLOAT64_T))
-									{
-										if (isSameType($3.type,INT32_T))
-										{
-											((float *) entry.elements)[$1.calcIndex] = atoi($3.value);
-										}
-										else
-										{
-											((float *) entry.elements)[$1.calcIndex] = atof($3.value);
-										}
-									}
-									response = sym_enter($1.lexema, &entry);
-
-									if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
-									{
-										yyerror("Error al guardar en symtab");
-									}
-
-									fprintf(yyout, "ID: %s pren per valor: %s a la posicio: %i\n", $1.lexema, (char *) $3.value, $1.calcIndex);
-								}
-								else
-								{
-									yyerror("Error al cargar variable de la symtab");
-								}
-							}
-							else
-							{
-								yyerror("No se puede asignar un tensor a un indice de un tensor");
-							}*/
+							sym_value_type entry = getEntry($1.lexema);
+							int size = 0;
+							size = isSameType($3.type,INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
+							entry.type = $3.type;
+							entry.size = getAcumElemDim(entry.elem_dims,entry.num_dim) * size;
+							addOrUpdateEntry($1.lexema, entry);
+							value_info v1 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
+							emet(INSTR_COPY, v1, $3, generateEmptyValueInfo());
 						}
 	| ID ASSIGN tensor	{
 					invertVector(vector_dims_tensor, $3.dim);
@@ -178,50 +122,55 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 				}
 
 id : lista_indices CORCHETE_CERRADO	{
-						//$$ = createTensorInfo($1.index_dim, $1.calcIndex, $1.lexema);
-					}
+							$$ = $1;
+						}
    
 lista_indices : lista_indices COMA lista_sumas	{
-							/*if (isSameType($3.type, INT32_T)) 
-							{
-								int dim = getDim($1.lexema, $1.index_dim);
-								if (dim != -1)
-								{
-									$$ = createTensorInfo($1.index_dim + 1, $1.calcIndex * dim + atoi($3.value), $1.lexema);
-								}
-								else
-								{
-									yyerror(generateString("Mal acceso a la variable %s",1,$1.lexema);
-								}
-							}
-							else
-							{
-								if (isSameType($3.valueInfoType,LIT_T))
-								{
-									yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));
-								}
-								else
-								{
-									yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));
-								}
-							}*/
-						}
-		| ID CORCHETE_ABIERTO lista_sumas	{
-		      					/*	if (isSameType($3.type, INT32_T))
-		      						{
-		      							$$ = createTensorInfo(1, atoi($3.value), $1.lexema);
-		      						}
-								else
-								{
-									if (isSameType($3.valueInfoType,LIT_T))
+							if (isSameType($3.type, INT32_T))
 									{
-										yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.value,$3.type));
+										int dim = getDim($1.lexema, $1.index_dim);
+										if (isSameType($1.calcIndex.valueInfoType, VAR_T) || isSameType($3.valueInfoType, VAR_T))
+										{
+											char *nameTmp = generateTmpId();
+											sym_value_type entry = getEntry($1.lexema);
+											value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
+											value_info v2 = createValueInfo($1.calcIndex.value, $1.calcIndex.type, $1.calcIndex.valueInfoType, generateEmptyValueInfoBase());
+											value_info v3 = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
+											emet(INSTR_MULI, v1, v2, v3);
+											emet(INSTR_ADDI, v1, v1, $3);
+											value_info_base calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
+											$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
+										}
+										else
+										{
+											value_info_base calcIndex = createValueInfoBase(itos(atoi($1.calcIndex.value) * dim + atoi($3.value)), INT32_T, LIT_T);
+											$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
+										}
 									}
 									else
 									{
-										yyerror(generateString("El indice -> %s es %s,debería ser INT32",2,$3.lexema,$3.type));
+										yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
 									}
-								}*/
+						}
+		| ID CORCHETE_ABIERTO lista_sumas	{
+		      					if (isSameType($3.type, INT32_T)) 
+								{
+									
+									value_info_base calcIndex;
+									if (isSameType($3.valueInfoType, VAR_T))
+									{
+										calcIndex = createValueInfoBase($3.value, INT32_T, VAR_T);
+									}
+									else
+									{
+										calcIndex = createValueInfoBase($3.value, INT32_T, LIT_T);
+									}
+									$$ = createTensorInfo(1, calcIndex, $1.lexema);
+								}
+								else
+								{
+									yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
+								}
 		     					}
 
 expresion_aritmetica : lista_sumas
@@ -367,27 +316,19 @@ id_arit : ID_ARIT	{
 				$$ = $1;
 			}	
 	| lista_indices_arit CORCHETE_CERRADO	{
-							if (isSameType($1.calcIndex.type, INT32_T))
-							{
 								sym_value_type entry = getEntry($1.lexema);
 								char *nameTmp = generateTmpId();
 								value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
 								value_info v2 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
 								emet(INSTR_COPY, v1, v2, generateEmptyValueInfo());
 								$$ = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
-							}
-							else
-							{
-								yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $1.calcIndex.value, $1.calcIndex.type));
-							}
-
 						}
 
 lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 									if (isSameType($3.type, INT32_T))
 									{
 										int dim = getDim($1.lexema, $1.index_dim);
-										if (isSametype($1.calcIndex.valueInfoType, VAR_T) || isSametype($3.valueInfoType, VAR_T))
+										if (isSameType($1.calcIndex.valueInfoType, VAR_T) || isSameType($3.valueInfoType, VAR_T))
 										{
 											char *nameTmp = generateTmpId();
 											sym_value_type entry = getEntry($1.lexema);
@@ -411,21 +352,24 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 									}
 								}
 		| ID_ARIT CORCHETE_ABIERTO lista_sumas	{
-	   					/*		if (isSameType($3.type, INT32_T)) 
+	   							if (isSameType($3.type, INT32_T)) 
 								{
-									$$ = createTensorInfo(1, atoi($3.value), $1.lexema);
-								}
-								else
-								{
-									if (isSameType($3.valueInfoType, LIT_T))
+									
+									value_info_base calcIndex;
+									if (isSameType($3.valueInfoType, VAR_T))
 									{
-										yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
+										calcIndex = createValueInfoBase($3.value, INT32_T, VAR_T);
 									}
 									else
 									{
-										yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.lexema, $3.type));
+										calcIndex = createValueInfoBase($3.value, INT32_T, LIT_T);
 									}
-								}*/
+									$$ = createTensorInfo(1, calcIndex, $1.value);
+								}
+								else
+								{
+									yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
+								}
 							}
 
 tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{

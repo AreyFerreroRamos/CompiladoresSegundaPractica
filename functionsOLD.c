@@ -267,16 +267,6 @@ void printSymValueType(sym_value_type entry)
 	printf("------------------------\n\n");
 }
 
-int getAcumElemDim(int *elem_dim, int num_dim)
-{
-	int acum = 1;
-	for (int i = 0; i < num_dim; i++)
-	{
-		acum *= elem_dim[i];
-	}
-	return acum;
-}
-
 void saveTmpTensorInSymTab(value_info *val, char *type1, char *type2, sym_value_type entry)
 {
 	char *id = "prueba"; // generateTmpTensorId();

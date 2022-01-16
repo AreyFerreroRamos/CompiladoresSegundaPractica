@@ -72,12 +72,6 @@ void printTensor(char *nameVar, sym_value_type tensor, int inFile);
 void printSymValueType(sym_value_type entry);
 
 /**
- * Dado un vector de enteros que representa las dimensiones de un tensor, devuelve el número
- * de elemntos que hay dentro de el
- **/
-int getAcumElemDim(int *elem_dim, int num_dim);
-
-/**
  *
  **/
 void saveTmpTensorInSymTab(value_info *val, char *type1, char *type2, sym_value_type entry);

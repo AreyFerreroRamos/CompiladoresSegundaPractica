@@ -76,4 +76,10 @@ void invertVector(int *vector, int dim);
  */
 int getDim(char *key, int index_dim);
 
+/**
+ * Dado un vector de enteros que representa las dimensiones de un tensor, devuelve el número
+ * de elemntos que hay dentro de el
+ **/
+int getAcumElemDim(int *elem_dim, int num_dim);
+
 #endif
