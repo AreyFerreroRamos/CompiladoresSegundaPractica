@@ -49,10 +49,10 @@
 	void *no_definit;
 }
 
-%token <no_definit> ASSIGN
+%token <no_definit> ASSIGN START RETURN END DOBLE_DOS_PUNTOS LLAVE_ABIERTA LLAVE_CERRADA ID_PROC
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA
+%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TYPE
 %token <ident> ID 
 %token <operand> ID_ARIT
 
@@ -67,7 +67,16 @@
 %%
 
 
-programa : lista_de_sentencias
+programa : lista_de_procedimientos main | main
+
+lista_de_procedimientos : lista_de_procedimientos procedimiento | procedimiento
+
+procedimiento : cabecera_procedimiento lista_de_sentencias end
+
+cabecera_procedimiento : cabecera_funcion
+			| cabecera_accion
+
+main : lista_de_sentencias
 
 lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 
@@ -90,6 +99,7 @@ sentencia : asignacion
 				}
 			}*/
 		}
+	| return
 
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
@@ -127,30 +137,30 @@ id : lista_indices CORCHETE_CERRADO	{
    
 lista_indices : lista_indices COMA lista_sumas	{
 							if (isSameType($3.type, INT32_T))
-									{
-										int dim = getDim($1.lexema, $1.index_dim);
-										if (isSameType($1.calcIndex.valueInfoType, VAR_T) || isSameType($3.valueInfoType, VAR_T))
-										{
-											char *nameTmp = generateTmpId();
-											sym_value_type entry = getEntry($1.lexema);
-											value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
-											value_info v2 = createValueInfo($1.calcIndex.value, $1.calcIndex.type, $1.calcIndex.valueInfoType, generateEmptyValueInfoBase());
-											value_info v3 = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
-											emet(INSTR_MULI, v1, v2, v3);
-											emet(INSTR_ADDI, v1, v1, $3);
-											value_info_base calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
-											$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
-										}
-										else
-										{
-											value_info_base calcIndex = createValueInfoBase(itos(atoi($1.calcIndex.value) * dim + atoi($3.value)), INT32_T, LIT_T);
-											$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
-										}
-									}
-									else
-									{
-										yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
-									}
+							{
+								int dim = getDim($1.lexema, $1.index_dim);
+								if (isSameType($1.calcIndex.valueInfoType, VAR_T) || isSameType($3.valueInfoType, VAR_T))
+								{
+									char *nameTmp = generateTmpId();
+									sym_value_type entry = getEntry($1.lexema);
+									value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
+									value_info v2 = createValueInfo($1.calcIndex.value, $1.calcIndex.type, $1.calcIndex.valueInfoType, generateEmptyValueInfoBase());
+									value_info v3 = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
+									emet(INSTR_MULI, v1, v2, v3);
+									emet(INSTR_ADDI, v1, v1, $3);
+									value_info_base calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
+									$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
+								}
+								else
+								{
+									value_info_base calcIndex = createValueInfoBase(itos(atoi($1.calcIndex.value) * dim + atoi($3.value)), INT32_T, LIT_T);
+									$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
+								}
+							}
+							else
+							{
+								yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
+							}
 						}
 		| ID CORCHETE_ABIERTO lista_sumas	{
 		      					if (isSameType($3.type, INT32_T)) 
@@ -186,7 +196,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 									else
 									{
 										//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
-										$$ = createValueInfo(generateTmpId(), getNewType($1.type,$3.type), VAR_T, generateEmptyValueInfoBase());
+										$$ = createValueInfo(generateTmpId(), getNewType($1.type, $3.type), VAR_T, generateEmptyValueInfoBase());
 										classifyOperation($2, $$, $1, $3);
 										//GUARDAR VARIABLE TMP EN SYMTAB?
 									}
@@ -203,7 +213,7 @@ lista_sumas : lista_sumas OP_ARIT_P3 lista_productos	{
 						}
 						else
 						{
-							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));
+							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $1.type));
 						}
 					}
 
@@ -235,7 +245,7 @@ lista_productos : lista_productos op_arit_p2 lista_potencias 	{
 						}
 						else
 						{
-							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));
+							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $1.type));
 						}
 					}
 
@@ -257,14 +267,14 @@ lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico {
 										else
 										{ 
 											//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
-											$$ = createValueInfo(generateTmpId(),getNewType($1.type,$3.type),VAR_T,generateEmptyValueInfoBase());
-											classifyOperation($2,$$,$1,$3);
+											$$ = createValueInfo(generateTmpId(), getNewType($1.type, $3.type), VAR_T, generateEmptyValueInfoBase());
+											classifyOperation($2, $$, $1, $3);
 											//GUARDAR VARIABLE TMP EN SYMTAB?
 										}
 									}
 									else
 									{
-										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $3.type));
+										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $3.type));
 									}
 								}
 		| terminal_aritmetico	{
@@ -274,7 +284,7 @@ lista_potencias : lista_potencias OP_ARIT_P1 terminal_aritmetico {
 						}
 						else
 						{
-							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $1.type));
+							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $1.type));
 						}
 					}
 
@@ -425,5 +435,18 @@ lista_valores : lista_valores COMA lista_sumas	{
 					}
 				}
 
+cabecera_funcion : cabecera_accion DOBLE_DOS_PUNTOS TYPE
+
+cabecera_accion : START ID_PROC PARENTESIS_ABIERTO lista_params PARENTESIS_CERRADO
+
+lista_params : lista_params COMA param
+		| param
+
+param : ID DOBLE_DOS_PUNTOS TYPE
+	| ID DOBLE_DOS_PUNTOS TYPE LLAVE_ABIERTA TYPE LLAVE_CERRADA
+
+return : RETURN expresion_aritmetica
+
+end : END
 
 %%

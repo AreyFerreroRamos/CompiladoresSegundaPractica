@@ -5,7 +5,7 @@
 #include "functions.h"
 
 extern int num_tmp_variable;
-extern int sq;		   // Siguiente linia que toca escribir
+extern int sq;	        // Siguiente linia que toca escribir
 extern int lengthCode; // Nombre de linias de c3a
 extern char **c3a;	   // Conjunto de lineas que formarán el codigo de 3 adreces
 
@@ -24,7 +24,6 @@ void emet(char *type, value_info v1, value_info v2, value_info v3)
 	if (isSameType(type, INSTR_COPY))
 	{
 		instruction = emetCopy(v1, v2);
-		writeLine(sq, instruction);
 	}
 	else if (isSameType(type, INSTR_ADDI) || isSameType(type, INSTR_ADDD) 
 	        || isSameType(type, INSTR_SUBI) || isSameType(type, INSTR_SUBD)
@@ -33,8 +32,8 @@ void emet(char *type, value_info v1, value_info v2, value_info v3)
 	        || isSameType(type, INSTR_MODI))
 	{
 		instruction = emetOperation(type, v1, v2, v3);
-		writeLine(sq, instruction);
 	}
+    writeLine(sq, instruction);
 }
 
 void emetTensor(char *lexema, tensor_ini_info tensor)

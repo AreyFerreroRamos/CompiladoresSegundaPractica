@@ -20,6 +20,7 @@
   bool assignFounded = false;
   bool corcheteOpenFounded = false;
   bool insideFunction = false;
+  bool insideParams = false;
 %}
 
 %option yylineno
@@ -110,22 +111,49 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		return CORCHETE_CERRADO;
 	}
 
+"{" {
+        debug("%s\n", yytext, 0);
+        return LLAVE_ABIERTA;
+    }
+
+"}" {
+        debug("%s\n", yytext, 0);
+        return LLAVE_CERRADA;
+    }
+
+
 ;   {
 		debug("%s\n", yytext, 0);
 		return PUNTO_Y_COMA;
 	}
 
+::  {
+        debug("%s\n", yytext, 0);
+        return DOBLE_DOS_PUNTOS;
+    }
+
 "function"  {
-                /*debug("%s\n", yytext, 0);
+                debug("%s\n", yytext, 0);
                 insideFunction = true;
-                return START;*/
+                return START;
+            }
+
+"return"    {
+                debug("%s\n", yytext, 0);
+                return RETURN;
             }
 
 "end"	{
-            /*debug("%s\n", yytext, 0);
+            debug("%s\n", yytext, 0);
             insideFunction = false;
-            return END;*/
+            insideParams = false;
+            return END;
         }
+
+("Int32"|"Float64"|"String"|"Bool"|"Tensor") {
+                                                debug("%s\n", yytext, 0);
+                                                return TYPE;
+                                            }
 
 {id}	{
             if (strlen(yytext) > ID_MAX_LENGTH)
@@ -139,6 +167,10 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
                 yylval.ident.lenght = strlen(yytext);
                 yylval.ident.line = yylineno;
                 return ID;
+            }
+            else if (insideFunction == true && insideParams == false)
+            {
+                return ID_PROC;
             }
             else
             {

@@ -11,8 +11,9 @@
 #define TMP_BASE_ID "$t"
 #define INT32_T "Int32"
 #define FLOAT64_T "Float64"
-#define BOOLEAN_T "Boolean"
+#define BOOLEAN_T "Bool"
 #define STRING_T "String"
+#define TENSOR_T "Tensor"
 
 #define FUNC_T "_FUNC_T"
 #define VAR_T "_VAR_T"
