@@ -104,7 +104,7 @@ sentencia : asignacion
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
 							int size = 0;
-							size = isSameType($3.type,INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
+							size = isSameType($3.type, INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
 							entry = createSymValueType($3.type, size, 0, NULL, NULL, VAR_T);
 							addOrUpdateEntry($1.lexema, entry);
 							value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, generateEmptyValueInfoBase());
@@ -113,9 +113,9 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 	| id ASSIGN expresion_aritmetica	{	
 							sym_value_type entry = getEntry($1.lexema);
 							int size = 0;
-							size = isSameType($3.type,INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
+							size = isSameType($3.type, INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
 							entry.type = $3.type;
-							entry.size = getAcumElemDim(entry.elem_dims,entry.num_dim) * size;
+							entry.size = getAcumElemDim(entry.elem_dims, entry.num_dim) * size;
 							addOrUpdateEntry($1.lexema, entry);
 							value_info v1 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
 							emet(INSTR_COPY, v1, $3, generateEmptyValueInfo());
@@ -304,7 +304,7 @@ terminal_aritmetico : INTEGER	{
 									}
 									else
 									{
-										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type));
+										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $2.type));
 									}
 								}
 	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{

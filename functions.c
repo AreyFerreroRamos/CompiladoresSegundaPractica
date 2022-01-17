@@ -51,56 +51,53 @@ void emetTensor(char *lexema, tensor_ini_info tensor)
 
 void classifyOperation(char *operation, value_info v1, value_info v2, value_info v3)
 {
-    if (isSameType(operation, OP_ARIT_SUMA))
+    if (isSameType(v1.type, INT32_T))
     {
-        if (isSameType(v1.type, INT32_T))
+        if (isSameType(operation, OP_ARIT_SUMA))
         {
             emet(INSTR_ADDI, v1, v2, v3);
         }
-        else
-        {
-            emet(INSTR_ADDD, v1, v2, v3);
-        }
-    }
-    else if (isSameType(operation, OP_ARIT_RESTA))
-    {
-        if (isSameType(v1.type, INT32_T))
+        else if (isSameType(operation, OP_ARIT_RESTA))
         {
             emet(INSTR_SUBI, v1, v2, v3);
         }
-        else
-        {
-            emet(INSTR_SUBD, v1, v2, v3);
-        }
-    }
-    else if (isSameType(operation, OP_ARIT_MULT))
-    {
-        if (isSameType(v1.type, INT32_T))
+        else if (isSameType(operation, OP_ARIT_MULT))
         {
             emet(INSTR_MULI, v1, v2, v3);
         }
-        else
-        {
-            emet(INSTR_MULD, v1, v2, v3);
-        }
-    }
-    else if (isSameType(operation, OP_ARIT_DIV))
-    {
-        if (isSameType(v1.type, INT32_T))
+        else if (isSameType(operation, OP_ARIT_DIV))
         {
             emet(INSTR_DIVI, v1, v2, v3);
         }
-        else
+        else if (isSameType(operation, OP_ARIT_MOD))
+        {
+            emet(INSTR_MODI, v1, v2, v3);
+        }
+        else if (isSameType(operation, OP_ARIT_POTENCIA))
+        {
+        }
+    }
+    else
+    {
+        if (isSameType(operation, OP_ARIT_SUMA))
+        {
+            emet(INSTR_ADDD, v1, v2, v3);
+        }
+        else if (isSameType(operation, OP_ARIT_RESTA))
+        {
+            emet(INSTR_SUBD, v1, v2, v3);
+        }
+        else if (isSameType(operation, OP_ARIT_MULT))
+        {
+            emet(INSTR_MULD, v1, v2, v3);
+        }
+        else if (isSameType(operation, OP_ARIT_DIV))
         {
             emet(INSTR_DIVD, v1, v2, v3);
         }
-    }
-    else if (isSameType(operation, OP_ARIT_MOD))
-    {
-        emet(INSTR_MODI, v1, v2, v3);
-    }
-    else if (isSameType(operation, OP_ARIT_POTENCIA))
-    {
+        else if (isSameType(operation, OP_ARIT_POTENCIA))
+        {
+        }
     }
 }
 
