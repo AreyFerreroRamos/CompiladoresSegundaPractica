@@ -189,7 +189,7 @@ int getDim(char *key, int index_dim)
     sym_value_type entry = getEntry(key);
     if (index_dim >= entry.num_dim)
     {
-        yyerror("Estás accediendo a una dimensión no válida");
+        yyerror("Estás accediendo a una dimensión no válida.");
     }
     return entry.elem_dims[index_dim];
 }

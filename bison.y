@@ -112,7 +112,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						}
 	| id ASSIGN expresion_aritmetica	{
 							sym_value_type entry = getEntry($1.lexema);
-							int size = 0;
+							int size;
 							size = isSameType($3.type, INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
 							entry.type = $3.type;
 							entry.size = getAcumElemDim(entry.elem_dims, entry.num_dim) * size;
@@ -292,12 +292,12 @@ id_arit : ID_ARIT	{
 				$$ = $1;
 			}	
 	| lista_indices_arit CORCHETE_CERRADO	{
-								sym_value_type entry = getEntry($1.lexema);
-								char *nameTmp = generateTmpId();
-								value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
-								value_info v2 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
-								emet(INSTR_COPY, v1, v2, generateEmptyValueInfo());
-								$$ = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
+							sym_value_type entry = getEntry($1.lexema);
+							char *nameTmp = generateTmpId();
+							value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
+							value_info v2 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
+							emet(INSTR_COPY, v1, v2, generateEmptyValueInfo());
+							$$ = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
 						}
 
 lista_indices_arit : lista_indices_arit COMA lista_sumas	{
@@ -324,13 +324,12 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 									}
 									else
 									{
-										yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
+										yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32.", 2, $3.value, $3.type));
 									}
 								}
 		| ID_ARIT CORCHETE_ABIERTO lista_sumas	{
 	   							if (isSameType($3.type, INT32_T)) 
 								{
-									
 									value_info_base calcIndex;
 									if (isSameType($3.valueInfoType, VAR_T))
 									{
@@ -344,7 +343,7 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 								}
 								else
 								{
-									yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
+									yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32.", 2, $3.value, $3.type));
 								}
 							}
 
