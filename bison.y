@@ -13,7 +13,7 @@
   	// Variables necesarias para la inicialización de un tensor.
   int *vector_dims_tensor;	// Vector con el número de elementos de cada dimensión del tensor.
   int num_dims_tensor = 0;	// Número de dimensiones del tensor.
-  bool *ampliar_vector_dims; 	// Vector de booleanos para limitar la ampliación de memoria del vector de dimensiones a una sola por dimensión.
+  bool *ampliar_vector_dims; 	// Vector de booleanos para limitar la ampliación de memoria del vector de dimensiones a una sola ampliación por dimensión.
 
 	//Variables para controlar el flujo de variables temporales en la symtab
   char **list_tmp_variables_symtab;
@@ -110,7 +110,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 							value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, generateEmptyValueInfoBase());
 							emet(INSTR_COPY, v1, $3, generateEmptyValueInfo());
 						}
-	| id ASSIGN expresion_aritmetica	{	
+	| id ASSIGN expresion_aritmetica	{
 							sym_value_type entry = getEntry($1.lexema);
 							int size = 0;
 							size = isSameType($3.type, INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
@@ -124,7 +124,6 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 					invertVector(vector_dims_tensor, $3.dim);
 					sym_value_type entry = createSymValueType($3.type, calculateSizeType($3.type) * $3.num_elem, $3.dim, vector_dims_tensor, $3.elements, TENS_T);
 					addOrUpdateEntry($1.lexema, entry);
-
 					emetTensor($1.lexema, $3);
 					vector_dims_tensor = NULL;
 					ampliar_vector_dims = NULL;
@@ -132,8 +131,8 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 				}
 
 id : lista_indices CORCHETE_CERRADO	{
-							$$ = $1;
-						}
+						$$ = $1;
+					}
    
 lista_indices : lista_indices COMA lista_sumas	{
 							if (isSameType($3.type, INT32_T))
@@ -409,28 +408,28 @@ lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
 					}
 				}
 
-componente : lista_valores	{
-					$$ = $1;
-				}
-	| tensor	{
+componente : tensor	{
+				$$ = $1;
+			}
+	| lista_valores	{
 				$$ = $1;
 			}
 
 lista_valores : lista_valores COMA lista_sumas	{
-							$$ = createTensorIniInfo(0, getNewType($1.type, $3.type), joinElementsVectors($1.elements, castValueInfoToTensorIniInfo($3), $1.num_elem, 1), $1.num_elem + 1);
+							$$ = createTensorIniInfo(0, getNewType($1.type, $3.type), joinElementsVectors($1.elements, castValueInfoToValueInfoBase($3), $1.num_elem, 1), $1.num_elem + 1);
 							if (ampliar_vector_dims[0])
 							{
 								vector_dims_tensor[0] += 1;
 							}
 						}
 		| lista_sumas	{
-					$$ = createTensorIniInfo(0, $1.type, castValueInfoToTensorIniInfo($1), 1);
+					$$ = createTensorIniInfo(0, $1.type, castValueInfoToValueInfoBase($1), 1);
 					if (ampliar_vector_dims == NULL)
 					{
-						vector_dims_tensor = malloc(4);
-						vector_dims_tensor[0] = 1;
 						ampliar_vector_dims = malloc(1);
 						ampliar_vector_dims[0] = true;
+						vector_dims_tensor = malloc(4);
+						vector_dims_tensor[0] = 1;
 						num_dims_tensor++;
 					}
 				}

@@ -131,11 +131,11 @@ sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDim
 {
     sym_value_type aux;
     aux.type = strdup(type);
-    aux.entryType = strdup(entryType);
     aux.size = size;
     aux.num_dim = numDim;
     aux.elem_dims = elemDims;
     aux.elements = elements;
+    aux.entryType = strdup(entryType);
     return aux;
 }
 
@@ -235,15 +235,15 @@ void addOrUpdateEntry(char* key, sym_value_type entry)
     int response = sym_enter(key, &entry);
     if (response == SYMTAB_NOT_FOUND)
     {
-        yyerror(generateString("No se ha encontrado la clave %s en la symtab",1, key));
+        yyerror(generateString("No se ha encontrado la clave %s en la symtab.",1, key));
     }
     else if (response == SYMTAB_NO_MEMORY)
     {
-        yyerror("No hay más memoria");
+        yyerror("No hay más memoria.");
     }
     else if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
     {
-        yyerror("Algun problema guardando el valor en la symtab");
+        yyerror("Algún problema guardando el valor en la symtab.");
     }
 }
 

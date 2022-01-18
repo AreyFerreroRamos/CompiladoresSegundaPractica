@@ -38,13 +38,13 @@ void emet(char *type, value_info v1, value_info v2, value_info v3)
 
 void emetTensor(char *lexema, tensor_ini_info tensor)
 {
-    value_info v1, v2, v3;
+    value_info v1, v2;
     int pos = 0, desp = calculateSizeType(tensor.type);
     for (int i = 0; i < tensor.num_elem; i++)
     {
         v1 = createValueInfo(lexema, tensor.type, TENS_T, createValueInfoBase(itos(pos), INT32_T, LIT_T));
         v2 = createValueInfo(tensor.elements[i].value, tensor.elements[i].type, tensor.elements[i].valueInfoType,generateEmptyValueInfoBase());
-        emet(INSTR_COPY, v1, v2, v3);
+        emet(INSTR_COPY, v1, v2, generateEmptyValueInfo());
         pos += desp;
     }
 }
@@ -158,18 +158,18 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 }
 
 
-value_info_base *castValueInfoToTensorIniInfo(value_info v)
+value_info_base *castValueInfoToValueInfoBase(value_info v)
 {
     value_info_base *aux = malloc(sizeof(value_info_base));
-    aux->valueInfoType = strdup(v.valueInfoType);
-    aux->type = strdup(v.type);
     aux->value = strdup(v.value);
+    aux->type = strdup(v.type);
+    aux->valueInfoType = strdup(v.valueInfoType);
     return aux;
 }
 
 value_info_base *joinElementsVectors(value_info_base * vec1, value_info_base * vec2, int numElemVec1, int numElemVec2)
 {
-    int totalElem = numElemVec1+numElemVec2;
+    int totalElem = numElemVec1 + numElemVec2;
     value_info_base *aux = realloc(vec1,totalElem * sizeof(value_info_base));
     int cont = numElemVec1;
     for (int i = 0; i < numElemVec2; i++)
