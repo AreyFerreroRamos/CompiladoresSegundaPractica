@@ -158,13 +158,12 @@ lista_indices : lista_indices COMA lista_sumas	{
 							}
 							else
 							{
-								yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
+								yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32.", 2, $3.value, $3.type));
 							}
 						}
 		| ID CORCHETE_ABIERTO lista_sumas	{
-		      					if (isSameType($3.type, INT32_T)) 
+		      						if (isSameType($3.type, INT32_T))
 								{
-									
 									value_info_base calcIndex;
 									if (isSameType($3.valueInfoType, VAR_T))
 									{
@@ -178,7 +177,7 @@ lista_indices : lista_indices COMA lista_sumas	{
 								}
 								else
 								{
-									yyerror(generateString("El indice -> %s es %s, debería ser INT32", 2, $3.value, $3.type));
+									yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32.", 2, $3.value, $3.type));
 								}
 		     					}
 

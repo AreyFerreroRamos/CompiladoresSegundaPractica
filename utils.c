@@ -221,7 +221,6 @@ sym_value_type getEntry(char* key)
     if (response == SYMTAB_NOT_FOUND)
     {
         yyerror(generateString("No se ha encontrado el elemento '%s' en la symtab.",1, key));
-        
     }
     else if (response != SYMTAB_OK)
     {
