@@ -98,7 +98,7 @@ typedef const char *sym_name_type; /* If you are using something other */
 /*El codi ens indica quin struct es tracta.*/
 
 /* Uncomment the following #define to enable nested name scoping.           */
-/* #define SYM_DEEP_BINDING    */
+ #define SYM_DEEP_BINDING
 /*treure els comentaris si es vol treballar amb diferents ambits.*/
 /*per defecte comentat i vol dir un unic ambit.*/
 

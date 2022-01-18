@@ -139,6 +139,20 @@ sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDim
     return aux;
 }
 
+func_param_info createFuncParamInfo(value_info_base *params,int numParams,char *funcName,char *returnType)
+{
+    func_param_info aux;
+    aux.params=params;
+    aux.numParams=numParams;
+    aux.funcName=funcName;
+    if(returnType!=NULL)
+    {
+        aux.returnType = strdup(returnType);
+    }else{
+        aux.returnType = NULL;
+    }
+}
+
 int isNumberType(char *type)
 {
     return (strcmp(type, INT32_T) == 0 || strcmp(type, FLOAT64_T) == 0);
@@ -222,27 +236,32 @@ sym_value_type getEntry(char* key)
     {
         yyerror(generateString("No se ha encontrado el elemento '%s' en la symtab.",1, key));
     }
-    else if (response != SYMTAB_OK)
-    {
-        yyerror("Algun problema buscando el elemento en la symtab.");
-    }
     return entry;
 }
 
 void addOrUpdateEntry(char* key, sym_value_type entry)
 {
     int response = sym_enter(key, &entry);
-    if (response == SYMTAB_NOT_FOUND)
+    if (response == SYMTAB_STACK_OVERFLOW)
     {
-        yyerror(generateString("No se ha encontrado la clave %s en la symtab.",1, key));
+        yyerror("No hay más memoria. (añadiendo entrada)");
     }
-    else if (response == SYMTAB_NO_MEMORY)
+}
+
+void pushSymtab(){
+    int response = sym_push_scope();
+    if (response == SYMTAB_STACK_OVERFLOW)
     {
-        yyerror("No hay más memoria.");
+        yyerror("No hay más memoria. (haciendo push)");
     }
-    else if (response != SYMTAB_OK && response != SYMTAB_DUPLICATE)
-    {
-        yyerror("Algún problema guardando el valor en la symtab.");
+}
+
+void popSymtab() {
+    int response = sym_pop_scope();
+    if (response == SYMTAB_STACK_UNDERFLOW) {
+        yyerror("El ámbito actual es el global");
+    }else if(response == SYMTAB_NOT_TOP){
+        yyerror("El ámbito actual no esta en la cima de la pila");
     }
 }
 

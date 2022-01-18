@@ -58,7 +58,7 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
  * Dado un value_info que llegará como valor de un tensor devuelve un string de una posición
  * con los datos pasados
  */
-value_info_base *castValueInfoToTensorIniInfo(value_info v);
+value_info_base *castValueInfoToValueInfoBase(value_info v);
 
 /**
  * Dados dos arrays de value_info_base devuelve un nuevo array con la union de los dos anteriores
