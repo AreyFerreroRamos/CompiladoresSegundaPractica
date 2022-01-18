@@ -73,9 +73,6 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
         {
             emet(INSTR_MODI, v1, v2, v3);
         }
-        else if (isSameType(operation, OP_ARIT_POTENCIA))
-        {
-        }
     }
     else
     {
@@ -94,9 +91,6 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
         else if (isSameType(operation, OP_ARIT_DIV))
         {
             emet(INSTR_DIVD, v1, v2, v3);
-        }
-        else if (isSameType(operation, OP_ARIT_POTENCIA))
-        {
         }
     }
 }

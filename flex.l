@@ -50,16 +50,10 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
                         debug("COMMENT: %s\n", yytext, 0);
                     }
 
-"^" {
-        debug("%s\n", yytext, 0);
-        yylval.cadena = strdup(yytext);
-        return OP_ARIT_P1;
-    }
-
 ("/"|"%")   {
                 debug("%s\n", yytext, 0);
                 yylval.cadena = strdup(yytext);
-                return OP_ARIT_P2;
+                return OP_ARIT_P1;
             }
 
 "*" {
@@ -71,7 +65,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 ("+"|"-")   {
                 debug("%s\n", yytext, 0);
                 yylval.cadena = strdup(yytext);
-                return OP_ARIT_P3;
+                return OP_ARIT_P2;
             }
 
 "(" {
