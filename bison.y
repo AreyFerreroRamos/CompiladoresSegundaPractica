@@ -111,19 +111,15 @@ sentencia : asignacion
 
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
-							int size = 0;
-							size = isSameType($3.type, INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
-							entry = createSymValueType($3.type, size, 0, NULL, NULL, VAR_T);
+							entry = createSymValueType($3.type, calculateSizeType($3.type), 0, NULL, NULL, VAR_T);
 							addOrUpdateEntry($1.lexema, entry);
 							value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, generateEmptyValueInfoBase());
 							emet(INSTR_COPY, v1, $3, generateEmptyValueInfo());
 						}
 	| id ASSIGN expresion_aritmetica	{
 							sym_value_type entry = getEntry($1.lexema);
-							int size;
-							size = isSameType($3.type, INT32_T) ? calculateSizeType(INT32_T) : calculateSizeType(FLOAT64_T);
 							entry.type = $3.type;
-							entry.size = getAcumElemDim(entry.elem_dims, entry.num_dim) * size;
+							entry.size = getAcumElemDim(entry.elem_dims, entry.num_dim) * calculateSizeType($3.type);
 							addOrUpdateEntry($1.lexema, entry);
 							value_info v1 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
 							emet(INSTR_COPY, v1, $3, generateEmptyValueInfo());
