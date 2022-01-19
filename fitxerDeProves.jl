@@ -1,3 +1,14 @@
+function swap(v::Tensor{Int32})
+    temp = v[1]
+    v[1] = v[2]
+    v[2] = temp
+end
+
+function mean(a::Float64, b::Float64)::Float64
+    return (a + b) / 2
+end
+
+
 var = 2 +5
 var2 = var + 8 * var - (var % 2)
 var2x3x4 = [[[0, 1, 2, 3]; [4, 5, 6, 7]; [8, 9, 10, 11]]; [[12, 13, 14, 15]; [16, 17, 18, 19]; [20, 21, 22, 23]]]  #var2x3x4[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
@@ -5,7 +16,7 @@ var6 = var2x3x4[0,2,3]
 var6 = var2x3x4[1,0,0]                                                                                             
 var6 = var2x3x4[var,2,3]                                                                                           
 var = var2x3x4[0,0,3] + var2x3x4[0,var6,3]      
-var2x3x4[0,0,0] = 1                                                                                            
+var2x3x4[1,1,1] = 1
 var2x3x4[0,0,0] = var                                                                                            
 var2x3x4[0,var,0] = 1                                                                                            
 var2x3x4[0,var,0] = var + var2x3x4[0,0,3] + var2x3x4[0,var6,3]                                                                                     

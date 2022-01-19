@@ -23,6 +23,17 @@ char *emetCopy(value_info v1, value_info v2);
 char *emetOperation(char *op, value_info v1, value_info v2, value_info v3);
 
 /**
+ * Dado el nombre la función devuelve la instrucción "START [nombre función]"
+ */
+char *emetStart(char *func);
+
+/**
+ * Dado el valor a devolver en un RETURN  devuelve la instrucción "RETURN [valor]".
+ * Si el valor es NULL se devolvera solo "RETURN"
+ */
+char *emetReturn(char *var);
+
+/**
  * Dada la información de la variable a la que se le asigna algun valor
  * devuelve su correspondencia a c3a
  */
