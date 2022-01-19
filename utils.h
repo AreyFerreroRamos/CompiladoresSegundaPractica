@@ -64,6 +64,12 @@ tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elemen
 sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDims, void *elements, char *entryType);
 
 /**
+ * Dados los campos para llenar la estructura que sirve para gestionar las funciones en bison
+ * devuelve una estructura con los campos llenos
+ */
+func_param_info createFuncParamInfo(value_info_base *params,int numParams,char *funcName,char *returnType);
+
+/**
  * Dado un tipo controla si es entero o float y devuelve 1 en caso de serlo
  * o 0 si no lo es.
  **/
@@ -113,5 +119,17 @@ sym_value_type getEntry(char* key);
 * se lanzará un yyerror()
 **/
 void addOrUpdateEntry(char* key, sym_value_type entry);
+
+/**
+ * La función hace push de la symtab para añadir un nuevo ámbito imbricado. Si se produce algún error
+* se lanzará un yyerror()
+ */
+void pushSymtab();
+
+/**
+ * La función hace un pop de la symtab para volver a un ámbito más global. Si se produce algún error
+* se lanzará un yyerror()
+ */
+void popSymtab();
 
 #endif

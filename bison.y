@@ -4,6 +4,10 @@
   #include <stdbool.h>
   #include <string.h>
 
+  #include "tipus.h"
+  #include "utils.h"
+  #include "functions.h"
+
   #define YYLMAX 100
 
   extern FILE *yyout;
@@ -21,6 +25,10 @@
   int sq = 0;
   int lengthCode = 0;
   char **c3a;
+
+  	//Variable para controlar las funciones
+  func_param_info functionInfo;
+
 %}
 
 %code requires
@@ -78,7 +86,7 @@ cabecera_procedimiento : cabecera_funcion
 
 main : lista_de_sentencias
 
-lista_de_sentencias : lista_de_sentencias sentencia | sentencia
+lista_de_sentencias : lista_de_sentencias sentencia{createFuncParamInfo(NULL,0,"prueba",NULL);}| sentencia
 
 sentencia : asignacion 
 	| expresion_aritmetica 	{
@@ -401,16 +409,45 @@ lista_valores : lista_valores COMA lista_sumas	{
 				}
 
 cabecera_funcion : cabecera_accion DOBLE_DOS_PUNTOS TYPE
+{
+//1.Rellenar el campo returnType de functionInfo
+}
 
 cabecera_accion : START ID_PROC PARENTESIS_ABIERTO lista_params PARENTESIS_CERRADO
+{
+//1.Rellenar el campo nameFunc de functionInfo
+}
 
 lista_params : lista_params COMA param
+		{
+		//1.Agrandar el campo params en functionInfo para almacenar numParams+1 value_info_base
+		//2.Añadir param al campo params
+		//4.Sumar 1 al campo numParams en functionInfo
+		}
 		| param
+		{
+		//1.Iniciar el campo params en functionInfo para almacenar 1 value_info_base
+		//2.Añadir param al campo params
+		//3.Poner a 1 el campo numParams en functionInfo
+		}
 
 param : ID DOBLE_DOS_PUNTOS TYPE
+	{
+	//1.Crear param con el tipo = $3, valueInfoType = VAR_T, value = $1
+	}
 	| ID DOBLE_DOS_PUNTOS TYPE LLAVE_ABIERTA TYPE LLAVE_CERRADA
+	{
+	//1.Crear param con el tipo = $5, valueInfoType = TENS_T, value = $1
+	//*Habría que validar que $3 es TENS_T*
+	}
 
 return : RETURN expresion_aritmetica
+	{
+	//Esta parte hay que hablarla porque el return puede usarse solo
+	//a modo de return 0 en una función para que acabe en ese punto
+	//pero si añado la opcion RETURN me salen 5 shift/reduces
+	}
+
 
 end : END
 
