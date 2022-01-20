@@ -21,10 +21,17 @@ char *generateTmpId();
 void classifyOperation(char *operation, value_info v1, value_info v2, value_info v3);
 
 /**
- *  Dado un tipo de instrucción y los posibles valores dentro de ella, se encarga de gestionar
- *  como se escribe la instruccion o conjunto de intrucciones y añadirla al c3a
+ *  Dado un tipo de instrucción el numero de argumentos y los datos necesarios para cada instruccion
+ *  añade la instrucción al c3a. Los datos según la instrucción son los siguientes.
+ *  INSTR_COPY -> (value_info variable,value_info valor)
+ *  INSTR_(Operaciones) -> (value_info variable,value_info op1,value_info op2)
+ *  INSTR_START -> (char* nombreFuncion)
+ *  INSTR_END -> (int esAccion? (1 si es accion, 0 si es función)
+ *  INSTR_RETURN -> 0 args o (char* valor)
  **/
-void emet(char *type, value_info v1, value_info v2, value_info v3);
+void emet(char *type, int nArgs, ...);
+
+void controlTensorIndex(value_info *v);
 
 /**
  * Dada una variable de tipo tensor y la estructura necesaria para gestionarlo durante su definición,
@@ -81,5 +88,13 @@ int getDim(char *key, int index_dim);
  * de elemntos que hay dentro de el
  **/
 int getAcumElemDim(int *elem_dim, int num_dim);
+
+/**
+ * Dada una lista de parametros, el numero de parametros que hay y un nuevo parametro a
+ * añadir reserva el espacio necesario e introduce el nuevo elemento
+ */
+void addValueInfoBase(value_info_base *list,int numElem,value_info_base toAdd);
+
+sym_value_type castValueInfoBaseToSymValueType(value_info_base v);
 
 #endif

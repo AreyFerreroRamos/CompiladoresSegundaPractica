@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "functions.h"
 
@@ -18,34 +19,98 @@ char *generateTmpId()
 	return id;
 }
 
-void emet(char *type, value_info v1, value_info v2, value_info v3)
+void emet(char *type, int nArgs, ...)
 {
-	char *instruction;
-	if (isSameType(type, INSTR_COPY))
-	{
-		instruction = emetCopy(v1, v2);
-	}
-	else if (isSameType(type, INSTR_ADDI) || isSameType(type, INSTR_ADDD) 
-	        || isSameType(type, INSTR_SUBI) || isSameType(type, INSTR_SUBD)
-	        || isSameType(type, INSTR_MULI) || isSameType(type, INSTR_MULD)
-	        || isSameType(type, INSTR_DIVI) || isSameType(type, INSTR_DIVD)
-	        || isSameType(type, INSTR_MODI))
-	{
-		instruction = emetOperation(type, v1, v2, v3);
-	}
+    va_list ap;
+    va_start(ap, nArgs);
+
+    char *instruction;
+    if (isSameType(type, INSTR_COPY))
+    {
+        value_info *data = malloc(sizeof(value_info)*2);
+        for (int i = 0; i < nArgs; i++)
+        {
+            data[i] = va_arg(ap, value_info);
+        }
+        controlTensorIndex(&data[0]);
+        controlTensorIndex(&data[1]);
+        instruction = emetCopy(data[0], data[1]);
+    }
+    else if (isSameType(type, INSTR_ADDI) || isSameType(type, INSTR_ADDD)
+             || isSameType(type, INSTR_SUBI) || isSameType(type, INSTR_SUBD)
+             || isSameType(type, INSTR_MULI) || isSameType(type, INSTR_MULD)
+             || isSameType(type, INSTR_DIVI) || isSameType(type, INSTR_DIVD)
+             || isSameType(type, INSTR_MODI))
+    {
+        value_info *data = malloc(sizeof(value_info)*3);
+        for (int i = 0; i < 3; i++)
+        {
+            data[i] = va_arg(ap, value_info);
+        }
+        instruction = emetOperation(type, data[0], data[1], data[2]);
+    }
+    else if(isSameType(type,INSTR_START))
+    {
+        char *func = strdup(va_arg(ap,char*));
+        instruction = emetStart(func);
+    }
+    else if(isSameType(type,INSTR_END))
+    {
+        int isAction = va_arg(ap,int);
+        //Si no tiene valor de retorno y la última línea no es un RETURN
+        if( isAction==1 && isSameType(c3a[sq-1],INSTR_RETURN))
+        {
+            writeLine(sq,INSTR_RETURN);
+        }
+        writeLine(sq,INSTR_END);
+        instruction = "";
+    }
+    else if(isSameType(type,INSTR_RETURN))
+    {
+        if(nArgs==0){
+            instruction = emetReturn(NULL);
+        }else{
+            char *value = strdup(va_arg(ap,char*));
+            instruction = emetReturn(value);
+        }
+    }
+
+    va_end(ap);
     writeLine(sq, instruction);
+}
+
+void controlTensorIndex(value_info *v){
+    if(isSameType(v->valueInfoType,TENS_T)){
+        if(isSameType(v->index.valueInfoType,VAR_T)){
+            char *tmp = generateTmpId(tmp);
+            value_info v1,v2,v3;
+            //RESTAMOS 1
+            v1 = createValueInfo(tmp,v->index.type,VAR_T,generateEmptyValueInfoBase());
+            v2 = createValueInfo(v->index.value,v->index.type,v->index.valueInfoType,generateEmptyValueInfoBase());
+            v3 = createValueInfo("1",v->index.type,LIT_T,generateEmptyValueInfoBase());
+            classifyOperation(OP_ARIT_RESTA,v1,v2,v3);
+
+            //MULTIPLICAMOS POR ESPACIO DEL TIPO
+            tmp=generateTmpId();
+            v2 = v1;
+            v1 = createValueInfo(tmp,v2.type,VAR_T,generateEmptyValueInfoBase());
+            v3 = createValueInfo(itos(calculateSizeType(v2.type)),v->type,LIT_T,generateEmptyValueInfoBase());
+            classifyOperation(OP_ARIT_MULT,v1,v2,v3);
+            *v=v1;
+        }else{
+            v->index.value = itos((atoi(v->index.value )-1)* calculateSizeType(v->index.type));
+        }
+    }
 }
 
 void emetTensor(char *lexema, tensor_ini_info tensor)
 {
     value_info v1, v2;
-    int pos = 0, desp = calculateSizeType(tensor.type);
-    for (int i = 0; i < tensor.num_elem; i++)
+    for (int i = 1; i <= tensor.num_elem; i++)
     {
-        v1 = createValueInfo(lexema, tensor.type, TENS_T, createValueInfoBase(itos(pos), INT32_T, LIT_T));
-        v2 = createValueInfo(tensor.elements[i].value, tensor.elements[i].type, tensor.elements[i].valueInfoType,generateEmptyValueInfoBase());
-        emet(INSTR_COPY, v1, v2, generateEmptyValueInfo());
-        pos += desp;
+        v1 = createValueInfo(lexema, tensor.type, TENS_T, createValueInfoBase(itos(i), INT32_T, LIT_T));
+        v2 = createValueInfo(tensor.elements[i-1].value, tensor.elements[i-1].type, tensor.elements[i-1].valueInfoType,generateEmptyValueInfoBase());
+        emet(INSTR_COPY,2, v1, v2);
     }
 }
 
@@ -55,42 +120,42 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
     {
         if (isSameType(operation, OP_ARIT_SUMA))
         {
-            emet(INSTR_ADDI, v1, v2, v3);
+            emet(INSTR_ADDI,3, v1, v2, v3);
         }
         else if (isSameType(operation, OP_ARIT_RESTA))
         {
-            emet(INSTR_SUBI, v1, v2, v3);
+            emet(INSTR_SUBI,3, v1, v2, v3);
         }
         else if (isSameType(operation, OP_ARIT_MULT))
         {
-            emet(INSTR_MULI, v1, v2, v3);
+            emet(INSTR_MULI,3, v1, v2, v3);
         }
         else if (isSameType(operation, OP_ARIT_DIV))
         {
-            emet(INSTR_DIVI, v1, v2, v3);
+            emet(INSTR_DIVI,3, v1, v2, v3);
         }
         else if (isSameType(operation, OP_ARIT_MOD))
         {
-            emet(INSTR_MODI, v1, v2, v3);
+            emet(INSTR_MODI,3, v1, v2, v3);
         }
     }
     else
     {
         if (isSameType(operation, OP_ARIT_SUMA))
         {
-            emet(INSTR_ADDD, v1, v2, v3);
+            emet(INSTR_ADDD,3, v1, v2, v3);
         }
         else if (isSameType(operation, OP_ARIT_RESTA))
         {
-            emet(INSTR_SUBD, v1, v2, v3);
+            emet(INSTR_SUBD,3, v1, v2, v3);
         }
         else if (isSameType(operation, OP_ARIT_MULT))
         {
-            emet(INSTR_MULD, v1, v2, v3);
+            emet(INSTR_MULD,3, v1, v2, v3);
         }
         else if (isSameType(operation, OP_ARIT_DIV))
         {
-            emet(INSTR_DIVD, v1, v2, v3);
+            emet(INSTR_DIVD,3, v1, v2, v3);
         }
     }
 }
@@ -202,4 +267,18 @@ int getAcumElemDim(int *elem_dim, int num_dim)
 		acum *= elem_dim[i];
 	}
 	return acum;
+}
+
+void addValueInfoBase(value_info_base *list,int numElem,value_info_base toAdd)
+{
+    if(numElem==0){
+        list = malloc(sizeof(value_info_base));
+    }else{
+        list = realloc(list, sizeof(value_info_base)*(numElem+1));
+    }
+    list[numElem]=toAdd;
+}
+
+sym_value_type castValueInfoBaseToSymValueType(value_info_base v){
+    return createSymValueType(v.type,0,0,NULL,NULL,v.valueInfoType);
 }

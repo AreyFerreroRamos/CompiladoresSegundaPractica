@@ -42,6 +42,26 @@ char *emetOperation(char *op, value_info v1, value_info v2, value_info v3)
     return instr;
 }
 
+char *emetStart(char *func){
+    char *instr;
+
+    instr = generateString("START %s", 1, func);
+
+    return instr;
+}
+
+char *emetReturn(char *var){
+    char *instr;
+
+    if(var==NULL){
+        instr = strdup(INSTR_RETURN);
+    }else{
+        instr = generateString("RETURN %s", 1, var);
+    }
+
+    return instr;
+}
+
 char *addV1(value_info v1)
 {
     char *instr;
@@ -66,7 +86,7 @@ char *addV2(char *instruction, value_info v2)
     }
     else if (isSameType(v2.valueInfoType, TENS_T))
     {
-        instr = generateString("%s%s[%s] ", 3, instr, v2.value, v2.index.value);
+        instr = generateString("%s%s[%s] ", 3, instr, v2.value,  v2.index.value);
     }
     else if (isSameType(v2.valueInfoType, LIT_T))
     {

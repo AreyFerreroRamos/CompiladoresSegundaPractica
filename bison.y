@@ -50,17 +50,19 @@
 	float real;
 	char *cadena;
 	bool boolea;
+	value_info_base value_info_base;
 	value_info operand;
 	tensor_info tensor_info;
 	tensor_ini_info tensor_ini_info;
 	sym_value_type sym_value_type;
+	func_param_info func_param_info;
 	void *no_definit;
 }
 
-%token <no_definit> ASSIGN START RETURN END DOBLE_DOS_PUNTOS LLAVE_ABIERTA LLAVE_CERRADA ID_PROC
+%token <no_definit> ASSIGN START VALUERETURN DIRECTRETURN END DOBLE_DOS_PUNTOS LLAVE_ABIERTA LLAVE_CERRADA
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TYPE
+%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TYPE ID_PROC
 %token <ident> ID 
 %token <operand> ID_ARIT
 
@@ -68,7 +70,8 @@
 %type <tensor_info> id lista_indices lista_indices_arit
 %type <tensor_ini_info> tensor componente lista_componentes lista_valores
 %type <cadena> op_arit_p1
-
+%type <func_param_info> cabecera_procedimiento cabecera_funcion cabecera_accion lista_params
+%type <value_info_base> param
 %start programa
 
 
@@ -79,7 +82,24 @@ programa : lista_de_procedimientos main | main
 
 lista_de_procedimientos : lista_de_procedimientos procedimiento | procedimiento
 
-procedimiento : cabecera_procedimiento lista_de_sentencias end
+procedimiento : cabecera_procedimiento lista_de_sentencias END
+{
+	if($1.returnType==NULL)
+	{
+	emet(INSTR_END,1,1);
+	}
+	else
+	{
+	emet(INSTR_END,1,0);
+	}
+	popSymtab();
+	sym_value_type entry = createSymValueType($1.returnType,$1.numParams,0,NULL,$1.params,FUNC_T);
+
+printf("LLEGO AQUI");
+fflush(stdout);
+	addOrUpdateEntry($1.funcName,entry);
+
+}
 
 cabecera_procedimiento : cabecera_funcion
 			| cabecera_accion
@@ -107,14 +127,22 @@ sentencia : asignacion
 				}
 			}*/
 		}
-	| return
+		| VALUERETURN expresion_aritmetica
+		{
+			emet(INSTR_RETURN,1,$2.value);
+		}
+		| DIRECTRETURN
+		{
+			emet(INSTR_RETURN,0);
+		}
+
 
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
 							entry = createSymValueType($3.type, calculateSizeType($3.type), 0, NULL, NULL, VAR_T);
 							addOrUpdateEntry($1.lexema, entry);
 							value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, generateEmptyValueInfoBase());
-							emet(INSTR_COPY, v1, $3, generateEmptyValueInfo());
+							emet(INSTR_COPY, 2,v1, $3);
 						}
 	| id ASSIGN expresion_aritmetica	{
 							sym_value_type entry = getEntry($1.lexema);
@@ -122,7 +150,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 							entry.size = getAcumElemDim(entry.elem_dims, entry.num_dim) * calculateSizeType($3.type);
 							addOrUpdateEntry($1.lexema, entry);
 							value_info v1 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
-							emet(INSTR_COPY, v1, $3, generateEmptyValueInfo());
+							emet(INSTR_COPY, 2,v1, $3);
 						}
 	| ID ASSIGN tensor	{
 					invertVector(vector_dims_tensor, $3.dim);
@@ -149,8 +177,8 @@ lista_indices : lista_indices COMA lista_sumas	{
 									value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
 									value_info v2 = createValueInfo($1.calcIndex.value, $1.calcIndex.type, $1.calcIndex.valueInfoType, generateEmptyValueInfoBase());
 									value_info v3 = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
-									emet(INSTR_MULI, v1, v2, v3);
-									emet(INSTR_ADDI, v1, v1, $3);
+									emet(INSTR_MULI,3, v1, v2, v3);
+									emet(INSTR_ADDI,3, v1, v1, $3);
 									value_info_base calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
 									$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
 								}
@@ -296,12 +324,12 @@ id_arit : ID_ARIT	{
 				$$ = $1;
 			}	
 	| lista_indices_arit CORCHETE_CERRADO	{
-							sym_value_type entry = getEntry($1.lexema);
-							char *nameTmp = generateTmpId();
-							value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
-							value_info v2 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
-							emet(INSTR_COPY, v1, v2, generateEmptyValueInfo());
-							$$ = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
+								sym_value_type entry = getEntry($1.lexema);
+								char *nameTmp = generateTmpId();
+								value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
+								value_info v2 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
+								emet(INSTR_COPY,2, v1, v2);
+								$$ = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
 						}
 
 lista_indices_arit : lista_indices_arit COMA lista_sumas	{
@@ -315,8 +343,8 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 											value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
 											value_info v2 = createValueInfo($1.calcIndex.value, $1.calcIndex.type, $1.calcIndex.valueInfoType, generateEmptyValueInfoBase());
 											value_info v3 = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
-											emet(INSTR_MULI, v1, v2, v3);
-											emet(INSTR_ADDI, v1, v1, $3);
+											emet(INSTR_MULI,3, v1, v2, v3);
+											emet(INSTR_ADDI,3, v1, v1, $3);
 											value_info_base calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
 											$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
 										}
@@ -406,45 +434,52 @@ lista_valores : lista_valores COMA lista_sumas	{
 
 cabecera_funcion : cabecera_accion DOBLE_DOS_PUNTOS TYPE
 {
-//1.Rellenar el campo returnType de functionInfo
+	$1.returnType = strdup($3);
+	$$ = $1;
 }
 
 cabecera_accion : START ID_PROC PARENTESIS_ABIERTO lista_params PARENTESIS_CERRADO
 {
-//1.Rellenar el campo nameFunc de functionInfo
+	emet(INSTR_START,1,$2);
+	$4.funcName = strdup($2);
+	$$=$4;
 }
 
 lista_params : lista_params COMA param
 		{
-		//1.Agrandar el campo params en functionInfo para almacenar numParams+1 value_info_base
-		//2.Añadir param al campo params
-		//4.Sumar 1 al campo numParams en functionInfo
+		addValueInfoBase($1.params,$1.numParams,$3);
+		$1.numParams++;
+		$$=$1;
 		}
 		| param
 		{
-		//1.Iniciar el campo params en functionInfo para almacenar 1 value_info_base
-		//2.Añadir param al campo params
-		//3.Poner a 1 el campo numParams en functionInfo
+		$$ = createFuncParamInfo(NULL,0,NULL,NULL);
+		addValueInfoBase($$.params,$$.numParams,$1);
+		$$.numParams++;
 		}
 
 param : ID DOBLE_DOS_PUNTOS TYPE
 	{
-	//1.Crear param con el tipo = $3, valueInfoType = VAR_T, value = $1
+		value_info_base v = createValueInfoBase($1.lexema,$3,VAR_T);
+		sym_value_type entry = castValueInfoBaseToSymValueType(v);
+		addOrUpdateEntry(v.value,entry);
+		$$ = v;
 	}
 	| ID DOBLE_DOS_PUNTOS TYPE LLAVE_ABIERTA TYPE LLAVE_CERRADA
 	{
-	//1.Crear param con el tipo = $5, valueInfoType = TENS_T, value = $1
-	//*Habría que validar que $3 es TENS_T*
+		if(isSameType($3,TENSOR_T))
+		{
+			value_info_base v = createValueInfoBase($1.lexema,$5,TENS_T);
+			sym_value_type entry = castValueInfoBaseToSymValueType(v);
+			addOrUpdateEntry(v.value,entry);
+			$$ = v;
+		}else{
+			yyerror("El tipo debería ser un tensor");
+		}
 	}
 
-return : RETURN expresion_aritmetica
-	{
-	//Esta parte hay que hablarla porque el return puede usarse solo
-	//a modo de return 0 en una función para que acabe en ese punto
-	//pero si añado la opcion RETURN me salen 5 shift/reduces
-	}
 
 
-end : END
+
 
 %%

@@ -130,7 +130,11 @@ tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elemen
 sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDims, void *elements, char *entryType)
 {
     sym_value_type aux;
-    aux.type = strdup(type);
+    if(type!=NULL) {
+        aux.type = strdup(type);
+    }else{
+        aux.type = NULL;
+    }
     aux.size = size;
     aux.num_dim = numDim;
     aux.elem_dims = elemDims;
@@ -151,6 +155,7 @@ func_param_info createFuncParamInfo(value_info_base *params,int numParams,char *
     }else{
         aux.returnType = NULL;
     }
+    return aux;
 }
 
 int isNumberType(char *type)
@@ -205,7 +210,7 @@ void debug(char *text, char *var, int typeFile)
     // flex
     if (typeFile == 0)
     {
-        // printf(text, var);
+         printf(text, var);
     }
     // bison
     else
