@@ -97,4 +97,10 @@ void addValueInfoBase(value_info_base *list,int numElem,value_info_base toAdd);
 
 sym_value_type castValueInfoBaseToSymValueType(value_info_base v);
 
+/**
+ * Dada la dimension actual, el cálculo del indice hasta ahora y el nuevo indice a introducir
+ * hace el calculo y devuelve el nombre del temporal donde ha quedado almacenado
+ */
+char *calculateNewIndex(int dim, value_info_base calcIndex,value_info index);
+
 #endif

@@ -94,9 +94,6 @@ procedimiento : cabecera_procedimiento lista_de_sentencias END
 	}
 	popSymtab();
 	sym_value_type entry = createSymValueType($1.returnType,$1.numParams,0,NULL,$1.params,FUNC_T);
-
-printf("LLEGO AQUI");
-fflush(stdout);
 	addOrUpdateEntry($1.funcName,entry);
 
 }
@@ -163,6 +160,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 				}
 
 id : lista_indices CORCHETE_CERRADO	{
+
 						$$ = $1;
 					}
    
@@ -172,19 +170,13 @@ lista_indices : lista_indices COMA lista_sumas	{
 								int dim = getDim($1.lexema, $1.index_dim);
 								if (isSameType($1.calcIndex.valueInfoType, VAR_T) || isSameType($3.valueInfoType, VAR_T))
 								{
-									char *nameTmp = generateTmpId();
-									sym_value_type entry = getEntry($1.lexema);
-									value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
-									value_info v2 = createValueInfo($1.calcIndex.value, $1.calcIndex.type, $1.calcIndex.valueInfoType, generateEmptyValueInfoBase());
-									value_info v3 = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
-									emet(INSTR_MULI,3, v1, v2, v3);
-									emet(INSTR_ADDI,3, v1, v1, $3);
-									value_info_base calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
-									$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
+									char *tmp = calculateNewIndex(dim, $1.calcIndex,$3);
+									value_info_base calcIndexNew = createValueInfoBase(tmp, INT32_T, VAR_T);
+									$$ = createTensorInfo($1.index_dim + 1, calcIndexNew, $1.lexema);
 								}
 								else
 								{
-									value_info_base calcIndex = createValueInfoBase(itos(atoi($1.calcIndex.value) * dim + atoi($3.value)), INT32_T, LIT_T);
+									value_info_base calcIndex = createValueInfoBase(itos(atoi($1.calcIndex.value) * dim + (atoi($3.value)-1)), INT32_T, LIT_T);
 									$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
 								}
 							}
@@ -199,11 +191,15 @@ lista_indices : lista_indices COMA lista_sumas	{
 									value_info_base calcIndex;
 									if (isSameType($3.valueInfoType, VAR_T))
 									{
-										calcIndex = createValueInfoBase($3.value, INT32_T, VAR_T);
+										char *nameTmp = generateTmpId();
+										value_info v1 = createValueInfo(nameTmp, $3.type, VAR_T, generateEmptyValueInfoBase());
+										value_info v2 = createValueInfo("1", INT32_T, LIT_T, generateEmptyValueInfoBase());
+										emet(INSTR_SUBI,3, v1, $3, v2);
+										calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
 									}
 									else
 									{
-										calcIndex = createValueInfoBase($3.value, INT32_T, LIT_T);
+										calcIndex = createValueInfoBase(itos(atoi($3.value)-1), INT32_T, LIT_T);
 									}
 									$$ = createTensorInfo(1, calcIndex, $1.lexema);
 								}
@@ -338,19 +334,13 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 										int dim = getDim($1.lexema, $1.index_dim);
 										if (isSameType($1.calcIndex.valueInfoType, VAR_T) || isSameType($3.valueInfoType, VAR_T))
 										{
-											char *nameTmp = generateTmpId();
-											sym_value_type entry = getEntry($1.lexema);
-											value_info v1 = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
-											value_info v2 = createValueInfo($1.calcIndex.value, $1.calcIndex.type, $1.calcIndex.valueInfoType, generateEmptyValueInfoBase());
-											value_info v3 = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
-											emet(INSTR_MULI,3, v1, v2, v3);
-											emet(INSTR_ADDI,3, v1, v1, $3);
-											value_info_base calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
+											char *tmp = calculateNewIndex(dim, $1.calcIndex,$3);
+											value_info_base calcIndex = createValueInfoBase(tmp, INT32_T, VAR_T);
 											$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
 										}
 										else
 										{
-											value_info_base calcIndex = createValueInfoBase(itos(atoi($1.calcIndex.value) * dim + atoi($3.value)), INT32_T, LIT_T);
+											value_info_base calcIndex = createValueInfoBase(itos(atoi($1.calcIndex.value) * dim + (atoi($3.value)-1)), INT32_T, LIT_T);
 											$$ = createTensorInfo($1.index_dim + 1, calcIndex, $1.lexema);
 										}
 									}
@@ -365,11 +355,15 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 									value_info_base calcIndex;
 									if (isSameType($3.valueInfoType, VAR_T))
 									{
-										calcIndex = createValueInfoBase($3.value, INT32_T, VAR_T);
+										char *nameTmp = generateTmpId();
+										value_info v1 = createValueInfo(nameTmp, $3.type, VAR_T, generateEmptyValueInfoBase());
+										value_info v2 = createValueInfo("1", INT32_T, LIT_T, generateEmptyValueInfoBase());
+										emet(INSTR_SUBI,3, v1, $3, v2);
+										calcIndex = createValueInfoBase(nameTmp, INT32_T, VAR_T);
 									}
 									else
 									{
-										calcIndex = createValueInfoBase($3.value, INT32_T, LIT_T);
+										calcIndex = createValueInfoBase(itos(atoi($3.value)-1), INT32_T, LIT_T);
 									}
 									$$ = createTensorInfo(1, calcIndex, $1.value);
 								}

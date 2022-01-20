@@ -58,7 +58,7 @@ void emet(char *type, int nArgs, ...)
     {
         int isAction = va_arg(ap,int);
         //Si no tiene valor de retorno y la última línea no es un RETURN
-        if( isAction==1 && isSameType(c3a[sq-1],INSTR_RETURN))
+        if( isAction==1 && !isSameType(c3a[sq-1],INSTR_RETURN))
         {
             writeLine(sq,INSTR_RETURN);
         }
@@ -82,23 +82,18 @@ void emet(char *type, int nArgs, ...)
 void controlTensorIndex(value_info *v){
     if(isSameType(v->valueInfoType,TENS_T)){
         if(isSameType(v->index.valueInfoType,VAR_T)){
-            char *tmp = generateTmpId(tmp);
+            char *tmp;
             value_info v1,v2,v3;
-            //RESTAMOS 1
-            v1 = createValueInfo(tmp,v->index.type,VAR_T,generateEmptyValueInfoBase());
-            v2 = createValueInfo(v->index.value,v->index.type,v->index.valueInfoType,generateEmptyValueInfoBase());
-            v3 = createValueInfo("1",v->index.type,LIT_T,generateEmptyValueInfoBase());
-            classifyOperation(OP_ARIT_RESTA,v1,v2,v3);
 
             //MULTIPLICAMOS POR ESPACIO DEL TIPO
             tmp=generateTmpId();
-            v2 = v1;
-            v1 = createValueInfo(tmp,v2.type,VAR_T,generateEmptyValueInfoBase());
-            v3 = createValueInfo(itos(calculateSizeType(v2.type)),v->type,LIT_T,generateEmptyValueInfoBase());
+            v1 = createValueInfo(tmp,INT32_T,VAR_T,generateEmptyValueInfoBase());
+            v2 = createValueInfo(v->index.value,INT32_T,VAR_T,generateEmptyValueInfoBase());
+            v3 = createValueInfo(itos(calculateSizeType(v2.type)),INT32_T,LIT_T,generateEmptyValueInfoBase());
             classifyOperation(OP_ARIT_MULT,v1,v2,v3);
-            *v=v1;
+            v->index= createValueInfoBase(v1.value,v1.type,v1.valueInfoType);
         }else{
-            v->index.value = itos((atoi(v->index.value )-1)* calculateSizeType(v->index.type));
+            v->index.value = itos((atoi(v->index.value ))* calculateSizeType(v->index.type));
         }
     }
 }
@@ -106,10 +101,10 @@ void controlTensorIndex(value_info *v){
 void emetTensor(char *lexema, tensor_ini_info tensor)
 {
     value_info v1, v2;
-    for (int i = 1; i <= tensor.num_elem; i++)
+    for (int i = 0; i < tensor.num_elem; i++)
     {
         v1 = createValueInfo(lexema, tensor.type, TENS_T, createValueInfoBase(itos(i), INT32_T, LIT_T));
-        v2 = createValueInfo(tensor.elements[i-1].value, tensor.elements[i-1].type, tensor.elements[i-1].valueInfoType,generateEmptyValueInfoBase());
+        v2 = createValueInfo(tensor.elements[i].value, tensor.elements[i].type, tensor.elements[i].valueInfoType,generateEmptyValueInfoBase());
         emet(INSTR_COPY,2, v1, v2);
     }
 }
@@ -281,4 +276,28 @@ void addValueInfoBase(value_info_base *list,int numElem,value_info_base toAdd)
 
 sym_value_type castValueInfoBaseToSymValueType(value_info_base v){
     return createSymValueType(v.type,0,0,NULL,NULL,v.valueInfoType);
+}
+
+char *calculateNewIndex(int dim, value_info_base calcIndex,value_info index){
+
+    printf("VALUE:%s TYPE1:%s TYPE2:%s\n",calcIndex.value,calcIndex.type,calcIndex.valueInfoType);
+    char *nameTmp1 = generateTmpId();
+    value_info tmp1 = createValueInfo(nameTmp1, INT32_T, VAR_T, generateEmptyValueInfoBase());
+    value_info one = createValueInfo("1", INT32_T, LIT_T, generateEmptyValueInfoBase());
+    value_info calcIndexOld = createValueInfo(calcIndex.value, calcIndex.type, calcIndex.valueInfoType, generateEmptyValueInfoBase());
+    value_info dimension = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
+    emet(INSTR_MULI,3, tmp1, calcIndexOld, dimension);
+    if(isSameType(index.valueInfoType,VAR_T))
+    {
+        char *nameTmp2 = generateTmpId();
+        value_info tmp2 = createValueInfo(nameTmp2, INT32_T, VAR_T, generateEmptyValueInfoBase());
+        emet(INSTR_SUBI,3, tmp2, index,one);
+        emet(INSTR_ADDI,3, tmp1, tmp1, tmp2);
+    }
+    else
+    {
+        index.value = itos(atoi(index.value)-1);
+        emet(INSTR_ADDI,3, tmp1, tmp1, index);
+    }
+    return nameTmp1;
 }
