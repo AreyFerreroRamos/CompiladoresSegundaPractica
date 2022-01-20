@@ -42,6 +42,13 @@ char *emetOperation(char *op, value_info v1, value_info v2, value_info v3)
     return instr;
 }
 
+char *emetPut(char *element)
+{
+    char *instr;
+    instr = generateString("PUT %s", 1, element);
+    return instr;
+}
+
 char *emetStart(char *func){
     char *instr;
 

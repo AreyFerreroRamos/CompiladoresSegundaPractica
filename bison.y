@@ -110,22 +110,10 @@ lista_de_sentencias : lista_de_sentencias sentencia{createFuncParamInfo(NULL,0,"
 
 sentencia : asignacion 
 	| expresion_aritmetica 	{
-					//fprintf(yyout, "El resultado es %s\n", $1.value);
+					emet(INSTR_PUT, 1, $1.value);
 				}
 	| ID	{
-			/*sym_value_type entry;
-			int response = sym_lookup($1.lexema, &entry);
-			if (response == SYMTAB_OK) 
-			{
-				if (entry.num_dim > 0)
-				{
-					printTensor($1.lexema, entry, 1);
-				}
-				else
-				{
-					fprintf(yyout, "ID: %s val:%s\n", $1.lexema, (char *) entry.value);
-				}
-			}*/
+			emet(INSTR_PUT, 1, $1.lexema);
 		}
 		| VALUERETURN expresion_aritmetica
 		{
@@ -136,13 +124,12 @@ sentencia : asignacion
 			emet(INSTR_RETURN,0);
 		}
 
-
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
 							entry = createSymValueType($3.type, calculateSizeType($3.type), 0, NULL, NULL, VAR_T);
 							addOrUpdateEntry($1.lexema, entry);
 							value_info v1 = createValueInfo($1.lexema, $3.type, VAR_T, generateEmptyValueInfoBase());
-							emet(INSTR_COPY, 2,v1, $3);
+							emet(INSTR_COPY, 2, v1, $3);
 						}
 	| id ASSIGN expresion_aritmetica	{
 							sym_value_type entry = getEntry($1.lexema);
@@ -150,7 +137,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 							entry.size = getAcumElemDim(entry.elem_dims, entry.num_dim) * calculateSizeType($3.type);
 							addOrUpdateEntry($1.lexema, entry);
 							value_info v1 = createValueInfo($1.lexema, entry.type, TENS_T, $1.calcIndex);
-							emet(INSTR_COPY, 2,v1, $3);
+							emet(INSTR_COPY, 2, v1, $3);
 						}
 	| ID ASSIGN tensor	{
 					invertVector(vector_dims_tensor, $3.dim);
@@ -322,7 +309,7 @@ terminal_aritmetico : INTEGER	{
 
 id_arit : ID_ARIT	{
 				$$ = $1;
-			}	
+			}
 	| lista_indices_arit CORCHETE_CERRADO	{
 								sym_value_type entry = getEntry($1.lexema);
 								char *nameTmp = generateTmpId();

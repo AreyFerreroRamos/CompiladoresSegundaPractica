@@ -27,7 +27,7 @@ void emet(char *type, int nArgs, ...)
     char *instruction;
     if (isSameType(type, INSTR_COPY))
     {
-        value_info *data = malloc(sizeof(value_info)*2);
+        value_info *data = malloc(sizeof(value_info)*nArgs);
         for (int i = 0; i < nArgs; i++)
         {
             data[i] = va_arg(ap, value_info);
@@ -42,12 +42,17 @@ void emet(char *type, int nArgs, ...)
              || isSameType(type, INSTR_DIVI) || isSameType(type, INSTR_DIVD)
              || isSameType(type, INSTR_MODI))
     {
-        value_info *data = malloc(sizeof(value_info)*3);
-        for (int i = 0; i < 3; i++)
+        value_info *data = malloc(sizeof(value_info)*nArgs);
+        for (int i = 0; i < nArgs; i++)
         {
             data[i] = va_arg(ap, value_info);
         }
         instruction = emetOperation(type, data[0], data[1], data[2]);
+    }
+    else if (isSameType(type, INSTR_PUT))
+    {
+        char *element = strdup(va_arg(ap, char *));
+        instruction = emetPut(element);
     }
     else if(isSameType(type,INSTR_START))
     {

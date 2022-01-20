@@ -23,6 +23,12 @@ char *emetCopy(value_info v1, value_info v2);
 char *emetOperation(char *op, value_info v1, value_info v2, value_info v3);
 
 /**
+ * Dado un valor o el lexema de una variable temporal,
+ * devuelve al instrucción "PUT [valor | lexema].
+ */
+char *emetPut(char *element);
+
+/**
  * Dado el nombre la función devuelve la instrucción "START [nombre función]"
  */
 char *emetStart(char *func);
