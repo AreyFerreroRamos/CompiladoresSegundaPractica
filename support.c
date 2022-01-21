@@ -15,6 +15,7 @@ extern char **c3a;
 char *emetCopy(value_info v1, value_info v2)
 {
     char *instr;
+
         // Añadimos v1.
     instr = addV1(v1);
 
@@ -27,6 +28,7 @@ char *emetCopy(value_info v1, value_info v2)
 char *emetOperation(char *op, value_info v1, value_info v2, value_info v3)
 {
     char *instr;
+
         // Añadimos v1.
     instr = addV1(v1);
 
@@ -49,30 +51,31 @@ char *emetPut(char *element)
     return instr;
 }
 
-char *emetStart(char *func){
+char *emetStart(char *func)
+{
     char *instr;
-
     instr = generateString("START %s", 1, func);
-
     return instr;
 }
 
-char *emetReturn(char *var){
+char *emetReturn(char *var)
+{
     char *instr;
-
-    if(var==NULL){
+    if (var == NULL)
+    {
         instr = strdup(INSTR_RETURN);
-    }else{
+    }
+    else
+    {
         instr = generateString("RETURN %s", 1, var);
     }
-
     return instr;
 }
 
 char *addV1(value_info v1)
 {
     char *instr;
-    // Añadimos v1
+        // Añadimos v1
     if (isSameType(v1.valueInfoType, TENS_T))
     {
         instr = generateString("%s[%s] := ", 2, v1.value, v1.index.value);
@@ -93,7 +96,7 @@ char *addV2(char *instruction, value_info v2)
     }
     else if (isSameType(v2.valueInfoType, TENS_T))
     {
-        instr = generateString("%s%s[%s] ", 3, instr, v2.value,  v2.index.value);
+        instr = generateString("%s%s[%s] ", 3, instr, v2.value, v2.index.value);
     }
     else if (isSameType(v2.valueInfoType, LIT_T))
     {
@@ -101,10 +104,10 @@ char *addV2(char *instruction, value_info v2)
     }
     else if (isSameType(v2.valueInfoType, FUNC_T))
     {
-        // var[9999999999] := CALL func, numArgs
+            // var[9999999999] := CALL func, numArgs
         int numParams = 1;
         instr = generateString("%sCALL %s,%s", 3, instr, v2.value, itos(numParams));
-        // TODO añadir parámetros de la función
+            // TODO añadir parámetros de la función
     }
     return strdup(instr);
 }
@@ -172,7 +175,7 @@ void intOperations(int num1, int num2, char *operand, int *res)
     }
     else if (strcmp(operand, OP_ARIT_MOD) == 0)
     {
-        simpleDebug("Estoy en modulo\n", 1);
+        simpleDebug("Estoy en modulo.\n", 1);
         if (num2 != 0)
         {
             *res = num1 % num2;
@@ -225,9 +228,7 @@ void floatOperations(float num1, float num2, char *operand, float *res)
 int init_analisi_lexic(char *file_name)
 {
     int error;
-
     yyin = fopen(file_name, "r");
-
     if (yyin == NULL)
     {
         error = EXIT_FAILURE;
@@ -242,9 +243,7 @@ int init_analisi_lexic(char *file_name)
 int init_analisi_sintactic(char *filename)
 {
     int error = EXIT_SUCCESS;
-
     yyout = fopen(filename, "w");
-
     if (yyout == NULL)
     {
         error = EXIT_FAILURE;
@@ -255,7 +254,6 @@ int init_analisi_sintactic(char *filename)
 int analisi_semantic()
 {
     int error;
-
     if (yyparse() == 0)
     {
         error = EXIT_SUCCESS;
@@ -270,9 +268,7 @@ int analisi_semantic()
 int end_analisi_lexic()
 {
     int error;
-
     error = fclose(yyin);
-
     if (error == 0)
     {
         error = EXIT_SUCCESS;
@@ -287,9 +283,7 @@ int end_analisi_lexic()
 int end_analisi_sintactic()
 {
     int error;
-
     error = fclose(yyout);
-
     if (error == 0)
     {
         error = EXIT_SUCCESS;

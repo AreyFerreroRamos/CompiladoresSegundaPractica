@@ -52,14 +52,16 @@ char *generateString(char *message, int nArgs, ...)
             sprintf(string, message, params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
             break;
         default:
-            yyerror("Estas usando mal la función generateString(), nArgs debe estar entre 0 y 7");
+            yyerror("Estas usando mal la función generateString(). nArgs debe estar entre 0 y 7.");
             break;
     }
     return strdup(string);
 }
 
-int isValueInfoBaseNull(value_info_base v){
-    if(v.value==NULL || v.type==NULL || v.valueInfoType==NULL){
+int isValueInfoBaseNull(value_info_base v)
+{
+    if (v.value == NULL || v.type == NULL || v.valueInfoType == NULL)
+    {
         return 1;
     }
     return 0;
@@ -77,9 +79,9 @@ value_info_base createValueInfoBase(char *value, char *type, char *valueInfoType
 value_info_base generateEmptyValueInfoBase()
 {
     value_info_base aux;
-    aux.value=NULL;
-    aux.type=NULL;
-    aux.valueInfoType=NULL;
+    aux.value = NULL;
+    aux.type = NULL;
+    aux.valueInfoType = NULL;
     return aux;
 }
 
@@ -89,10 +91,12 @@ value_info createValueInfo(char *value, char *type, char *valueInfoType, value_i
     aux.value = strdup(value);
     aux.type = strdup(type);
     aux.valueInfoType = strdup(valueInfoType);
-    if(isValueInfoBaseNull(index)==0)
+    if (isValueInfoBaseNull(index) == 0)
     {
         aux.index = createValueInfoBase(index.value,index.type,index.valueInfoType);
-    }else{
+    }
+    else
+    {
         aux.index = index;
     }
     return aux;
@@ -101,9 +105,9 @@ value_info createValueInfo(char *value, char *type, char *valueInfoType, value_i
 value_info generateEmptyValueInfo()
 {
     value_info aux;
-    aux.value=NULL;
-    aux.type=NULL;
-    aux.valueInfoType=NULL;
+    aux.value = NULL;
+    aux.type = NULL;
+    aux.valueInfoType = NULL;
     aux.index = generateEmptyValueInfoBase();
     return aux;
 }
@@ -130,9 +134,12 @@ tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elemen
 sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDims, void *elements, char *entryType)
 {
     sym_value_type aux;
-    if(type!=NULL) {
+    if (type != NULL)
+    {
         aux.type = strdup(type);
-    }else{
+    }
+    else
+    {
         aux.type = NULL;
     }
     aux.size = size;
@@ -143,16 +150,18 @@ sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDim
     return aux;
 }
 
-func_param_info createFuncParamInfo(value_info_base *params,int numParams,char *funcName,char *returnType)
+func_param_info createFuncParamInfo(value_info_base *params, int numParams, char *funcName, char *returnType)
 {
     func_param_info aux;
-    aux.params=params;
-    aux.numParams=numParams;
-    aux.funcName=funcName;
-    if(returnType!=NULL)
+    aux.params = params;
+    aux.numParams = numParams;
+    aux.funcName = funcName;
+    if (returnType != NULL)
     {
         aux.returnType = strdup(returnType);
-    }else{
+    }
+    else
+    {
         aux.returnType = NULL;
     }
     return aux;
@@ -170,7 +179,7 @@ int isSameType(char *type1, char *type2)
 
 char *itos(int num)
 {
-    char *string = (char *)malloc(sizeof(char) * INT_MAX_LENGTH_STR);
+    char *string = (char *) malloc(sizeof(char) * INT_MAX_LENGTH_STR);
     sprintf(string, "%i", num);
     return string;
 }
@@ -249,24 +258,28 @@ void addOrUpdateEntry(char* key, sym_value_type entry)
     int response = sym_enter(key, &entry);
     if (response == SYMTAB_STACK_OVERFLOW)
     {
-        yyerror("No hay más memoria. (añadiendo entrada)");
+        yyerror("No hay más memoria (añadiendo entrada).");
     }
 }
 
-void pushSymtab(){
+void pushSymtab()
+{
     int response = sym_push_scope();
     if (response == SYMTAB_STACK_OVERFLOW)
     {
-        yyerror("No hay más memoria. (haciendo push)");
+        yyerror("No hay más memoria (haciendo push).");
     }
 }
 
-void popSymtab() {
+void popSymtab()
+{
     int response = sym_pop_scope();
-    if (response == SYMTAB_STACK_UNDERFLOW) {
-        yyerror("El ámbito actual es el global");
-    }else if(response == SYMTAB_NOT_TOP){
-        yyerror("El ámbito actual no esta en la cima de la pila");
+    if (response == SYMTAB_STACK_UNDERFLOW)
+    {
+        yyerror("El ámbito actual es el global.");
+    }
+    else if (response == SYMTAB_NOT_TOP)
+    {
+        yyerror("El ámbito actual no esta en la cima de la pila.");
     }
 }
-

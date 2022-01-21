@@ -17,11 +17,11 @@
 								   /* segons ens convingui.            */
 typedef struct sym_value_type
 {
-	void *type;         /* Tipo de variable. En caso de que sea FUNC_T sera el tipo de retorno, si es accion estra a NULL*/
-	int size;           /* Tamaño del elemento en bytes o en caso de una FUNC_T el numero de elementos*/
+	void *type;         /* Tipo de variable. En caso de que sea FUNC_T sera el tipo de retorno, si es accion estará inicializada a NULL. */
+	int size;           /* Tamaño del elemento en bytes o en caso de una FUNC_T el número de elementos. */
 	int num_dim;        /* Número de dimensiones que tendrá un tensor (TENS_T). */
 	int *elem_dims;     /* Vector con las dimensiones del tensor (TENS_T). */
-	void *elements;     /* Vector con todos los elementos de un TENS_T o todos los aprametros de un FUNC_T */
+	void *elements;     /* Vector con todos los elementos de un TENS_T o todos los parámetros de un FUNC_T. */
 	void *entryType;    /* Indica si el elemento es una variable, un tensor o una función. */
 } sym_value_type;
 

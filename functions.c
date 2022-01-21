@@ -6,9 +6,9 @@
 #include "functions.h"
 
 extern int num_tmp_variable;
-extern int sq;	        // Siguiente linia que toca escribir
-extern int lengthCode; // Nombre de linias de c3a
-extern char **c3a;	   // Conjunto de lineas que formarán el codigo de 3 adreces
+extern int sq;          // Siguiente linia que toca escribir.
+extern int lengthCode;  // Nombre de linias de c3a.
+extern char **c3a;      // Conjunto de lineas que formarán el c3a.
 
 char *generateTmpId()
 {
@@ -27,7 +27,7 @@ void emet(char *type, int nArgs, ...)
     char *instruction;
     if (isSameType(type, INSTR_COPY))
     {
-        value_info *data = malloc(sizeof(value_info)*nArgs);
+        value_info *data = malloc(sizeof(value_info) * nArgs);
         for (int i = 0; i < nArgs; i++)
         {
             data[i] = va_arg(ap, value_info);
@@ -42,7 +42,7 @@ void emet(char *type, int nArgs, ...)
              || isSameType(type, INSTR_DIVI) || isSameType(type, INSTR_DIVD)
              || isSameType(type, INSTR_MODI))
     {
-        value_info *data = malloc(sizeof(value_info)*nArgs);
+        value_info *data = malloc(sizeof(value_info) * nArgs);
         for (int i = 0; i < nArgs; i++)
         {
             data[i] = va_arg(ap, value_info);
@@ -54,51 +54,57 @@ void emet(char *type, int nArgs, ...)
         char *element = strdup(va_arg(ap, char *));
         instruction = emetPut(element);
     }
-    else if(isSameType(type,INSTR_START))
+    else if (isSameType(type,INSTR_START))
     {
-        char *func = strdup(va_arg(ap,char*));
+        char *func = strdup(va_arg(ap, char *));
         instruction = emetStart(func);
     }
-    else if(isSameType(type,INSTR_END))
+    else if (isSameType(type,INSTR_END))
     {
-        int isAction = va_arg(ap,int);
-        //Si no tiene valor de retorno y la última línea no es un RETURN
-        if( isAction==1 && !isSameType(c3a[sq-1],INSTR_RETURN))
+        int isAction = va_arg(ap, int);
+            //Si no tiene valor de retorno y la última línea no es un RETURN.
+        if (isAction == 1 && ! isSameType(c3a[sq - 1],INSTR_RETURN))
         {
             writeLine(sq,INSTR_RETURN);
         }
         writeLine(sq,INSTR_END);
         instruction = "";
     }
-    else if(isSameType(type,INSTR_RETURN))
+    else if (isSameType(type,INSTR_RETURN))
     {
-        if(nArgs==0){
+        if (nArgs == 0)
+        {
             instruction = emetReturn(NULL);
-        }else{
-            char *value = strdup(va_arg(ap,char*));
+        }
+        else
+        {
+            char *value = strdup(va_arg(ap, char *));
             instruction = emetReturn(value);
         }
     }
-
     va_end(ap);
     writeLine(sq, instruction);
 }
 
-void controlTensorIndex(value_info *v){
-    if(isSameType(v->valueInfoType,TENS_T)){
-        if(isSameType(v->index.valueInfoType,VAR_T)){
+void controlTensorIndex(value_info *v)
+{
+    if (isSameType(v->valueInfoType,TENS_T))
+    {
+        if (isSameType(v->index.valueInfoType,VAR_T))
+        {
             char *tmp;
-            value_info v1,v2,v3;
-
-            //MULTIPLICAMOS POR ESPACIO DEL TIPO
-            tmp=generateTmpId();
+            value_info v1, v2, v3;
+                // MULTIPLICAMOS POR ESPACIO DEL TIPO
+            tmp = generateTmpId();
             v1 = createValueInfo(tmp,INT32_T,VAR_T,generateEmptyValueInfoBase());
             v2 = createValueInfo(v->index.value,INT32_T,VAR_T,generateEmptyValueInfoBase());
             v3 = createValueInfo(itos(calculateSizeType(v2.type)),INT32_T,LIT_T,generateEmptyValueInfoBase());
-            classifyOperation(OP_ARIT_MULT,v1,v2,v3);
-            v->index= createValueInfoBase(v1.value,v1.type,v1.valueInfoType);
-        }else{
-            v->index.value = itos((atoi(v->index.value ))* calculateSizeType(v->index.type));
+            classifyOperation(OP_ARIT_MULT, v1, v2, v3);
+            v->index = createValueInfoBase(v1.value,v1.type,v1.valueInfoType);
+        }
+        else
+        {
+            v->index.value = itos((atoi(v->index.value )) * calculateSizeType(v->index.type));
         }
     }
 }
@@ -269,30 +275,34 @@ int getAcumElemDim(int *elem_dim, int num_dim)
 	return acum;
 }
 
-void addValueInfoBase(value_info_base *list,int numElem,value_info_base toAdd)
+void addValueInfoBase(value_info_base *list, int numElem, value_info_base toAdd)
 {
-    if(numElem==0){
+    if (numElem == 0)
+    {
         list = malloc(sizeof(value_info_base));
-    }else{
-        list = realloc(list, sizeof(value_info_base)*(numElem+1));
     }
-    list[numElem]=toAdd;
+    else
+    {
+        list = realloc(list, sizeof(value_info_base) * (numElem + 1));
+    }
+    list[numElem] = toAdd;
 }
 
-sym_value_type castValueInfoBaseToSymValueType(value_info_base v){
+sym_value_type castValueInfoBaseToSymValueType(value_info_base v)
+{
     return createSymValueType(v.type,0,0,NULL,NULL,v.valueInfoType);
 }
 
-char *calculateNewIndex(int dim, value_info_base calcIndex,value_info index){
+char *calculateNewIndex(int dim, value_info_base calcIndex, value_info index){
 
-    printf("VALUE:%s TYPE1:%s TYPE2:%s\n",calcIndex.value,calcIndex.type,calcIndex.valueInfoType);
+    printf("VALUE:%s TYPE1:%s TYPE2:%s\n", calcIndex.value, calcIndex.type, calcIndex.valueInfoType);
     char *nameTmp1 = generateTmpId();
     value_info tmp1 = createValueInfo(nameTmp1, INT32_T, VAR_T, generateEmptyValueInfoBase());
     value_info one = createValueInfo("1", INT32_T, LIT_T, generateEmptyValueInfoBase());
     value_info calcIndexOld = createValueInfo(calcIndex.value, calcIndex.type, calcIndex.valueInfoType, generateEmptyValueInfoBase());
     value_info dimension = createValueInfo(itos(dim), INT32_T, LIT_T, generateEmptyValueInfoBase());
     emet(INSTR_MULI,3, tmp1, calcIndexOld, dimension);
-    if(isSameType(index.valueInfoType,VAR_T))
+    if (isSameType(index.valueInfoType,VAR_T))
     {
         char *nameTmp2 = generateTmpId();
         value_info tmp2 = createValueInfo(nameTmp2, INT32_T, VAR_T, generateEmptyValueInfoBase());
@@ -301,7 +311,7 @@ char *calculateNewIndex(int dim, value_info_base calcIndex,value_info index){
     }
     else
     {
-        index.value = itos(atoi(index.value)-1);
+        index.value = itos(atoi(index.value) - 1);
         emet(INSTR_ADDI,3, tmp1, tmp1, index);
     }
     return nameTmp1;

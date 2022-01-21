@@ -21,10 +21,10 @@
   bool corcheteOpenFounded = false;
 
   /* CONTROL FOR FUNCTION DEFINITION */
-  bool inFunction =false;
+  bool inFunction = false;
   bool inHeader = false;
   bool inParams = false;
-  bool idProcReaded=false;
+  bool idProcReaded = false;
   bool isAction = true;
   bool isReturnLine = false;
 %}
@@ -75,17 +75,19 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             }
 
 "(" {
-        if(inHeader==true){
-            inParams=true;
+        debug("%s\n", yytext, 0);
+        if (inHeader == true)
+        {
+            inParams = true;
         }
-		debug("%s\n", yytext, 0);
 		return PARENTESIS_ABIERTO;
 	}
 
 ")" {
-        if(inHeader==true){
-            inHeader=false;
-            inParams=false;
+        if (inHeader == true)
+        {
+            inHeader = false;
+            inParams = false;
         }
 		debug("%s\n", yytext, 0);
 		return PARENTESIS_CERRADO;
@@ -128,35 +130,37 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
         return LLAVE_CERRADA;
     }
 
-
 ;   {
 		debug("%s\n", yytext, 0);
 		return PUNTO_Y_COMA;
 	}
 
 ::  {
-        if(inFunction ==true && inParams == false){
+        debug("%s\n", yytext, 0);
+        if (inFunction == true && inParams == false)
+        {
             isAction = false;
         }
-        debug("%s\n", yytext, 0);
         return DOBLE_DOS_PUNTOS;
     }
 
 "function"  {
                 debug("%s\n", yytext, 0);
                 pushSymtab();
-                inFunction =true;
+                inFunction = true;
                 inHeader = true;
                 return START;
             }
 
 "return"    {
-
 		        isReturnLine = true;
-                if(isAction ==true){
+                if (isAction == true)
+                {
                     debug("%s\n", yytext, 0);
                     return DIRECTRETURN;
-                }else{
+                }
+                else
+                {
                     debug("%s with action\n", yytext, 0);
                     return VALUERETURN;
                 }
@@ -164,25 +168,25 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 
 "end"	{
             debug("%s\n", yytext, 0);
-            inFunction =false;
+            inFunction = false;
             inParams = false;
             idProcReaded = false;
-            isAction=true;
+            isAction = true;
             return END;
         }
 
-("Int32"|"Float64"|"String"|"Bool"|"Tensor") {
-                                                debug("%s\n", yytext, 0);
-                                                yylval.cadena =strdup(yytext);
-                                                return TYPE;
-                                            }
+("Int32"|"Float64"|"String"|"Bool"|"Tensor")    {
+                                                    debug("%s\n", yytext, 0);
+                                                    yylval.cadena = strdup(yytext);
+                                                    return TYPE;
+                                                }
 
 {id}	{
             if (strlen(yytext) > ID_MAX_LENGTH)
             {
                 yyerror(generateString("ID -> %s demasiado largo", 1, yytext));
             }
-            else if (assignFounded == false && corcheteOpenFounded == false && isReturnLine == false && ( (inFunction == true && idProcReaded == true) || inFunction == false))
+            else if (assignFounded == false && corcheteOpenFounded == false && isReturnLine == false && ((inFunction == true && idProcReaded == true) || inFunction == false))
             {
                 debug("ID POINTER: %s\n", yytext, 0);
                 yylval.ident.lexema = strdup(yytext);
@@ -193,7 +197,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             else if (inHeader == true && idProcReaded == false)
             {
                 debug("ID PROC: %s\n", yytext, 0);
-                idProcReaded=true;
+                idProcReaded = true;
                 yylval.cadena = strdup(yytext);
                 return ID_PROC;
             }

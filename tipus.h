@@ -112,13 +112,14 @@ typedef struct
 } tensor_ini_info;
 
 /**
- * Esta estructura contiene los campos necesarios para gestionar la funciones y sus cabecera
+ * Esta estructura contiene los campos necesarios para gestionar las funciones y sus cabeceras.
  */
 typedef struct
 {
-    value_info_base *params;        //Lista de parametros de la cabecera
-    int numParams;                  //Numero de parametros
-    char *funcName;                //Nombre de la función
-    char *returnType;               //Parametro de retorno (puede estar a null)
-}func_param_info;
+    value_info_base *params;    // Lista de parámetros de la función.
+    int numParams;              // Número de parámetros.
+    char *funcName;             // Nombre de la función.
+    char *returnType;           // Parametro de retorno (puede ser nulo).
+} func_param_info;
+
 #endif
