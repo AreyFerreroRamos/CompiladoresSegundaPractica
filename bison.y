@@ -102,10 +102,7 @@ cabecera_procedimiento : cabecera_funcion | cabecera_accion
 
 main : lista_de_sentencias
 
-lista_de_sentencias : lista_de_sentencias sentencia	{
-								createFuncParamInfo(NULL, 0, "prueba", NULL);
-							}
-		| sentencia
+lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 
 sentencia : asignacion
 	| expresion_aritmetica	{
