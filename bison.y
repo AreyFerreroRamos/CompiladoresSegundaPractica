@@ -63,9 +63,9 @@
 %token <real> FLOAT
 %token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TIPO ID_PROC
 %token <ident> ID 
-%token <operand> ID_ARIT
+%token <operand> ID_ARIT ID_FUNC ID_ACC
 
-%type <operand> expresion_aritmetica lista_sumas lista_productos terminal_aritmetico id_arit
+%type <operand> expresion_aritmetica lista_sumas lista_productos terminal_aritmetico id_arit funcion
 %type <tensor_info> id lista_indices lista_indices_arit
 %type <tensor_ini_info> tensor componente lista_componentes lista_valores
 %type <cadena> op_arit_p1
@@ -117,6 +117,7 @@ sentencia : asignacion
 	| DIRECT_RETURN	{
 				emet(INSTR_RETURN, 0);
 			}
+	| accion
 
 asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
@@ -298,6 +299,7 @@ terminal_aritmetico : INTEGER	{
 										yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type);
 									}*/
 								}
+	| funcion
 
 id_arit : ID_ARIT	{
 				$$ = $1;
@@ -450,6 +452,14 @@ param : ID DOBLE_DOS_PUNTOS TIPO	{
 											yyerror("El tipo debería ser TENS_T.");
 										}
 									}
+
+funcion : ID_FUNC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO
+
+accion : ID_ACC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO
+
+lista_args : lista_args expresion_aritmetica | expresion_aritmetica
+
+
 
 
 %%
