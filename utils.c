@@ -267,7 +267,7 @@ void pushSymtab()
     int response = sym_push_scope();
     if (response == SYMTAB_STACK_OVERFLOW)
     {
-        yyerror("No hay más memoria (haciendo push).");
+        yyerror("Se ha desbordado la pila.");
     }
 }
 

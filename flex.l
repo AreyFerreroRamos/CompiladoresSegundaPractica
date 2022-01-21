@@ -25,8 +25,8 @@
   bool inHeader = false;
   bool inParams = false;
   bool idProcReaded = false;
-  bool isAction = true;
   bool isReturnLine = false;
+  bool isAction;
 %}
 
 %option yylineno
@@ -84,12 +84,12 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 	}
 
 ")" {
+        debug("%s\n", yytext, 0);
         if (inHeader == true)
         {
             inHeader = false;
             inParams = false;
         }
-		debug("%s\n", yytext, 0);
 		return PARENTESIS_CERRADO;
 	}
 
@@ -141,14 +141,18 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
         {
             isAction = false;
         }
+        else
+        {
+            isAction = true;
+        }
         return DOBLE_DOS_PUNTOS;
     }
 
 "function"  {
                 debug("%s\n", yytext, 0);
-                pushSymtab();
                 inFunction = true;
                 inHeader = true;
+                pushSymtab();
                 return START;
             }
 
@@ -169,9 +173,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 "end"	{
             debug("%s\n", yytext, 0);
             inFunction = false;
-            inParams = false;
             idProcReaded = false;
-            isAction = true;
             return END;
         }
 
@@ -184,9 +186,9 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 {id}	{
             if (strlen(yytext) > ID_MAX_LENGTH)
             {
-                yyerror(generateString("ID -> %s demasiado largo", 1, yytext));
+                yyerror(generateString("ID -> %s demasiado largo.", 1, yytext));
             }
-            else if (assignFounded == false && corcheteOpenFounded == false && isReturnLine == false && ((inFunction == true && idProcReaded == true) || inFunction == false))
+            else if (assignFounded == false && corcheteOpenFounded == false && isReturnLine == false && (inFunction == false || (inFunction == true && idProcReaded == true)))
             {
                 debug("ID POINTER: %s\n", yytext, 0);
                 yylval.ident.lexema = strdup(yytext);
@@ -197,18 +199,17 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             else if (inHeader == true && idProcReaded == false)
             {
                 debug("ID PROC: %s\n", yytext, 0);
-                idProcReaded = true;
                 yylval.cadena = strdup(yytext);
+                idProcReaded = true;
                 return ID_PROC;
             }
             else
             {
                 debug("ID ARIT: %s\n", yytext, 0);
                 sym_value_type entry = getEntry(yytext);
-                value_info v = createValueInfo(yytext, entry.type, entry.entryType, generateEmptyValueInfoBase());
-                if (isSameType(v.type, INT32_T) || isSameType(v.type, FLOAT64_T))
+                if (isSameType(entry.type, INT32_T) || isSameType(entry.type, FLOAT64_T))
                 {
-                    yylval.operand = v;
+                    yylval.operand = createValueInfo(yytext, entry.type, entry.entryType, generateEmptyValueInfoBase());
                     return ID_ARIT;
                 }
             }
