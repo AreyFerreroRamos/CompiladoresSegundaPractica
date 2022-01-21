@@ -111,6 +111,12 @@ typedef struct
 	int num_elem;               // Número de elementos del tensor.
 } tensor_ini_info;
 
+typedef struct
+{
+    value_info_base *params;    // Lista de parámetros de la función.
+    int numParams;              // Número de parámetros.
+} func_param_info_base;
+
 /**
  * Esta estructura contiene los campos necesarios para gestionar las funciones y sus cabeceras.
  */

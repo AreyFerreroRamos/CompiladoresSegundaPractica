@@ -96,7 +96,7 @@ int getAcumElemDim(int *elem_dim, int num_dim);
  * Dada una lista de parametros, el numero de parametros que hay y un nuevo parametro a
  * añadir reserva el espacio necesario e introduce el nuevo elemento.
  */
-void addValueInfoBase(value_info_base *list, int numElem, value_info_base toAdd);
+value_info_base *addValueInfoBase(value_info_base *list, int numElem, value_info_base toAdd);
 
 /**
  *

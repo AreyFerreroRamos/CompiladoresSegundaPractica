@@ -64,6 +64,12 @@ tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elemen
 sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDims, void *elements, char *entryType);
 
 /**
+ * Dados los campos para llenar la estructura que sirve para gestionar losparámetros de las funciones en bison
+ * devuelve una estructura con los campos llenos.
+ */
+func_param_info_base createFuncParamInfoBase(value_info_base *params, int numParams);
+
+/**
  * Dados los campos para llenar la estructura que sirve para gestionar las funciones en bison
  * devuelve una estructura con los campos llenos.
  */
@@ -113,6 +119,12 @@ void simpleDebug(char *text, int typeFile);
  * se lanzará un yyerror().
  */
 sym_value_type getEntry(char* key);
+
+/**
+ * La función busca en la symtab la variable y la devuelve junto con el resultado
+ * de la busqueda. El tratamiento del error se realizará externamente.
+ */
+int getEntryMessage(char* key, sym_value_type *entry);
 
 /**
  * La función añade o actualiza (si ya existía) una entrada en la symtab. Si se produce algún error

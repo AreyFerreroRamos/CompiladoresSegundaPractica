@@ -27,6 +27,10 @@
   bool idProcReaded = false;
   bool isReturnLine = false;
   bool isAction;
+
+  /* CONTROL CALL FUNCTION */
+  bool isFunctionCall = false;
+  int numParenthesis = 0;
 %}
 
 %option yylineno
@@ -80,6 +84,10 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
         {
             inParams = true;
         }
+        else if (isFunctionCall == true)
+        {
+            numParenthesis++;
+        }
 		return PARENTESIS_ABIERTO;
 	}
 
@@ -89,6 +97,14 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
         {
             inHeader = false;
             inParams = false;
+        }
+        else if (isFunctionCall == true)
+        {
+            numParenthesis--;
+            if (numParenthesis == 0)
+            {
+                isFunctionCall = false;
+            }
         }
 		return PARENTESIS_CERRADO;
 	}
@@ -188,29 +204,51 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             {
                 yyerror(generateString("ID -> %s demasiado largo.", 1, yytext));
             }
-            else if (assignFounded == false && corcheteOpenFounded == false && isReturnLine == false && (inFunction == false || (inFunction == true && idProcReaded == true)))
+            sym_value_type entry;
+            int response = getEntryMessage(yytext, &entry);
+            if ((response == SYMTAB_OK) && (isSameType(entry.entryType, FUNC_T)))
             {
-                debug("ID POINTER: %s\n", yytext, 0);
+                isFunctionCall = true;
                 yylval.ident.lexema = strdup(yytext);
-                yylval.ident.lenght = strlen(yytext);
+                yylval.ident.length = entry.size;
                 yylval.ident.line = yylineno;
-                return ID;
-            }
-            else if (inHeader == true && idProcReaded == false)
-            {
-                debug("ID PROC: %s\n", yytext, 0);
-                yylval.cadena = strdup(yytext);
-                idProcReaded = true;
-                return ID_PROC;
+                if (entry.size == 0)
+                {
+                    debug("ID ACC: %s\n", yytext, 0);
+                    return ID_ACC;
+                }
+                else
+                {
+                    debug("ID FUNC: %s\n", yytext, 0);
+                    return ID_FUNC;
+                }
             }
             else
             {
-                debug("ID ARIT: %s\n", yytext, 0);
-                sym_value_type entry = getEntry(yytext);
-                if (isSameType(entry.type, INT32_T) || isSameType(entry.type, FLOAT64_T))
+                if (assignFounded == false && corcheteOpenFounded == false && isReturnLine == false && isFunctionCall == false && (inFunction == false || (inFunction == true && idProcReaded == true)))
                 {
-                    yylval.operand = createValueInfo(yytext, entry.type, entry.entryType, generateEmptyValueInfoBase());
-                    return ID_ARIT;
+                    debug("ID POINTER: %s\n", yytext, 0);
+                    yylval.ident.lexema = strdup(yytext);
+                    yylval.ident.length = strlen(yytext);
+                    yylval.ident.line = yylineno;
+                    return ID;
+                }
+                else if (inHeader == true && idProcReaded == false)
+                {
+                    debug("ID PROC: %s\n", yytext, 0);
+                    yylval.cadena = strdup(yytext);
+                    idProcReaded = true;
+                    return ID_PROC;
+                }
+                else
+                {
+                    debug("ID ARIT: %s\n", yytext, 0);
+                    sym_value_type entry = getEntry(yytext);
+                    if (isSameType(entry.type, INT32_T) || isSameType(entry.type, FLOAT64_T))
+                    {
+                        yylval.operand = createValueInfo(yytext, entry.type, entry.entryType, generateEmptyValueInfoBase());
+                        return ID_ARIT;
+                    }
                 }
             }
         }

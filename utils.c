@@ -150,12 +150,27 @@ sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDim
     return aux;
 }
 
+func_param_info_base createFuncParamInfoBase(value_info_base *params, int numParams)
+{
+    func_param_info_base aux;
+    aux.params = params;
+    aux.numParams = numParams;
+    return aux;
+}
+
 func_param_info createFuncParamInfo(value_info_base *params, int numParams, char *funcName, char *returnType)
 {
     func_param_info aux;
     aux.params = params;
     aux.numParams = numParams;
-    aux.funcName = funcName;
+    if (funcName != NULL)
+    {
+        aux.funcName = strdup(funcName);
+    }
+    else
+    {
+        aux.funcName = NULL;
+    }
     if (returnType != NULL)
     {
         aux.returnType = strdup(returnType);
@@ -251,6 +266,11 @@ sym_value_type getEntry(char* key)
         yyerror(generateString("No se ha encontrado el elemento '%s' en la symtab.",1, key));
     }
     return entry;
+}
+
+int getEntryMessage(char* key, sym_value_type *entry)
+{
+    return sym_lookup(key, entry);
 }
 
 void addOrUpdateEntry(char* key, sym_value_type entry)

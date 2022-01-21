@@ -42,13 +42,14 @@
 	struct
 	{
 		char *lexema;
-		int lenght;
+		int length;
 		int line;
 	} ident;
 	int enter;
 	float real;
 	char *cadena;
 	bool boolea;
+	func_param_info_base func_param_info_base;
 	value_info_base value_info_base;
 	value_info operand;
 	tensor_info tensor_info;
@@ -62,8 +63,8 @@
 %token <enter> INTEGER
 %token <real> FLOAT
 %token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TIPO ID_PROC
-%token <ident> ID 
-%token <operand> ID_ARIT ID_FUNC ID_ACC
+%token <ident> ID ID_FUNC ID_ACC
+%token <operand> ID_ARIT
 
 %type <operand> expresion_aritmetica lista_sumas lista_productos terminal_aritmetico id_arit funcion
 %type <tensor_info> id lista_indices lista_indices_arit
@@ -71,6 +72,8 @@
 %type <cadena> op_arit_p1
 %type <func_param_info> cabecera_procedimiento cabecera_funcion cabecera_accion lista_params
 %type <value_info_base> param
+%type <func_param_info_base> lista_args
+
 %start programa
 
 
@@ -299,7 +302,9 @@ terminal_aritmetico : INTEGER	{
 										yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type);
 									}*/
 								}
-	| funcion
+	| funcion	{
+				$$ = $1;
+			}
 
 id_arit : ID_ARIT	{
 				$$ = $1;
@@ -423,13 +428,14 @@ cabecera_accion : START ID_PROC PARENTESIS_ABIERTO lista_params PARENTESIS_CERRA
 											}
 
 lista_params : lista_params COMA param	{
-						addValueInfoBase($1.params, $1.numParams, $3);
-						$1.numParams++;
 						$$ = $1;
+						$$.params = addValueInfoBase($1.params, $1.numParams, $3);
+						$$.numParams++;
+
 					}
 		| param	{
 				$$ = createFuncParamInfo(NULL, 0, NULL, NULL);
-				addValueInfoBase($$.params, $$.numParams, $1);
+				$$.params = addValueInfoBase($$.params, $$.numParams, $1);
 				$$.numParams++;
 			}
 
@@ -453,13 +459,50 @@ param : ID DOBLE_DOS_PUNTOS TIPO	{
 										}
 									}
 
-funcion : ID_FUNC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO
+funcion : ID_FUNC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
+										if ($1.length == $3.numParams)
+										{
+											for (int i = 0; i < $3.numParams; i++)
+											{
+												emet(INSTR_PARAM, 1, $3.params[i].value);
+											}
 
-accion : ID_ACC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO
+											char *nameTmp = generateTmpId();
+											emet(INSTR_CALL, 3, $1.lexema, $3.numParams, nameTmp);
+											sym_value_type entry = getEntry($1.lexema);
+											$$ = createValueInfo(nameTmp, entry.type, VAR_T, generateEmptyValueInfoBase());
+										}
+										else
+										{
+											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto. Se han de pasar %i paraámetros", 1, $1.length));
+										}
+									}
 
-lista_args : lista_args expresion_aritmetica | expresion_aritmetica
+accion : ID_ACC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
+										if ($1.length == $3.numParams)
+										{
+											for (int i = 0; i < $3.numParams; i++)
+											{
+												emet(INSTR_PARAM, 1, $3.params[i].value);
+											}
+											emet(INSTR_CALL, 2, $1.lexema, $3.numParams);
+										}
+										else
+										{
+											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto. Se han de pasar %i paraámetros", 1, $1.length));
+										}
+									}
 
-
+lista_args : lista_args COMA expresion_aritmetica	{
+								$$ = $1;
+								$$.params = addValueInfoBase($1.params, $1.numParams, *castValueInfoToValueInfoBase($3));
+								$$.numParams++;
+							}
+	| expresion_aritmetica	{
+					$$ = createFuncParamInfoBase(NULL, 0);
+					$$.params = addValueInfoBase($$.params, $$.numParams, *castValueInfoToValueInfoBase($1));
+					$$.numParams++;
+				}
 
 
 %%

@@ -82,6 +82,22 @@ void emet(char *type, int nArgs, ...)
             instruction = emetReturn(value);
         }
     }
+    else if (isSameType(type,INSTR_PARAM))
+    {
+        char *param = strdup(va_arg(ap, char *));
+        instruction = generateString("PARAM %s", 1, param);
+    }
+    else if (isSameType(type,INSTR_CALL))
+    {
+        char *nameFunc = strdup(va_arg(ap, char *));
+        int numParams = va_arg(ap, int);
+        char *tmp = "";
+        if (nArgs == 3) {
+            tmp = strdup(va_arg(ap, char *));
+            tmp = generateString("%s := ",1, tmp);
+        }
+        instruction = generateString("%sCALL %s,%i",3, tmp, nameFunc, numParams);
+    }
     va_end(ap);
     writeLine(sq, instruction);
 }
@@ -275,17 +291,26 @@ int getAcumElemDim(int *elem_dim, int num_dim)
 	return acum;
 }
 
-void addValueInfoBase(value_info_base *list, int numElem, value_info_base toAdd)
+value_info_base *addValueInfoBase(value_info_base *list, int numElem, value_info_base toAdd)
 {
+    value_info_base *aux;
+    printf("%i: size:%i   ",numElem,sizeof(value_info_base));
+    fflush(stdout);
     if (numElem == 0)
     {
-        list = malloc(sizeof(value_info_base));
+        aux = malloc(sizeof(value_info_base));
     }
     else
     {
-        list = realloc(list, sizeof(value_info_base) * (numElem + 1));
+        aux = realloc(list, sizeof(value_info_base) * (numElem + 1));
     }
-    list[numElem] = toAdd;
+    aux[numElem] = toAdd;
+    for(int i = 0 ; i <numElem+1;i++){
+        printf("%s, ",aux[i].value);
+        fflush(stdout);
+    }
+    printf("\n");
+    fflush(stdout);
 }
 
 sym_value_type castValueInfoBaseToSymValueType(value_info_base v)
