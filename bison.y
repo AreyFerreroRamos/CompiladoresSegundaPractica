@@ -466,7 +466,6 @@ funcion : ID_FUNC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
 											{
 												emet(INSTR_PARAM, 1, $3.params[i].value);
 											}
-
 											char *nameTmp = generateTmpId();
 											emet(INSTR_CALL, 3, $1.lexema, $3.numParams, nameTmp);
 											sym_value_type entry = getEntry($1.lexema);
@@ -474,7 +473,7 @@ funcion : ID_FUNC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
 										}
 										else
 										{
-											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto. Se han de pasar %i paraámetros", 1, $1.length));
+											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto. Se han de pasar %i paraámetros.", 1, $1.length));
 										}
 									}
 
@@ -489,7 +488,7 @@ accion : ID_ACC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
 										}
 										else
 										{
-											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto. Se han de pasar %i paraámetros", 1, $1.length));
+											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto. Se han de pasar %i paraámetros.", 1, $1.length));
 										}
 									}
 
