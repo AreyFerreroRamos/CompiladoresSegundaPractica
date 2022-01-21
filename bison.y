@@ -58,10 +58,10 @@
 	void *no_definit;
 }
 
-%token <no_definit> ASSIGN START VALUERETURN DIRECTRETURN END DOBLE_DOS_PUNTOS LLAVE_ABIERTA LLAVE_CERRADA
+%token <no_definit> ASSIGN START VALUE_RETURN DIRECT_RETURN END DOBLE_DOS_PUNTOS LLAVE_ABIERTA LLAVE_CERRADA
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TYPE ID_PROC
+%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TIPO ID_PROC
 %token <ident> ID 
 %token <operand> ID_ARIT
 
@@ -111,10 +111,10 @@ sentencia : asignacion
 	| ID	{
 			emet(INSTR_PUT, 1, $1.lexema);
 		}
-	| VALUERETURN expresion_aritmetica	{
+	| VALUE_RETURN expresion_aritmetica	{
 							emet(INSTR_RETURN, 1, $2.value);
 						}
-	| DIRECTRETURN	{
+	| DIRECT_RETURN	{
 				emet(INSTR_RETURN, 0);
 			}
 
@@ -409,7 +409,7 @@ lista_valores : lista_valores COMA lista_sumas	{
 					}
 				}
 
-cabecera_funcion : cabecera_accion DOBLE_DOS_PUNTOS TYPE	{
+cabecera_funcion : cabecera_accion DOBLE_DOS_PUNTOS TIPO	{
 									$1.returnType = strdup($3);
 									$$ = $1;
 								}
@@ -431,13 +431,13 @@ lista_params : lista_params COMA param	{
 				$$.numParams++;
 			}
 
-param : ID DOBLE_DOS_PUNTOS TYPE	{
+param : ID DOBLE_DOS_PUNTOS TIPO	{
 						value_info_base v = createValueInfoBase($1.lexema, $3, VAR_T);
 						sym_value_type entry = castValueInfoBaseToSymValueType(v);
 						addOrUpdateEntry(v.value, entry);
 						$$ = v;
 					}
-	| ID DOBLE_DOS_PUNTOS TYPE LLAVE_ABIERTA TYPE LLAVE_CERRADA	{
+	| ID DOBLE_DOS_PUNTOS TIPO LLAVE_ABIERTA TIPO LLAVE_CERRADA	{
 										if (isSameType($3, TENSOR_T))
 										{
 											value_info_base v = createValueInfoBase($1.lexema, $5, TENS_T);

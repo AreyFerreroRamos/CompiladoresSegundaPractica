@@ -157,12 +157,12 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
                 if (isAction == true)
                 {
                     debug("%s\n", yytext, 0);
-                    return DIRECTRETURN;
+                    return DIRECT_RETURN;
                 }
                 else
                 {
                     debug("%s with action\n", yytext, 0);
-                    return VALUERETURN;
+                    return VALUE_RETURN;
                 }
             }
 
@@ -178,7 +178,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 ("Int32"|"Float64"|"String"|"Bool"|"Tensor")    {
                                                     debug("%s\n", yytext, 0);
                                                     yylval.cadena = strdup(yytext);
-                                                    return TYPE;
+                                                    return TIPO;
                                                 }
 
 {id}	{
