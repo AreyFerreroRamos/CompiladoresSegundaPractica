@@ -20,6 +20,9 @@
   bool assignFounded = false;
   bool corcheteOpenFounded = false;
 
+  /* CONTROL FOR KNOW START MAIN */
+  bool inMain = false;
+
   /* CONTROL FOR FUNCTION DEFINITION */
   bool inFunction = false;
   bool inHeader = false;
@@ -45,12 +48,20 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 
 
 ({digit})+  {
+                if(inFunction == false && inMain ==false){
+                    emet(INSTR_START, 1, "main");
+                    inMain=true;
+                }
                 debug("%s\n", yytext, 0);
                 yylval.enter = atoi(yytext);
                 return INTEGER;
             }
 
 ({digit})+"."({digit})+(e(-)?({digit})+)?   {
+                                                if(inFunction == false && inMain ==false){
+                                                    emet(INSTR_START, 1, "main");
+                                                    inMain=true;
+                                                }
                                                 debug("%s\n", yytext, 0);
                                                 yylval.real = atof(yytext);
                                                 return FLOAT;
@@ -204,6 +215,10 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
             {
                 yyerror(generateString("ID -> %s demasiado largo.", 1, yytext));
             }
+            if(inFunction == false && inMain ==false){
+                emet(INSTR_START, 1, "main");
+                inMain=true;
+            }
             sym_value_type entry;
             int response = getEntryMessage(yytext, &entry);
             if ((response == SYMTAB_OK) && (isSameType(entry.entryType, FUNC_T)))
@@ -212,7 +227,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
                 yylval.ident.lexema = strdup(yytext);
                 yylval.ident.length = entry.size;
                 yylval.ident.line = yylineno;
-                if (entry.size == 0)
+                if (entry.type == NULL)
                 {
                     debug("ID ACC: %s\n", yytext, 0);
                     return ID_ACC;
@@ -246,7 +261,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
                     sym_value_type entry = getEntry(yytext);
                     if (isSameType(entry.type, INT32_T) || isSameType(entry.type, FLOAT64_T))
                     {
-                        yylval.operand = createValueInfo(yytext, entry.type, entry.entryType, generateEmptyValueInfoBase());
+                        yylval.valueInfo = createValueInfo(yytext, entry.type, entry.entryType);
                         return ID_ARIT;
                     }
                 }

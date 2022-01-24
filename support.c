@@ -12,52 +12,6 @@ extern char **c3a;
 
 //-------------------------EMET FUNCTIONS----------------------------
 
-char *emetCopy(value_info v1, value_info v2)
-{
-    char *instr;
-
-        // Añadimos v1.
-    instr = addV1(v1);
-
-        // Añadimos primer operando.
-    instr = addV2(instr, v2);
-
-    return instr;
-}
-
-char *emetOperation(char *op, value_info v1, value_info v2, value_info v3)
-{
-    char *instr;
-
-        // Añadimos v1.
-    instr = addV1(v1);
-
-        // Añadimos primer operando.
-    instr = addV2(instr, v2);
-
-        // Añadimos operación.
-    instr = addOperation(instr, op);
-
-        // Añadimos segundo operando.
-    instr = addV3(instr, v3);
-
-    return instr;
-}
-
-char *emetPut(char *element)
-{
-    char *instr;
-    instr = generateString("PUT %s", 1, element);
-    return instr;
-}
-
-char *emetStart(char *func)
-{
-    char *instr;
-    instr = generateString("START %s", 1, func);
-    return instr;
-}
-
 char *emetReturn(char *var)
 {
     char *instr;
@@ -72,64 +26,6 @@ char *emetReturn(char *var)
     return instr;
 }
 
-char *addV1(value_info v1)
-{
-    char *instr;
-        // Añadimos v1
-    if (isSameType(v1.valueInfoType, TENS_T))
-    {
-        instr = generateString("%s[%s] := ", 2, v1.value, v1.index.value);
-    }
-    else
-    {
-        instr = generateString("%s := ", 1, v1.value);
-    }
-    return strdup(instr);
-}
-
-char *addV2(char *instruction, value_info v2)
-{
-    char *instr = strdup(instruction);
-    if (isSameType(v2.valueInfoType, VAR_T))
-    {
-        instr = generateString("%s%s ", 2, instr, v2.value);
-    }
-    else if (isSameType(v2.valueInfoType, TENS_T))
-    {
-        instr = generateString("%s%s[%s] ", 3, instr, v2.value, v2.index.value);
-    }
-    else if (isSameType(v2.valueInfoType, LIT_T))
-    {
-        instr = generateString("%s%s ", 2, instr, v2.value);
-    }
-    else if (isSameType(v2.valueInfoType, FUNC_T))
-    {
-            // var[9999999999] := CALL func, numArgs
-        int numParams = 1;
-        instr = generateString("%sCALL %s,%s", 3, instr, v2.value, itos(numParams));
-            // TODO añadir parámetros de la función
-    }
-    return strdup(instr);
-}
-
-char *addOperation(char *instruction, char *op)
-{
-    return strdup(generateString("%s%s ", 2, instruction, op));
-}
-
-char *addV3(char *instruction, value_info v3)
-{
-    char *instr = strdup(instruction);
-    if (isSameType(v3.valueInfoType, VAR_T))
-    {
-        instr = generateString("%s%s", 2, instr, v3.value);
-    }
-    else if (isSameType(v3.valueInfoType, LIT_T))
-    {
-        instr = generateString("%s%s", 2, instr, v3.value);
-    }
-    return strdup(instr);
-}
 
 //-------------------------------------------------------------------
 

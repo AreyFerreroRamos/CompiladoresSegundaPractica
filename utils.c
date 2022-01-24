@@ -58,7 +58,7 @@ char *generateString(char *message, int nArgs, ...)
     return strdup(string);
 }
 
-int isValueInfoBaseNull(value_info_base v)
+int isValueInfoBaseNull(value_info v)
 {
     if (v.value == NULL || v.type == NULL || v.valueInfoType == NULL)
     {
@@ -67,52 +67,16 @@ int isValueInfoBaseNull(value_info_base v)
     return 0;
 }
 
-value_info_base createValueInfoBase(char *value, char *type, char *valueInfoType)
+value_info createValueInfo(char *value, char *type, char *valueInfoType)
 {
-    value_info_base aux;
+    value_info aux;
     aux.valueInfoType = strdup(valueInfoType);
     aux.type = strdup(type);
     aux.value = strdup(value);
     return aux;
 }
 
-value_info_base generateEmptyValueInfoBase()
-{
-    value_info_base aux;
-    aux.value = NULL;
-    aux.type = NULL;
-    aux.valueInfoType = NULL;
-    return aux;
-}
-
-value_info createValueInfo(char *value, char *type, char *valueInfoType, value_info_base index)
-{
-    value_info aux;
-    aux.value = strdup(value);
-    aux.type = strdup(type);
-    aux.valueInfoType = strdup(valueInfoType);
-    if (isValueInfoBaseNull(index) == 0)
-    {
-        aux.index = createValueInfoBase(index.value,index.type,index.valueInfoType);
-    }
-    else
-    {
-        aux.index = index;
-    }
-    return aux;
-}
-
-value_info generateEmptyValueInfo()
-{
-    value_info aux;
-    aux.value = NULL;
-    aux.type = NULL;
-    aux.valueInfoType = NULL;
-    aux.index = generateEmptyValueInfoBase();
-    return aux;
-}
-
-tensor_info createTensorInfo(int index_dim, value_info_base calcIndex, char *lexema)
+tensor_info createTensorInfo(int index_dim, value_info calcIndex, char *lexema)
 {
     tensor_info aux;
     aux.index_dim = index_dim;
@@ -121,7 +85,7 @@ tensor_info createTensorInfo(int index_dim, value_info_base calcIndex, char *lex
     return aux;
 }
 
-tensor_ini_info createTensorIniInfo(int dim, char *type, value_info_base *elements, int num_elem)
+tensor_ini_info createTensorIniInfo(int dim, char *type, value_info *elements, int num_elem)
 {
     tensor_ini_info aux;
     aux.dim = dim;
@@ -147,38 +111,6 @@ sym_value_type createSymValueType(char *type, int size, int numDim, int *elemDim
     aux.elem_dims = elemDims;
     aux.elements = elements;
     aux.entryType = strdup(entryType);
-    return aux;
-}
-
-func_param_info_base createFuncParamInfoBase(value_info_base *params, int numParams)
-{
-    func_param_info_base aux;
-    aux.params = params;
-    aux.numParams = numParams;
-    return aux;
-}
-
-func_param_info createFuncParamInfo(value_info_base *params, int numParams, char *funcName, char *returnType)
-{
-    func_param_info aux;
-    aux.params = params;
-    aux.numParams = numParams;
-    if (funcName != NULL)
-    {
-        aux.funcName = strdup(funcName);
-    }
-    else
-    {
-        aux.funcName = NULL;
-    }
-    if (returnType != NULL)
-    {
-        aux.returnType = strdup(returnType);
-    }
-    else
-    {
-        aux.returnType = NULL;
-    }
     return aux;
 }
 
@@ -234,7 +166,7 @@ void debug(char *text, char *var, int typeFile)
     // flex
     if (typeFile == 0)
     {
-         //printf(text, var);
+        // printf(text, var);
     }
     // bison
     else

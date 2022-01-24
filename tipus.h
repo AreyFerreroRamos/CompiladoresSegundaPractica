@@ -53,6 +53,8 @@
 #define INSTR_I2D "I2D"
 #define INSTR_D2I "D2I"
 #define INSTR_COPY "COPY"       // Se asigna el contenido de una variable a otra variable.
+#define INSTR_COPY_TO_TENSOR "COPY2TENSOR"              // t[] = var
+#define INSTR_COPY_FROM_TENSOR "COPYFROMTENSOR"         // var = t[]
 #define INSTR_CONSULT "CONSULT" // Se asigna el contenido de una posición de un tensor a una variable.
 #define INSTR_ASSIGN "ASSIGN"   // Se asigna el contenido de una variable en una posición del tensor.
 #define INSTR_PARAM "PARAM"
@@ -62,19 +64,14 @@
 #define INSTR_RETURN "RETURN"
 
 /**
- * Esta estructura contiene los campos necesarios para gestionar un elemento (literal o una variable)
- * en un punto del programa en que dicho elemento se utiliza como índice para acceder a un tensor.
- * Los tensores y las funciones también pueden comportarse como índices de otro tensor,
- * pero serán convertidos en variables temporales durante el proceso de generación del código intermedio (tiempo de compilación).
- * Esta estructura contiene los mismos campos que la estructura value_info (definida justo después) con excepción del índice.
- * Si las estructuras de tipo 'typedef struct' permitiesen acceso recursivo, este registro no sería necesario.
+ * Esta estructura contiene los campos necesarios para gestionar un ID
  */
- typedef struct
+typedef struct
 {
-    char *type;             // Tipo del elemenento.
-    char *value;            // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable.
-    char *valueInfoType;    // Indica si el elemento es una variable o un literal.
-} value_info_base;
+    char *lexema;
+    int length;
+    int line;
+} ident;
 
  /**
   * Esta estructura contiene los campos necesarios para gestionar un elemento (literal, variable, tensor o función)
@@ -85,7 +82,6 @@ typedef struct
 	char *type;                 // Tipo del elemenento.
 	char *value;                // Valor del elemento en caso de tratarse de un literal o lexema en caso de tratarse de una variable, un tensor o una función.
 	char *valueInfoType;        // Indica si el elemento es un literal, una variable, un tensor o una función.
-	value_info_base index;      // Índice de acceso en caso de ser un tensor. Si el elemento no es un tensor, este campo será nulo.
 } value_info;
 
 /**
@@ -95,7 +91,7 @@ typedef struct
 typedef struct
 {
 	int index_dim;              // Posición actual del vector de dimensiones del tensor.
-	value_info_base calcIndex;  // Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor tratándolo como si fuera un vector.
+    value_info calcIndex;       // Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor tratándolo como si fuera un vector.
 	char *lexema;               // Nombre de la variable tensor.
 } tensor_info;
 
@@ -107,13 +103,13 @@ typedef struct
 {
 	int dim;                    // Dimension concreta que se esta evaluando actualmente.
 	char *type;                 // Tipo concreto que se esta evaluando actualmente.
-	value_info_base *elements;  // Valores dentro del componente.
+    value_info *elements;  // Valores dentro del componente.
 	int num_elem;               // Número de elementos del tensor.
 } tensor_ini_info;
 
 typedef struct
 {
-    value_info_base *params;    // Lista de parámetros de la función.
+    value_info *params;    // Lista de parámetros de la función.
     int numParams;              // Número de parámetros.
 } func_param_info_base;
 
@@ -122,10 +118,9 @@ typedef struct
  */
 typedef struct
 {
-    value_info_base *params;    // Lista de parámetros de la función.
-    int numParams;              // Número de parámetros.
-    char *funcName;             // Nombre de la función.
-    char *returnType;           // Parametro de retorno (puede ser nulo).
+    func_param_info_base paramsInfo;
+    char *funcName;                 // Nombre de la función.
+    char *returnType;               // Parametro de retorno (puede ser nulo).
 } func_param_info;
 
 #endif

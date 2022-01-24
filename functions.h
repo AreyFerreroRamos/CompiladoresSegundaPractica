@@ -15,6 +15,12 @@
 char *generateTmpId();
 
 /**
+ * Vuelve a poner el numero del identificador del temporal a 1 para que se reciclen en diferentes
+ * contextos
+ */
+void restartNumberTmpId();
+
+/**
  * Dado un operador y los operadores ejecuta la función emet() con la
  * instrucción adecuada.
  */
@@ -24,6 +30,7 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
  *  Dado un tipo de instrucción el numero de argumentos y los datos necesarios para cada instruccion
  *  añade la instrucción al c3a. Los datos según la instrucción son los siguientes.
  *  INSTR_COPY -> (value_info variable,value_info valor).
+ *  INSTR_COPY_FROM/TO_TENSOR -> (char *v1, char *v2, char *indice) v1 = v2[indice] / v1[indice] = v2
  *  INSTR_(Operaciones) -> (value_info variable,value_info op1,value_info op2).
  *  INSTR_START -> (char* nombreFuncion).
  *  INSTR_END -> (int esAccion? (1 si es accion, 0 si es función).
@@ -34,14 +41,20 @@ void emet(char *type, int nArgs, ...);
 /**
  *
  */
-void controlTensorIndex(value_info *v);
+void controlTensorIndex(value_info *v,char* tensorType);
 
 /**
  * Dada una variable de tipo tensor y la estructura necesaria para gestionarlo durante su definición,
  * se generará el c3a necesario para imprimir, línea a línea, la inicialización de cada posición del vector,
  * Para lograrlo, se llama a la función anterior para cada posición del tensor.
  */
-void emetTensor(char *lexema, tensor_ini_info tensor);
+void emetTensor(char *lexema, tensor_ini_info tensor,char *tensorType);
+
+/**
+ * Dada la lista de parametros y el tamaño de la lista hace un emet
+ * de cada uno de ellos para que imprima "PARAM <ID>"
+ */
+void emetParams(value_info *listParams, int numParams);
 
 /**
  *  Dada una linea y un string, se encarga de añadir de añadir el string dentro del c3a.
@@ -65,15 +78,9 @@ int calculateSizeType(char *type);
 void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val);
 
 /**
- * Dado un value_info que llegará como valor de un tensor devuelve un string de una posición
- * con los datos pasados.
+ * Dados dos arrays de value_info devuelve un nuevo array con la unión de los dos anteriores.
  */
-value_info_base *castValueInfoToValueInfoBase(value_info v);
-
-/**
- * Dados dos arrays de value_info_base devuelve un nuevo array con la unión de los dos anteriores.
- */
-value_info_base *joinElementsVectors(value_info_base * vec1, value_info_base * vec2, int numElemVec1, int numElemVec2);
+value_info *joinElementsVectors(value_info * vec1, value_info * vec2, int numElemVec1, int numElemVec2);
 
 /**
  * Dado un vector, se invierte el orden de los elementos que lo componen.
@@ -96,17 +103,25 @@ int getAcumElemDim(int *elem_dim, int num_dim);
  * Dada una lista de parametros, el numero de parametros que hay y un nuevo parametro a
  * añadir reserva el espacio necesario e introduce el nuevo elemento.
  */
-value_info_base *addValueInfoBase(value_info_base *list, int numElem, value_info_base toAdd);
+value_info *addValueInfoBase(value_info *list, int numElem, value_info toAdd);
 
 /**
  *
  */
-sym_value_type castValueInfoBaseToSymValueType(value_info_base v);
+sym_value_type castValueInfoBaseToSymValueType(value_info v);
 
 /**
  * Dada la dimension actual, el cálculo del indice hasta ahora y el nuevo indice a introducir
  * hace el calculo y devuelve el nombre del temporal donde ha quedado almacenado.
  */
-char *calculateNewIndex(int dim, value_info_base calcIndex, value_info index);
+char *calculateNewIndex(int dim, value_info calcIndex, value_info index);
 
+/**
+ * Controla que todos los parametros son del tipo indicado en la cabecera de la
+ * función y acaba el programa si hay algún error. En caso de introducir un INT
+ * en un FLOAT se encarga de hacer la instrucción I2D.
+ */
+void checkTypesInFuction(value_info *expectedParams,value_info *listParams, int numParams);
+
+void checkIfIsNeededCast(char *expectedType, value_info *arrivedValue);
 #endif

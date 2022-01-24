@@ -11,56 +11,10 @@
 //-------------------------EMET FUNCTIONS----------------------------
 
 /**
- * Crea una instrucción de tipo copy con los parametros pasados
- * y la devuelve.
- */
-char *emetCopy(value_info v1, value_info v2);
-
-/**
- * Crea una instrucción de asignación con una operación aritmetica
- * y la devuelve.
- */
-char *emetOperation(char *op, value_info v1, value_info v2, value_info v3);
-
-/**
- * Dado un valor o el lexema de una variable temporal,
- * devuelve al instrucción "PUT [valor | lexema].
- */
-char *emetPut(char *element);
-
-/**
- * Dado el nombre la función devuelve la instrucción "START [nombre función]".
- */
-char *emetStart(char *func);
-
-/**
  * Dado el valor a devolver en un RETURN  devuelve la instrucción "RETURN [valor]".
  * Si el valor es NULL se devolvera solo "RETURN".
  */
 char *emetReturn(char *var);
-
-/**
- * Dada la información de la variable a la que se le asigna algun valor
- * devuelve su correspondencia a c3a.
- */
-char *addV1(value_info v1);
-
-/**
- * Dada la información del primer operando de una instruccion c3a y el inicio
- * de la instrucción, devuelve su correspondencia a c3a.
- */
-char *addV2(char *instruction, value_info v2);
-
-/**
- * Dada una operación y el inicio de la instrucción la añade a la instrucción.
- */
-char *addOperation(char *instruction, char *op);
-
-/**
- * Dada la información del segundo operando de una instruccion c3a y el inicio
- * de la instrucción devuelve su correspondencia a c3a.
- */
-char *addV3(char *instruction, value_info v3);
 
 //-------------------------------------------------------------------
 
