@@ -47,7 +47,7 @@
 	tensor_info tensorInfo;
 	tensor_ini_info tensorIniInfo;
 	func_param_info funcParamInfo;
-	func_param_info_base funcParamInfoBase;
+	elements_list elementsList;
 	sym_value_type symValueType;
 	void *no_definit;
 }
@@ -63,7 +63,7 @@
 %type <tensorIniInfo> tensor componente lista_componentes lista_valores
 %type <cadena> op_arit_p1
 %type <funcParamInfo> cabecera_procedimiento cabecera_funcion cabecera_accion lista_params
-%type <funcParamInfoBase> lista_args
+%type <elementsList> lista_args
 %type <valueInfo> param expresion_aritmetica lista_sumas lista_productos terminal_aritmetico id_arit funcion
 
 %start programa
@@ -86,7 +86,7 @@ procedimiento : cabecera_procedimiento lista_de_sentencias END	{
 										emet(INSTR_END, 1, 0);
 									}
 									popSymtab();
-									sym_value_type entry = createSymValueType($1.returnType, $1.paramsInfo.numParams, 0, NULL, $1.paramsInfo.params, FUNC_T);
+									sym_value_type entry = createSymValueType($1.returnType, $1.elemList.numElem, 0, NULL, $1.elemList.elements, FUNC_T);
 									addOrUpdateEntry($1.funcName, entry);
 									restartNumberTmpId();
 								}
@@ -131,7 +131,7 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 						}
 	| ID ASSIGN tensor	{
 					invertVector(vector_dims_tensor, $3.dim);
-					sym_value_type entry = createSymValueType($3.type, calculateSizeType($3.type) * $3.num_elem, $3.dim, vector_dims_tensor, $3.elements, TENS_T);
+					sym_value_type entry = createSymValueType($3.type, calculateSizeType($3.type) * $3.elemList.numElem, $3.dim, vector_dims_tensor, $3.elemList.elements, TENS_T);
 					addOrUpdateEntry($1.lexema, entry);
 					emetTensor($1.lexema, $3,$3.type);
 					vector_dims_tensor = NULL;
@@ -187,6 +187,10 @@ lista_indices : lista_indices COMA lista_sumas	{
 		     					}
 
 expresion_aritmetica : lista_sumas
+{
+
+				printf("2VALOR: %s TIPO1: %s TIPO2: %s\n",$1.value,$1.type,$1.valueInfoType);
+}
 
 lista_sumas : lista_sumas OP_ARIT_P2 lista_productos	{
 								if (isNumberType($3.type))
@@ -209,7 +213,7 @@ lista_sumas : lista_sumas OP_ARIT_P2 lista_productos	{
 								}
 								else
 								{
-									yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $3.type));
+									yyerror(generateString("4.No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $3.type));
 								}
 							}	
 		| lista_productos	{
@@ -219,7 +223,7 @@ lista_sumas : lista_sumas OP_ARIT_P2 lista_productos	{
 						}
 						else
 						{
-							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $1.type));
+							yyerror(generateString("3.No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $1.type));
 						}
 					}
 
@@ -243,7 +247,7 @@ lista_productos : lista_productos op_arit_p1 terminal_aritmetico	{
 										}
 										else
 										{
-											yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $3.type));
+											yyerror(generateString("2.No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $3.type));
 										}
 									}
 		| terminal_aritmetico	{
@@ -253,7 +257,7 @@ lista_productos : lista_productos op_arit_p1 terminal_aritmetico	{
 						}
 						else
 						{
-							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $1.type));
+							yyerror(generateString("1.No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $1.type));
 						}
 					}
 
@@ -271,7 +275,6 @@ terminal_aritmetico : INTEGER	{
 				$$ = createValueInfo(ftos($1), FLOAT64_T, LIT_T);
 			}
 	| id_arit 	{
-				$$ = $1;
 			}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
 									if (isNumberType($2.type))
@@ -365,7 +368,7 @@ tensor : CORCHETE_ABIERTO lista_componentes CORCHETE_CERRADO	{
 								}
 
 lista_componentes : lista_componentes PUNTO_Y_COMA componente	{
-									$$ = createTensorIniInfo($1.dim, getNewType($1.type, $3.type), joinElementsVectors($1.elements, $3.elements, $1.num_elem, $3.num_elem), $1.num_elem + $3.num_elem);
+									$$ = createTensorIniInfo($1.dim, getNewType($1.type, $3.type), joinElementsVectors($1.elemList.elements, $3.elemList.elements, $1.elemList.numElem, $3.elemList.numElem), $1.elemList.numElem + $3.elemList.numElem);
 									if (ampliar_vector_dims[$1.dim])
 									{
 										vector_dims_tensor[$1.dim] += 1;
@@ -390,7 +393,7 @@ componente : tensor	{
 			}
 
 lista_valores : lista_valores COMA lista_sumas	{
-							$$ = createTensorIniInfo(0, getNewType($1.type, $3.type), joinElementsVectors($1.elements, &$3, $1.num_elem, 1), $1.num_elem + 1);
+							$$ = createTensorIniInfo(0, getNewType($1.type, $3.type), joinElementsVectors($1.elemList.elements, &$3, $1.elemList.numElem, 1), $1.elemList.numElem + 1);
 							if (ampliar_vector_dims[0])
 							{
 								vector_dims_tensor[0] += 1;
@@ -416,19 +419,20 @@ cabecera_funcion : cabecera_accion DOBLE_DOS_PUNTOS TIPO	{
 cabecera_accion : START ID_PROC PARENTESIS_ABIERTO lista_params PARENTESIS_CERRADO	{
 												emet(INSTR_START, 1, $2);
 												$4.funcName = strdup($2);
+												$4.returnType = NULL;
 												$$ = $4;
 											}
 
 lista_params : lista_params COMA param	{
 						$$ = $1;
-						$$.paramsInfo.params = addValueInfoBase($1.paramsInfo.params, $1.paramsInfo.numParams, $3);
-						$$.paramsInfo.numParams++;
+						$$.elemList.elements = addValueInfoBase($1.elemList.elements, $1.elemList.numElem, $3);
+						$$.elemList.numElem++;
 
 					}
 		| param	{
-				$$.paramsInfo.numParams=0;
-				$$.paramsInfo.params = addValueInfoBase($$.paramsInfo.params, $$.paramsInfo.numParams, $1);
-				$$.paramsInfo.numParams++;
+				$$.elemList.numElem=0;
+				$$.elemList.elements = addValueInfoBase($$.elemList.elements, $$.elemList.numElem, $1);
+				$$.elemList.numElem++;
 			}
 
 param : ID DOBLE_DOS_PUNTOS TIPO	{
@@ -452,13 +456,13 @@ param : ID DOBLE_DOS_PUNTOS TIPO	{
 									}
 
 funcion : ID_FUNC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
-										if ($1.length == $3.numParams)
+										if ($1.length == $3.numElem)
 										{
 											sym_value_type entry = getEntry($1.lexema);
-											checkTypesInFuction(((value_info*) entry.elements), $3.params, $3.numParams);
-    											emetParams($3.params,$3.numParams);
+											checkTypesInFuction(((value_info*) entry.elements), $3.elements, $3.numElem);
+    											emetParams($3.elements,$3.numElem);
 											char *nameTmp = generateTmpId();
-											emet(INSTR_CALL, 3, $1.lexema, $3.numParams, nameTmp);
+											emet(INSTR_CALL, 3, $1.lexema, $3.numElem, nameTmp);
 											$$ = createValueInfo(nameTmp, entry.type, VAR_T);
 										}
 										else
@@ -468,12 +472,12 @@ funcion : ID_FUNC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
 									}
 
 accion : ID_ACC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
-										if ($1.length == $3.numParams)
+										if ($1.length == $3.numElem)
 										{
 											sym_value_type entry = getEntry($1.lexema);
-                                                                                        checkTypesInFuction(((value_info*) entry.elements), $3.params, $3.numParams);
-											emetParams($3.params, $3.numParams);
-											emet(INSTR_CALL, 2, $1.lexema, $3.numParams);
+                                                                                        checkTypesInFuction(((value_info*) entry.elements), $3.elements, $3.numElem);
+											emetParams($3.elements, $3.numElem);
+											emet(INSTR_CALL, 2, $1.lexema, $3.numElem);
 										}
 										else
 										{
@@ -483,13 +487,13 @@ accion : ID_ACC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
 
 lista_args : lista_args COMA expresion_aritmetica	{
 								$$ = $1;
-								$$.params = addValueInfoBase($1.params, $1.numParams, $3);
-								$$.numParams++;
+								$$.elements = addValueInfoBase($1.elements, $1.numElem, $3);
+								$$.numElem++;
 							}
 	| expresion_aritmetica	{
-					$$.numParams=0;
-					$$.params = addValueInfoBase($$.params, $$.numParams, $1);
-					$$.numParams++;
+					$$.numElem=0;
+					$$.elements = addValueInfoBase($$.elements, $$.numElem, $1);
+					$$.numElem++;
 				}
 
 

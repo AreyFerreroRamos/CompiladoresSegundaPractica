@@ -95,6 +95,12 @@ typedef struct
 	char *lexema;               // Nombre de la variable tensor.
 } tensor_info;
 
+typedef struct
+{
+    value_info *elements;    // Lista de variables o argumentos.
+    int numElem;             // Número de variables o argumentos.
+} elements_list;
+
 /**
  * Esta estructura contiene los campos necesarios para gestionar un tensor elemento a elemento
  * en el punto del programa en el que este es definido.
@@ -103,24 +109,17 @@ typedef struct
 {
 	int dim;                    // Dimension concreta que se esta evaluando actualmente.
 	char *type;                 // Tipo concreto que se esta evaluando actualmente.
-    value_info *elements;  // Valores dentro del componente.
-	int num_elem;               // Número de elementos del tensor.
+    elements_list elemList;
 } tensor_ini_info;
-
-typedef struct
-{
-    value_info *params;    // Lista de parámetros de la función.
-    int numParams;              // Número de parámetros.
-} func_param_info_base;
 
 /**
  * Esta estructura contiene los campos necesarios para gestionar las funciones y sus cabeceras.
  */
 typedef struct
 {
-    func_param_info_base paramsInfo;
     char *funcName;                 // Nombre de la función.
     char *returnType;               // Parametro de retorno (puede ser nulo).
+    elements_list elemList;
 } func_param_info;
 
 #endif

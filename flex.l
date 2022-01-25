@@ -258,7 +258,6 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
                 else
                 {
                     debug("ID ARIT: %s\n", yytext, 0);
-                    sym_value_type entry = getEntry(yytext);
                     if (isSameType(entry.type, INT32_T) || isSameType(entry.type, FLOAT64_T))
                     {
                         yylval.valueInfo = createValueInfo(yytext, entry.type, entry.entryType);

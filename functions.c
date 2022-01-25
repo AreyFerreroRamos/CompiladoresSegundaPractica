@@ -140,9 +140,9 @@ void controlTensorIndex(value_info *v,char* tensorType)
 
 void emetTensor(char *lexema, tensor_ini_info tensor,char *tensorType)
 {
-    for (int i = 0; i < tensor.num_elem; i++)
+    for (int i = 0; i < tensor.elemList.numElem; i++)
     {
-        emet(INSTR_COPY_TO_TENSOR,3, lexema, tensor.elements[i].value,itos(i* calculateSizeType(tensorType)));
+        emet(INSTR_COPY_TO_TENSOR,3, lexema, tensor.elemList.elements[i].value,itos(i* calculateSizeType(tensorType)));
     }
 }
 

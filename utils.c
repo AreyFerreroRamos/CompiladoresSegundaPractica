@@ -85,13 +85,13 @@ tensor_info createTensorInfo(int index_dim, value_info calcIndex, char *lexema)
     return aux;
 }
 
-tensor_ini_info createTensorIniInfo(int dim, char *type, value_info *elements, int num_elem)
+tensor_ini_info createTensorIniInfo(int dim, char *type, value_info *elements, int numElem)
 {
     tensor_ini_info aux;
     aux.dim = dim;
     aux.type = strdup(type);
-    aux.elements = elements;
-    aux.num_elem = num_elem;
+    aux.elemList.elements = elements;
+    aux.elemList.numElem = numElem;
     return aux;
 }
 
@@ -166,7 +166,7 @@ void debug(char *text, char *var, int typeFile)
     // flex
     if (typeFile == 0)
     {
-        // printf(text, var);
+         printf(text, var);
     }
     // bison
     else
