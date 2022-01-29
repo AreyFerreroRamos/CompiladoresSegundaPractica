@@ -55,7 +55,7 @@
 %token <no_definit> ASSIGN START VALUE_RETURN DIRECT_RETURN END DOBLE_DOS_PUNTOS LLAVE_ABIERTA LLAVE_CERRADA
 %token <enter> INTEGER
 %token <real> FLOAT
-%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO DIV COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TIPO ID_PROC
+%token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TIPO ID_PROC
 %token <ident> ID ID_FUNC ID_ACC
 %token <valueInfo> ID_ARIT
 
@@ -102,10 +102,11 @@ lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 
 sentencia : asignacion
 	| expresion_aritmetica	{
-					emet(INSTR_PUT, 1, $1.value);
+					emet(INSTR_PUT, 2, $1.value,$1.type);
 				}
 	| ID	{
-			emet(INSTR_PUT, 1, $1.lexema);
+			sym_value_type entry = getEntry($1.lexema);
+			emet(INSTR_PUT, 2, $1.lexema,entry.type);
 		}
 	| VALUE_RETURN expresion_aritmetica	{
 							emet(INSTR_RETURN, 1, $2.value);
@@ -281,20 +282,6 @@ terminal_aritmetico : INTEGER	{
 									{
 										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $2.type));
 									}
-								}
-	| DIV lista_sumas COMA lista_sumas PARENTESIS_CERRADO	{
-								/*	if ((isNumberType($2.type)) && (isNumberType($4.type)))
-									{
-										$$.value = (char *) malloc(sizeof(char) * FLOAT_MAX_LENGTH_STR);
-										if (!doAritmeticOperation($2, "/", $4, &$$))
-										{
-											yyerror("Ha habido algun problema realizando la operación");
-										}
-									}
-									else
-									{
-										yyerror(generateString,"No se pueden realizar operaciones aritméticas con el tipo %s",1, $2.type);
-									}*/
 								}
 	| funcion	{
 				$$ = $1;

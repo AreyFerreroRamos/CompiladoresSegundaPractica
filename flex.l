@@ -134,11 +134,6 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 		return COMA;
 	}
 
-"div("  {
-            simpleDebug("DIV ",0);
-            return DIV;
-        }
-
 "=" {
 		simpleDebug("ASSIGN ",0);
 		assignFounded = true;
