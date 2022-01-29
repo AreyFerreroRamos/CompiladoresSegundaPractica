@@ -34,8 +34,8 @@ void printCode3Adresses()
     printf("---------------------------------\n");
     for (int i = 0; i < lengthCode; i++)
     {
-        printf("%s\n", c3a[i]);
-        fprintf(yyout, "%s\n", c3a[i]);
+        printf("%i\t%s\n",i, c3a[i]);
+        fprintf(yyout, "%i\\t%s\\n",i, c3a[i]);
     }
     printf("---------------------------------\n");
 }

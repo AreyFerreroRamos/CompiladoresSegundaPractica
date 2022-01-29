@@ -187,10 +187,6 @@ lista_indices : lista_indices COMA lista_sumas	{
 		     					}
 
 expresion_aritmetica : lista_sumas
-{
-
-				printf("2VALOR: %s TIPO1: %s TIPO2: %s\n",$1.value,$1.type,$1.valueInfoType);
-}
 
 lista_sumas : lista_sumas OP_ARIT_P2 lista_productos	{
 								if (isNumberType($3.type))
