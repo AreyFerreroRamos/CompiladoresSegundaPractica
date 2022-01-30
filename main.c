@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					printf("ERROR");
+					printf("ERROR.");
 				}
 				error = end_analisi_sintactic();
 				if (error == EXIT_FAILURE)
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		printf("\nUsage: %s INPUT_FILE OUTPUT_FILE.\n", argv[0]);
+		printf("Usage: %s INPUT_FILE OUTPUT_FILE.\n", argv[0]);
 	}
 	return EXIT_SUCCESS;
 }

@@ -37,7 +37,7 @@
 #define OP_BOOL_AND "&&"
 #define OP_BOOL_OR "||"
 
-// TIPOS DE INSTRUCCIÓN.
+/* TIPOS DE INSTRUCCIÓN */
 
 #define INSTR_START "START"
 #define INSTR_END "END"
@@ -52,11 +52,11 @@
 #define INSTR_MODI "MODI"
 #define INSTR_I2D "I2D"
 #define INSTR_D2I "D2I"
-#define INSTR_COPY "COPY"       // Se asigna el contenido de una variable a otra variable.
-#define INSTR_COPY_TO_TENSOR "COPY2TENSOR"              // t[] = var
-#define INSTR_COPY_FROM_TENSOR "COPYFROMTENSOR"         // var = t[]
-#define INSTR_CONSULT "CONSULT" // Se asigna el contenido de una posición de un tensor a una variable.
-#define INSTR_ASSIGN "ASSIGN"   // Se asigna el contenido de una variable en una posición del tensor.
+#define INSTR_COPY "COPY"                       // Se asigna el contenido de una variable a otra variable.
+#define INSTR_COPY_TO_TENSOR "COPY2TENSOR"      // Instrucción t[] = var.
+#define INSTR_COPY_FROM_TENSOR "COPYFROMTENSOR" // Instrucción var = t[].
+#define INSTR_CONSULT "CONSULT"                 // Se asigna el contenido de una posición de un tensor a una variable.
+#define INSTR_ASSIGN "ASSIGN"                   // Se asigna el contenido de una variable en una posición del tensor.
 #define INSTR_PARAM "PARAM"
 #define INSTR_CALL "CALL"
 #define INSTR_PUT "PUT"
@@ -64,19 +64,19 @@
 #define INSTR_RETURN "RETURN"
 
 /**
- * Esta estructura contiene los campos necesarios para gestionar un ID
+ * Esta estructura contiene los campos necesarios para gestionar un ID.
  */
 typedef struct
 {
-    char *lexema;
-    int length;
-    int line;
-} ident;
+    char *lexema;   // Nombre del identificador.
+    int length;     // Tamaño en bytes del identificador.
+    int line;       // Línea en la que se encuentra el identificador.
+} ident_info;
 
- /**
-  * Esta estructura contiene los campos necesarios para gestionar un elemento (literal, variable, tensor o función)
-  * en cualquier punto del programa en el que sea usado, salvo cuando se utiliza como índice para acceder a un tensor.
-  */
+/**
+ * Esta estructura contiene los campos necesarios para gestionar un elemento (literal, variable, tensor o función)
+ * en cualquier punto del programa en el que sea usado, salvo cuando se utiliza como índice para acceder a un tensor.
+ */
 typedef struct
 {
 	char *type;                 // Tipo del elemenento.
@@ -95,6 +95,10 @@ typedef struct
 	char *lexema;               // Nombre de la variable tensor.
 } tensor_info;
 
+/**
+ * Esta estructura contiene los campos necesarios para gestionar una lista de elementos
+ * de tipo value_info.
+ */
 typedef struct
 {
     value_info *elements;    // Lista de variables o argumentos.
@@ -109,7 +113,7 @@ typedef struct
 {
 	int dim;                    // Dimension concreta que se esta evaluando actualmente.
 	char *type;                 // Tipo concreto que se esta evaluando actualmente.
-    elements_list elemList;
+    elements_list elemList;     // Lista con los elementos del tensor.
 } tensor_ini_info;
 
 /**
@@ -117,9 +121,9 @@ typedef struct
  */
 typedef struct
 {
-    char *funcName;                 // Nombre de la función.
-    char *returnType;               // Parametro de retorno (puede ser nulo).
-    elements_list elemList;
+    char *funcName;         // Nombre de la función.
+    char *returnType;       // Parametro de retorno (puede ser nulo).
+    elements_list elemList; // Lista con los parámetros de la función.
 } func_param_info;
 
 #endif

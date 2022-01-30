@@ -14,12 +14,12 @@
   extern int yylex();
   extern void yyerror(char *);
 
-  	// Variables necesarias para la inicialización de un tensor.
+  	/* Variables necesarias para la inicialización de un tensor. */
   int *vector_dims_tensor;	// Vector con el número de elementos de cada dimensión del tensor.
   int num_dims_tensor = 0;	// Número de dimensiones del tensor.
   bool *ampliar_vector_dims; 	// Vector de booleanos para limitar la ampliación de memoria del vector de dimensiones a una sola ampliación por dimensión.
 
-	//Variables para controlar el flujo de variables temporales en la symtab.
+	/* Variables para controlar el flujo de variables temporales en la symtab. */
   char **list_tmp_variables_symtab;
   int num_tmp_variable = 1;
   int sq = 0;
@@ -30,19 +30,18 @@
 
 %code requires
 {
+  #include "tipus.h"
   #include "utils.h"
   #include "functions.h"
-  #include "tipus.h"
 }
 
 %union
 {
-
 	int enter;
 	float real;
 	char *cadena;
 	bool boolea;
-	ident ident;
+	ident_info identInfo;
 	value_info valueInfo;
 	tensor_info tensorInfo;
 	tensor_ini_info tensorIniInfo;
@@ -56,7 +55,7 @@
 %token <enter> INTEGER
 %token <real> FLOAT
 %token <cadena> OP_ARIT_P1 OP_ARIT_P2 ASTERISCO OP_ARIT_P3 PARENTESIS_ABIERTO PARENTESIS_CERRADO COMA CORCHETE_ABIERTO CORCHETE_CERRADO PUNTO_Y_COMA TIPO ID_PROC
-%token <ident> ID ID_FUNC ID_ACC
+%token <identInfo> ID ID_FUNC ID_ACC
 %token <valueInfo> ID_ARIT
 
 %type <tensorInfo> id lista_indices lista_indices_arit
@@ -93,20 +92,20 @@ procedimiento : cabecera_procedimiento lista_de_sentencias END	{
 
 cabecera_procedimiento : cabecera_funcion | cabecera_accion
 
-main : lista_de_sentencias{
-    writeLine(sq, "HALT");
-    writeLine(sq, "END");
-}
+main : lista_de_sentencias	{
+				    writeLine(sq, "HALT");
+				    writeLine(sq, "END");
+				}
 
 lista_de_sentencias : lista_de_sentencias sentencia | sentencia
 
 sentencia : asignacion
 	| expresion_aritmetica	{
-					emet(INSTR_PUT, 2, $1.value,$1.type);
+					emet(INSTR_PUT, 2, $1.value, $1.type);
 				}
 	| ID	{
 			sym_value_type entry = getEntry($1.lexema);
-			emet(INSTR_PUT, 2, $1.lexema,entry.type);
+			emet(INSTR_PUT, 2, $1.lexema, entry.type);
 		}
 	| VALUE_RETURN expresion_aritmetica	{
 							emet(INSTR_RETURN, 1, $2.value);
@@ -120,21 +119,21 @@ asignacion : ID ASSIGN expresion_aritmetica	{
 							sym_value_type entry;
 							entry = createSymValueType($3.type, calculateSizeType($3.type), 0, NULL, NULL, VAR_T);
 							addOrUpdateEntry($1.lexema, entry);
-							emet(INSTR_COPY, 2,$1.lexema, $3.value);
+							emet(INSTR_COPY, 2, $1.lexema, $3.value);
 						}
 	| id ASSIGN expresion_aritmetica	{
 							sym_value_type entry = getEntry($1.lexema);
 							entry.type = $3.type;
 							entry.size = getAcumElemDim(entry.elem_dims, entry.num_dim) * calculateSizeType($3.type);
 							addOrUpdateEntry($1.lexema, entry);
-							controlTensorIndex(&($1.calcIndex),entry.type);
-							emet(INSTR_COPY_TO_TENSOR, 3, $1.lexema, $3.value,$1.calcIndex.value);
+							controlTensorIndex(&($1.calcIndex), entry.type);
+							emet(INSTR_COPY_TO_TENSOR, 3, $1.lexema, $3.value, $1.calcIndex.value);
 						}
 	| ID ASSIGN tensor	{
 					invertVector(vector_dims_tensor, $3.dim);
 					sym_value_type entry = createSymValueType($3.type, calculateSizeType($3.type) * $3.elemList.numElem, $3.dim, vector_dims_tensor, $3.elemList.elements, TENS_T);
 					addOrUpdateEntry($1.lexema, entry);
-					emetTensor($1.lexema, $3,$3.type);
+					emetTensor($1.lexema, $3, $3.type);
 					vector_dims_tensor = NULL;
 					ampliar_vector_dims = NULL;
 					num_dims_tensor = 0;
@@ -162,7 +161,7 @@ lista_indices : lista_indices COMA lista_sumas	{
 							}
 							else
 							{
-								yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32.", 2, $3.value, $3.type));
+								yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32", 2, $3.value, $3.type));
 							}
 						}
 		| ID CORCHETE_ABIERTO lista_sumas	{
@@ -199,18 +198,17 @@ lista_sumas : lista_sumas OP_ARIT_P2 lista_productos	{
 									}
 									else
 									{
-
 										char *newType = getNewType($1.type, $3.type);
-										checkIfIsNeededCast(newType,&$1);
-										checkIfIsNeededCast(newType,&$3);
-											// CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
-										$$ = createValueInfo(generateTmpId(),newType, VAR_T);
+										checkIfIsNeededCast(newType, &$1);
+										checkIfIsNeededCast(newType, &$3);
+											/* ¿CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS) */
+										$$ = createValueInfo(generateTmpId(), newType, VAR_T);
 										classifyOperation($2, $$, $1, $3);
 									}
 								}
 								else
 								{
-									yyerror(generateString("4.No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $3.type));
+									yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $3.type));
 								}
 							}	
 		| lista_productos	{
@@ -220,7 +218,7 @@ lista_sumas : lista_sumas OP_ARIT_P2 lista_productos	{
 						}
 						else
 						{
-							yyerror(generateString("3.No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $1.type));
+							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $1.type));
 						}
 					}
 
@@ -235,16 +233,16 @@ lista_productos : lista_productos op_arit_p1 terminal_aritmetico	{
 											else
 											{
 												char *newType = getNewType($1.type, $3.type);
-												checkIfIsNeededCast(newType,&$1);
-                                                                                        	checkIfIsNeededCast(newType,&$3);
-													//CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS)
+												checkIfIsNeededCast(newType, &$1);
+                                                                                        	checkIfIsNeededCast(newType, &$3);
+													/* ¿CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS) */
 												$$ = createValueInfo(generateTmpId(), getNewType($1.type, $3.type), VAR_T);
 												classifyOperation($2, $$, $1, $3);
 											}
 										}
 										else
 										{
-											yyerror(generateString("2.No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $3.type));
+											yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $3.type));
 										}
 									}
 		| terminal_aritmetico	{
@@ -254,7 +252,7 @@ lista_productos : lista_productos op_arit_p1 terminal_aritmetico	{
 						}
 						else
 						{
-							yyerror(generateString("1.No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $1.type));
+							yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $1.type));
 						}
 					}
 
@@ -271,7 +269,8 @@ terminal_aritmetico : INTEGER	{
 	| FLOAT		{
 				$$ = createValueInfo(ftos($1), FLOAT64_T, LIT_T);
 			}
-	| id_arit 	{
+	| id_arit	{
+				$$ = $1;
 			}
 	| PARENTESIS_ABIERTO lista_sumas PARENTESIS_CERRADO	{
 									if (isNumberType($2.type))
@@ -280,7 +279,7 @@ terminal_aritmetico : INTEGER	{
 									}
 									else
 									{
-										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s.", 1, $2.type));
+										yyerror(generateString("No se pueden realizar operaciones aritméticas con el tipo %s", 1, $2.type));
 									}
 								}
 	| funcion	{
@@ -291,11 +290,11 @@ id_arit : ID_ARIT	{
 				$$ = $1;
 			}
 	| lista_indices_arit CORCHETE_CERRADO	{
-								sym_value_type entry = getEntry($1.lexema);
-								controlTensorIndex(&($1.calcIndex),entry.type);
-								char *nameTmp = generateTmpId();
-								emet(INSTR_COPY_FROM_TENSOR, 3, nameTmp, $1.lexema,$1.calcIndex.value);
-								$$ = createValueInfo(nameTmp, entry.type, TENS_T);
+							sym_value_type entry = getEntry($1.lexema);
+							controlTensorIndex(&($1.calcIndex), entry.type);
+							char *nameTmp = generateTmpId();
+							emet(INSTR_COPY_FROM_TENSOR, 3, nameTmp, $1.lexema, $1.calcIndex.value);
+							$$ = createValueInfo(nameTmp, entry.type, TENS_T);
 						}
 
 lista_indices_arit : lista_indices_arit COMA lista_sumas	{
@@ -316,7 +315,7 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 									}
 									else
 									{
-										yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32.", 2, $3.value, $3.type));
+										yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32", 2, $3.value, $3.type));
 									}
 								}
 		| ID_ARIT CORCHETE_ABIERTO lista_sumas	{
@@ -337,7 +336,7 @@ lista_indices_arit : lista_indices_arit COMA lista_sumas	{
 								}
 								else
 								{
-									yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32.", 2, $3.value, $3.type));
+									yyerror(generateString("El indice -> %s es de tipo %s. El tipo debería ser INT32", 2, $3.value, $3.type));
 								}
 							}
 
@@ -413,7 +412,7 @@ lista_params : lista_params COMA param	{
 
 					}
 		| param	{
-				$$.elemList.numElem=0;
+				$$.elemList.numElem = 0;
 				$$.elemList.elements = addValueInfoBase($$.elemList.elements, $$.elemList.numElem, $1);
 				$$.elemList.numElem++;
 			}
@@ -434,7 +433,7 @@ param : ID DOBLE_DOS_PUNTOS TIPO	{
 										}
 										else
 										{
-											yyerror("El tipo debería ser Tensor.");
+											yyerror("El tipo debería ser Tensor");
 										}
 									}
 
@@ -442,15 +441,15 @@ funcion : ID_FUNC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
 										if ($1.length == $3.numElem)
 										{
 											sym_value_type entry = getEntry($1.lexema);
-											checkTypesInFuction(((value_info*) entry.elements), $3.elements, $3.numElem);
-    											emetParams($3.elements,$3.numElem);
+											checkTypesInFuction(((value_info *) entry.elements), $3.elements, $3.numElem);
+    											emetParams($3.elements, $3.numElem);
 											char *nameTmp = generateTmpId();
 											emet(INSTR_CALL, 3, $1.lexema, $3.numElem, nameTmp);
 											$$ = createValueInfo(nameTmp, entry.type, VAR_T);
 										}
 										else
 										{
-											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto. Se han de pasar %i parámetros.", 1, $1.length));
+											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto, se han de pasar %i parámetros", 1, $1.length));
 										}
 									}
 
@@ -458,13 +457,13 @@ accion : ID_ACC PARENTESIS_ABIERTO lista_args PARENTESIS_CERRADO	{
 										if ($1.length == $3.numElem)
 										{
 											sym_value_type entry = getEntry($1.lexema);
-                                                                                        checkTypesInFuction(((value_info*) entry.elements), $3.elements, $3.numElem);
+                                                                                        checkTypesInFuction(((value_info *) entry.elements), $3.elements, $3.numElem);
 											emetParams($3.elements, $3.numElem);
 											emet(INSTR_CALL, 2, $1.lexema, $3.numElem);
 										}
 										else
 										{
-											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto. Se han de pasar %i parámetros.", 1, $1.length));
+											yyerror(generateString("El número de parámetros que se le ha pasado a la función no es correcto, se han de pasar %i parámetros", 1, $1.length));
 										}
 									}
 
@@ -474,7 +473,7 @@ lista_args : lista_args COMA expresion_aritmetica	{
 								$$.numElem++;
 							}
 	| expresion_aritmetica	{
-					$$.numElem=0;
+					$$.numElem = 0;
 					$$.elements = addValueInfoBase($$.elements, $$.numElem, $1);
 					$$.numElem++;
 				}

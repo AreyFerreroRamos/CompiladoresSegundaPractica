@@ -10,7 +10,7 @@
 /****************************************************************************/
 
 /* The type of the value field of symbol table entries                      */
-/*typedef void * sym_value_type;*/ /* you will need to replace this  */
+/*typedef void * sym_value_type;*/ /* you will need to replace this    */
 								   /* with a declaration appropriate   */
 								   /* for your application.            */
 								   /* Ho subtituim per un unio o struct*/
@@ -132,7 +132,7 @@ typedef const char *sym_name_type; /* If you are using something other */
 /* function.  Commenting out SYM_SCOPE_STACK_DEPTH has the same effect.     */
 /* #define SYM_REQUIRE_SET_SCOPE                                            */
 
-/* Uncomment out the following define if you want to use sym_global_add(),    */
+/* Uncomment out the following define if you want to use sym_global_add(),  */
 /* sym_global_enter(), sym_global_lookup() or sym_global_remove() functions */
 /* If SYM_DEEP_BINDING is not defined, then these functions will be         */
 /* not be available even if SYM_REQUIRE_GLOBAL is defined.                  */

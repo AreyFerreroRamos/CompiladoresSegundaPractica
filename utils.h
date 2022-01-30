@@ -86,19 +86,19 @@ void simpleDebug(char *text, int typeFile);
  * La función busca en la symtab la variable y la devuelve. Si se produce algún error
  * se lanzará un yyerror().
  */
-sym_value_type getEntry(char* key);
+sym_value_type getEntry(char *key);
 
 /**
  * La función busca en la symtab la variable y la devuelve junto con el resultado
  * de la busqueda. El tratamiento del error se realizará externamente.
  */
-int getEntryMessage(char* key, sym_value_type *entry);
+int getEntryMessage(char *key, sym_value_type *entry);
 
 /**
  * La función añade o actualiza (si ya existía) una entrada en la symtab. Si se produce algún error
  * se lanzará un yyerror().
  */
-void addOrUpdateEntry(char* key, sym_value_type entry);
+void addOrUpdateEntry(char *key, sym_value_type entry);
 
 /**
  * La función hace push de la symtab para añadir un nuevo ámbito imbricado. Si se produce algún error

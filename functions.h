@@ -30,7 +30,7 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
  *  Dado un tipo de instrucción el numero de argumentos y los datos necesarios para cada instruccion
  *  añade la instrucción al c3a. Los datos según la instrucción son los siguientes.
  *  INSTR_COPY -> (value_info variable,value_info valor).
- *  INSTR_COPY_FROM/TO_TENSOR -> (char *v1, char *v2, char *indice) v1 = v2[indice] / v1[indice] = v2
+ *  INSTR_COPY_FROM/TO_TENSOR -> (char *v1, char *v2, char *indice) v1 = v2[indice] / v1[indice] = v2.
  *  INSTR_(Operaciones) -> (value_info variable,value_info op1,value_info op2).
  *  INSTR_START -> (char* nombreFuncion).
  *  INSTR_END -> (int esAccion? (1 si es accion, 0 si es función).
@@ -41,18 +41,18 @@ void emet(char *type, int nArgs, ...);
 /**
  *
  */
-void controlTensorIndex(value_info *v,char* tensorType);
+void controlTensorIndex(value_info *v, char *tensorType);
 
 /**
  * Dada una variable de tipo tensor y la estructura necesaria para gestionarlo durante su definición,
  * se generará el c3a necesario para imprimir, línea a línea, la inicialización de cada posición del vector,
  * Para lograrlo, se llama a la función anterior para cada posición del tensor.
  */
-void emetTensor(char *lexema, tensor_ini_info tensor,char *tensorType);
+void emetTensor(char *lexema, tensor_ini_info tensor, char *tensorType);
 
 /**
  * Dada la lista de parametros y el tamaño de la lista hace un emet
- * de cada uno de ellos para que imprima "PARAM <ID>"
+ * de cada uno de ellos para que imprima "PARAM <ID>".
  */
 void emetParams(value_info *listParams, int numParams);
 
@@ -80,7 +80,7 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 /**
  * Dados dos arrays de value_info devuelve un nuevo array con la unión de los dos anteriores.
  */
-value_info *joinElementsVectors(value_info * vec1, value_info * vec2, int numElemVec1, int numElemVec2);
+value_info *joinElementsVectors(value_info *vec1, value_info *vec2, int numElemVec1, int numElemVec2);
 
 /**
  * Dado un vector, se invierte el orden de los elementos que lo componen.
@@ -121,7 +121,11 @@ char *calculateNewIndex(int dim, value_info calcIndex, value_info index);
  * función y acaba el programa si hay algún error. En caso de introducir un INT
  * en un FLOAT se encarga de hacer la instrucción I2D.
  */
-void checkTypesInFuction(value_info *expectedParams,value_info *listParams, int numParams);
+void checkTypesInFuction(value_info *expectedParams, value_info *listParams, int numParams);
 
+/**
+ *
+ */
 void checkIfIsNeededCast(char *expectedType, value_info *arrivedValue);
+
 #endif

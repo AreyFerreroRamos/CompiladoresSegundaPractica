@@ -10,7 +10,7 @@ extern FILE *yyout;
 extern int lengthCode;
 extern char **c3a;
 
-//-------------------------EMET FUNCTIONS----------------------------
+/*-------------------------EMET FUNCTIONS----------------------------*/
 
 char *emetReturn(char *var)
 {
@@ -26,38 +26,37 @@ char *emetReturn(char *var)
     return instr;
 }
 
-
-//-------------------------------------------------------------------
+/*-------------------------------------------------------------------*/
 
 void printCode3Adresses()
 {
     printf("---------------------------------\n");
     for (int i = 0; i < lengthCode; i++)
     {
-        printf("%i\t%s\n",i, c3a[i]);
-        fprintf(yyout, "%i\\t%s\\n",i, c3a[i]);
+        printf("%i\t%s\n", i, c3a[i]);
+        fprintf(yyout, "%i\\t%s\\n", i, c3a[i]);
     }
     printf("---------------------------------\n");
 }
 
 void intOperations(int num1, int num2, char *operand, int *res)
 {
-    if (strcmp(operand, OP_ARIT_SUMA) == 0)
+    if (isSameType(operand, OP_ARIT_SUMA))
     {
         simpleDebug("Estoy en suma.\n", 1);
         *res = num1 + num2;
     }
-    else if (strcmp(operand, OP_ARIT_RESTA) == 0)
+    else if (isSameType(operand, OP_ARIT_RESTA))
     {
         simpleDebug("Estoy en resta.\n", 1);
         *res = num1 - num2;
     }
-    else if (strcmp(operand, OP_ARIT_MULT) == 0)
+    else if (isSameType(operand, OP_ARIT_MULT))
     {
         simpleDebug("Estoy en producto.\n", 1);
         *res = num1 * num2;
     }
-    else if (strcmp(operand, OP_ARIT_DIV) == 0)
+    else if (isSameType(operand, OP_ARIT_DIV))
     {
         simpleDebug("Estoy en division.\n", 1);
         if (num2 != 0)
@@ -66,10 +65,10 @@ void intOperations(int num1, int num2, char *operand, int *res)
         }
         else
         {
-            yyerror("No esta permitido dividir por 0.");
+            yyerror("No esta permitido dividir por 0");
         }
     }
-    else if (strcmp(operand, OP_ARIT_MOD) == 0)
+    else if (isSameType(operand, OP_ARIT_MOD))
     {
         simpleDebug("Estoy en modulo.\n", 1);
         if (num2 != 0)
@@ -78,10 +77,10 @@ void intOperations(int num1, int num2, char *operand, int *res)
         }
         else
         {
-            yyerror("No esta permitido dividir por 0.");
+            yyerror("No esta permitido dividir por 0");
         }
     }
-    else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
+    else if (isSameType(operand, OP_ARIT_POTENCIA))
     {
         simpleDebug("Estoy en la potencia.\n", 1);
         *res = (int) pow((double) num1, (double) num2);
@@ -90,19 +89,19 @@ void intOperations(int num1, int num2, char *operand, int *res)
 
 void floatOperations(float num1, float num2, char *operand, float *res)
 {
-    if (strcmp(operand, OP_ARIT_SUMA) == 0)
+    if (isSameType(operand, OP_ARIT_SUMA))
     {
         *res = num1 + num2;
     }
-    else if (strcmp(operand, OP_ARIT_RESTA) == 0)
+    else if (isSameType(operand, OP_ARIT_RESTA))
     {
         *res = num1 - num2;
     }
-    else if (strcmp(operand, OP_ARIT_MULT) == 0)
+    else if (isSameType(operand, OP_ARIT_MULT))
     {
         *res = num1 * num2;
     }
-    else if (strcmp(operand, OP_ARIT_DIV) == 0)
+    else if (isSameType(operand, OP_ARIT_DIV))
     {
         if (num2 != 0)
         {
@@ -110,16 +109,16 @@ void floatOperations(float num1, float num2, char *operand, float *res)
         }
         else
         {
-            yyerror("No esta permitido dividir por 0.");
+            yyerror("No esta permitido dividir por 0");
         }
     }
-    else if (strcmp(operand, OP_ARIT_POTENCIA) == 0)
+    else if (isSameType(operand, OP_ARIT_POTENCIA))
     {
         *res = (float) pow((double) num1, (double) num2);
     }
 }
 
-// FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR
+/* FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR */
 
 int init_analisi_lexic(char *file_name)
 {

@@ -3,12 +3,13 @@
 #define SUPPORT_H
 
 #include <math.h>
+
 #include "tipus.h"
 #include "utils.h"
 
 /* FUNCIONES QUE SOLAMENTE SON LLAMADAS DESDE EL FICHERO FUNCTIONS.C O DESDE EL MAIN */
 
-//-------------------------EMET FUNCTIONS----------------------------
+/*-------------------------EMET FUNCTIONS----------------------------*/
 
 /**
  * Dado el valor a devolver en un RETURN  devuelve la instrucción "RETURN [valor]".
@@ -16,7 +17,7 @@
  */
 char *emetReturn(char *var);
 
-//-------------------------------------------------------------------
+/*-------------------------------------------------------------------*/
 
 /**
  * Escribe el c3a por consola y en el fichero de salida.
@@ -37,7 +38,7 @@ void intOperations(int num1, int num2, char *op, int *res);
  */
 void floatOperations(float num1, float num2, char *op, float *res);
 
-// FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR
+/* FUNCIONES BASE PARA EJECUCIÓN DEL COMPILADOR */
 
 int init_analisi_lexic(char *);
 int init_analisi_sintactic(char *);

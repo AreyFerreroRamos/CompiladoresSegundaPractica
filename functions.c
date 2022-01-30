@@ -7,7 +7,7 @@
 
 extern int num_tmp_variable;
 extern int sq;          // Siguiente linia que toca escribir.
-extern int lengthCode;  // Nombre de linias de c3a.
+extern int lengthCode;  // Número de líneas de c3a.
 extern char **c3a;      // Conjunto de lineas que formarán el c3a.
 
 char *generateTmpId()
@@ -21,7 +21,7 @@ char *generateTmpId()
 
 void restartNumberTmpId()
 {
-    num_tmp_variable=1;
+    num_tmp_variable = 1;
 }
 
 void emet(char *type, int nArgs, ...)
@@ -32,24 +32,24 @@ void emet(char *type, int nArgs, ...)
     char *instruction;
     if (isSameType(type, INSTR_COPY))
     {
-        char *var1,*var2;
-        var1 = strdup(va_arg(ap, char*));
-        var2 = strdup(va_arg(ap, char*));
-        instruction = generateString("%s := %s",2,var1,var2);
+        char *var1, *var2;
+        var1 = strdup(va_arg(ap, char *));
+        var2 = strdup(va_arg(ap, char *));
+        instruction = generateString("%s := %s",2, var1, var2);
     }
-    if(isSameType(type,INSTR_COPY_TO_TENSOR) || isSameType(type,INSTR_COPY_FROM_TENSOR))
+    if (isSameType(type,INSTR_COPY_TO_TENSOR) || isSameType(type,INSTR_COPY_FROM_TENSOR))
     {
-        char *var1,*var2,*index;
-        var1 = strdup(va_arg(ap, char*));
-        var2 = strdup(va_arg(ap, char*));
-        index = strdup(va_arg(ap, char*));
-        if(isSameType(type,INSTR_COPY_FROM_TENSOR))
+        char *var1, *var2, *index;
+        var1 = strdup(va_arg(ap, char *));
+        var2 = strdup(va_arg(ap, char *));
+        index = strdup(va_arg(ap, char *));
+        if (isSameType(type,INSTR_COPY_FROM_TENSOR))
         {
-            instruction = generateString("%s := %s[%s]",3,var1,var2,index);
+            instruction = generateString("%s := %s[%s]",3, var1, var2, index);
         }
         else
         {
-            instruction = generateString("%s[%s] := %s",3,var1,index,var2);
+            instruction = generateString("%s[%s] := %s",3, var1, index, var2);
         }
     }
     else if (isSameType(type, INSTR_ADDI) || isSameType(type, INSTR_ADDD)
@@ -58,19 +58,19 @@ void emet(char *type, int nArgs, ...)
              || isSameType(type, INSTR_DIVI) || isSameType(type, INSTR_DIVD)
              || isSameType(type, INSTR_MODI))
     {
-        char *var1,*var2,*var3;
-        var1 = strdup(va_arg(ap, char*));
-        var2 = strdup(va_arg(ap, char*));
-        var3 = strdup(va_arg(ap, char*));
-        instruction = generateString("%s := %s %s %s",4,var1,var2,type,var3);
+        char *var1, *var2, *var3;
+        var1 = strdup(va_arg(ap, char *));
+        var2 = strdup(va_arg(ap, char *));
+        var3 = strdup(va_arg(ap, char *));
+        instruction = generateString("%s := %s %s %s",4, var1, var2, type, var3);
     }
     else if (isSameType(type, INSTR_PUT))
     {
         char *element = strdup(va_arg(ap, char *));
         char *type = strdup(va_arg(ap, char *));
-        emet(INSTR_PARAM,1,element);
+        emet(INSTR_PARAM,1, element);
         char *instr = isSameType(type,INT32_T) ? "PUTI" : "PUTD";
-        emet(INSTR_CALL,2,instr,1);
+        emet(INSTR_CALL,2, instr, 1);
         return;
     }
     else if (isSameType(type,INSTR_START))
@@ -81,7 +81,7 @@ void emet(char *type, int nArgs, ...)
     else if (isSameType(type,INSTR_END))
     {
         int isAction = va_arg(ap, int);
-            //Si no tiene valor de retorno y la última línea no es un RETURN.
+            /* Si no tiene valor de retorno y la última línea no es un RETURN. */
         if (isAction == 1 && ! isSameType(c3a[sq - 1],INSTR_RETURN))
         {
             writeLine(sq,INSTR_RETURN);
@@ -115,13 +115,13 @@ void emet(char *type, int nArgs, ...)
             tmp = strdup(va_arg(ap, char *));
             tmp = generateString("%s := ",1, tmp);
         }
-        instruction = generateString("%sCALL %s,%i",3, tmp, nameFunc, numParams);
+        instruction = generateString("%sCALL %s, %i",3, tmp, nameFunc, numParams);
     }
     else if (isSameType(type,INSTR_I2D))
     {
         char *newVar = strdup(va_arg(ap, char *));
         char *varToCast = strdup(va_arg(ap, char *));
-        instruction = generateString("%s := I2D %s",2,newVar,varToCast);
+        instruction = generateString("%s := I2D %s",2, newVar, varToCast);
     }
     va_end(ap);
     writeLine(sq, instruction);
@@ -129,11 +129,11 @@ void emet(char *type, int nArgs, ...)
 
 void controlTensorIndex(value_info *v,char* tensorType)
 {
-    // MULTIPLICAMOS POR ESPACIO DEL TIPO
+        /* MULTIPLICAMOS POR ESPACIO DEL TIPO */
         if (isSameType(v->valueInfoType,VAR_T))
         {
             char *tmp = generateTmpId();
-            emet(INSTR_MULI, 3,tmp, v->value,itos(calculateSizeType(tensorType)));
+            emet(INSTR_MULI, 3, tmp, v->value, itos(calculateSizeType(tensorType)));
             *v = createValueInfo(tmp,INT32_T,VAR_T);
         }
         else
@@ -142,11 +142,11 @@ void controlTensorIndex(value_info *v,char* tensorType)
         }
 }
 
-void emetTensor(char *lexema, tensor_ini_info tensor,char *tensorType)
+void emetTensor(char *lexema, tensor_ini_info tensor, char *tensorType)
 {
     for (int i = 0; i < tensor.elemList.numElem; i++)
     {
-        emet(INSTR_COPY_TO_TENSOR,3, lexema, tensor.elemList.elements[i].value,itos(i* calculateSizeType(tensorType)));
+        emet(INSTR_COPY_TO_TENSOR,3, lexema, tensor.elemList.elements[i].value, itos(i * calculateSizeType(tensorType)));
     }
 }
 
@@ -181,6 +181,7 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
         }
         else if (isSameType(operation, OP_ARIT_MOD))
         {
+            //TODO: si v3 es LIT_T comprobar que no sea un 0
             emet(INSTR_MODI,3, v1.value, v2.value, v3.value);
         }
     }
@@ -196,11 +197,11 @@ void classifyOperation(char *operation, value_info v1, value_info v2, value_info
         }
         else if (isSameType(operation, OP_ARIT_MULT))
         {
-            //TODO: si v3 es LIT_T comprobar que no sea un 0
             emet(INSTR_MULD,3, v1.value, v2.value, v3.value);
         }
         else if (isSameType(operation, OP_ARIT_DIV))
         {
+            //TODO: si v3 es LIT_T comprobar que no sea un 0
             emet(INSTR_DIVD,3, v1.value, v2.value, v3.value);
         }
     }
@@ -237,7 +238,7 @@ char *getNewType(char *type1, char *type2)
 
 void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_info *finish_val)
 {
-	if (strcmp(v1.type, "Int32") == 0 && strcmp(v2.type, "Int32") == 0)
+	if (isSameType(v1.type, "Int32") && isSameType(v2.type, "Int32"))
 	{
 		finish_val->type = "Int32";
 		int resInt;
@@ -246,7 +247,7 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 	}
 	else
 	{
-		if (strcmp(operand, "%") != 0)
+		if (!isSameType(operand, "%"))
 		{
 			finish_val->type = "Float64";
 			float resFloat;
@@ -255,17 +256,18 @@ void doAritmeticOperation(value_info v1, char *operand, value_info v2, value_inf
 		}
 		else
 		{
-			yyerror("No es posible realizar la operación módulo entre dos números reales.");
+			yyerror("No es posible realizar la operación módulo entre dos números reales");
 		}
 	}
 	finish_val->valueInfoType = LIT_T;
 }
 
-value_info *joinElementsVectors(value_info * vec1, value_info * vec2, int numElemVec1, int numElemVec2)
+value_info *joinElementsVectors(value_info *vec1, value_info *vec2, int numElemVec1, int numElemVec2)
 {
     int totalElem = numElemVec1 + numElemVec2;
     value_info *aux;
-    if(numElemVec1==0){
+    if (numElemVec1 == 0)
+    {
         aux = malloc(sizeof(value_info));
     }
     else
@@ -284,7 +286,7 @@ void invertVector(int *vector, int dim)
 {
     int aux;
     for (int i = 0; i < dim / 2; i++)
-    {   // Invertir el vector.
+    {   /* Invertir el vector. */
         aux = vector[i];
         vector[i] = vector[dim - i - 1];
         vector[dim - i - 1] = aux;
@@ -296,7 +298,7 @@ int getDim(char *key, int index_dim)
     sym_value_type entry = getEntry(key);
     if (index_dim >= entry.num_dim)
     {
-        yyerror("Estás accediendo a una dimensión no válida.");
+        yyerror("Estás accediendo a una dimensión no válida");
     }
     return entry.elem_dims[index_dim];
 }
@@ -331,7 +333,8 @@ sym_value_type castValueInfoBaseToSymValueType(value_info v)
     return createSymValueType(v.type,0,0,NULL,NULL,v.valueInfoType);
 }
 
-char *calculateNewIndex(int dim, value_info calcIndex, value_info index){
+char *calculateNewIndex(int dim, value_info calcIndex, value_info index)
+{
 
     char *nameTmp1 = generateTmpId();
     value_info tmp1 = createValueInfo(nameTmp1, INT32_T, VAR_T);
@@ -354,9 +357,8 @@ char *calculateNewIndex(int dim, value_info calcIndex, value_info index){
     return nameTmp1;
 }
 
-void checkTypesInFuction(value_info *expectedParams,value_info *listParams, int numParams)
+void checkTypesInFuction(value_info *expectedParams, value_info *listParams, int numParams)
 {
-
     value_info expected, arrived;
     for (int i = 0; i < numParams; i++)
     {
@@ -364,34 +366,31 @@ void checkTypesInFuction(value_info *expectedParams,value_info *listParams, int 
         arrived = listParams[i];
         if(isSameType(expected.valueInfoType,TENS_T) || isSameType(arrived.valueInfoType,TENS_T))
         {
-            if(!isSameType(expected.valueInfoType,TENS_T))
+            if (!isSameType(expected.valueInfoType,TENS_T))
             {
-                yyerror(generateString("No se esperaba un tensor como %i parametro",1,i+1));
+                yyerror(generateString("No se esperaba un tensor como %i parametro",1, i + 1));
             }
-            else if(!isSameType(arrived.valueInfoType,TENS_T))
+            else if (!isSameType(arrived.valueInfoType,TENS_T))
             {
-                yyerror(generateString("Se esperaba un tensor como %i parametro",1,i+1));
+                yyerror(generateString("Se esperaba un tensor como %i parametro",1, i + 1));
             }
         }
         checkIfIsNeededCast(expected.type,&listParams[i]);
         arrived = listParams[i];
         if (!isSameType(expected.type,arrived.type))
         {
-            yyerror(generateString("El parametro %i del procedimiento deberia ser %s pero es %s",3,i+1,expected.type,arrived.type));
+            yyerror(generateString("El parametro %i del procedimiento deberia ser %s pero es %s",3, i + 1, expected.type, arrived.type));
         }
     }
 }
 
 void checkIfIsNeededCast(char *expectedType, value_info *arrivedValue)
 {
-    if(isSameType(expectedType,FLOAT64_T) && isSameType(arrivedValue[0].type,INT32_T)
-     && !isSameType(arrivedValue[0].valueInfoType,LIT_T))
-    {
-        //HACER I2D Y MODIFICAR EL PARAMETRO
+    if (isSameType(expectedType,FLOAT64_T) && isSameType(arrivedValue[0].type,INT32_T) && !isSameType(arrivedValue[0].valueInfoType,LIT_T))
+    {   /* HACER I2D Y MODIFICAR EL PARAMETRO */
         char *tmp = generateTmpId();
-        emet(INSTR_I2D,2,tmp,arrivedValue[0].value);
+        emet(INSTR_I2D,2, tmp, arrivedValue[0].value);
         arrivedValue[0].type = FLOAT64_T;
         arrivedValue[0].value = strdup(tmp);
     }
-
 }

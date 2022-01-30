@@ -52,7 +52,7 @@ char *generateString(char *message, int nArgs, ...)
             sprintf(string, message, params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
             break;
         default:
-            yyerror("Estas usando mal la función generateString(). nArgs debe estar entre 0 y 7.");
+            yyerror("Estas usando mal la función generateString(), nArgs debe estar entre 0 y 7");
             break;
     }
     return strdup(string);
@@ -166,7 +166,7 @@ void simpleDebug(char *text, int typeFile)
     // flex
     if (typeFile == 0)
     {
-         printf(text);
+         //printf(text);
     }
     // bison
     else
@@ -175,28 +175,28 @@ void simpleDebug(char *text, int typeFile)
     }
 }
 
-sym_value_type getEntry(char* key)
+sym_value_type getEntry(char *key)
 {
     sym_value_type entry;
     int response = sym_lookup(key, &entry);
     if (response == SYMTAB_NOT_FOUND)
     {
-        yyerror(generateString("No se ha encontrado el elemento '%s' en la symtab.",1, key));
+        yyerror(generateString("No se ha encontrado el elemento '%s' en la symtab",1, key));
     }
     return entry;
 }
 
-int getEntryMessage(char* key, sym_value_type *entry)
+int getEntryMessage(char *key, sym_value_type *entry)
 {
     return sym_lookup(key, entry);
 }
 
-void addOrUpdateEntry(char* key, sym_value_type entry)
+void addOrUpdateEntry(char *key, sym_value_type entry)
 {
     int response = sym_enter(key, &entry);
     if (response == SYMTAB_STACK_OVERFLOW)
     {
-        yyerror("No hay más memoria (añadiendo entrada).");
+        yyerror("No hay más memoria (añadiendo entrada)");
     }
 }
 
@@ -205,7 +205,7 @@ void pushSymtab()
     int response = sym_push_scope();
     if (response == SYMTAB_STACK_OVERFLOW)
     {
-        yyerror("Se ha desbordado la pila.");
+        yyerror("Se ha desbordado la pila");
     }
 }
 
@@ -214,10 +214,10 @@ void popSymtab()
     int response = sym_pop_scope();
     if (response == SYMTAB_STACK_UNDERFLOW)
     {
-        yyerror("El ámbito actual es el global.");
+        yyerror("El ámbito actual es el global");
     }
     else if (response == SYMTAB_NOT_TOP)
     {
-        yyerror("El ámbito actual no esta en la cima de la pila.");
+        yyerror("El ámbito actual no esta en la cima de la pila");
     }
 }
