@@ -201,7 +201,6 @@ lista_sumas : lista_sumas OP_ARIT_P2 lista_productos	{
 										char *newType = getNewType($1.type, $3.type);
 										checkIfIsNeededCast(newType, &$1);
 										checkIfIsNeededCast(newType, &$3);
-											/* ¿CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS) */
 										$$ = createValueInfo(generateTmpId(), newType, VAR_T);
 										classifyOperation($2, $$, $1, $3);
 									}
@@ -235,7 +234,6 @@ lista_productos : lista_productos op_arit_p1 terminal_aritmetico	{
 												char *newType = getNewType($1.type, $3.type);
 												checkIfIsNeededCast(newType, &$1);
                                                                                         	checkIfIsNeededCast(newType, &$3);
-													/* ¿CONTROLAR OPERACIÓN VALIDA? (Ex: MODULO CON FLOATS) */
 												$$ = createValueInfo(generateTmpId(), getNewType($1.type, $3.type), VAR_T);
 												classifyOperation($2, $$, $1, $3);
 											}
