@@ -43,22 +43,18 @@ void intOperations(int num1, int num2, char *operand, int *res)
 {
     if (isSameType(operand, OP_ARIT_SUMA))
     {
-        simpleDebug("Estoy en suma.\n", 1);
         *res = num1 + num2;
     }
     else if (isSameType(operand, OP_ARIT_RESTA))
     {
-        simpleDebug("Estoy en resta.\n", 1);
         *res = num1 - num2;
     }
     else if (isSameType(operand, OP_ARIT_MULT))
     {
-        simpleDebug("Estoy en producto.\n", 1);
         *res = num1 * num2;
     }
     else if (isSameType(operand, OP_ARIT_DIV))
     {
-        simpleDebug("Estoy en division.\n", 1);
         if (num2 != 0)
         {
             *res = num1 / num2;
@@ -70,7 +66,6 @@ void intOperations(int num1, int num2, char *operand, int *res)
     }
     else if (isSameType(operand, OP_ARIT_MOD))
     {
-        simpleDebug("Estoy en modulo.\n", 1);
         if (num2 != 0)
         {
             *res = num1 % num2;
@@ -82,7 +77,6 @@ void intOperations(int num1, int num2, char *operand, int *res)
     }
     else if (isSameType(operand, OP_ARIT_POTENCIA))
     {
-        simpleDebug("Estoy en la potencia.\n", 1);
         *res = (int) pow((double) num1, (double) num2);
     }
 }
