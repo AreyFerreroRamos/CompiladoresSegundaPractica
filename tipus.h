@@ -75,7 +75,7 @@ typedef struct
 
 /**
  * Esta estructura contiene los campos necesarios para gestionar un elemento (literal, variable, tensor o función)
- * en cualquier punto del programa en el que sea usado, salvo cuando se utiliza como índice para acceder a un tensor.
+ * en cualquier punto del programa en el que sea usado.
  */
 typedef struct
 {
@@ -91,7 +91,7 @@ typedef struct
 typedef struct
 {
 	int index_dim;              // Posición actual del vector de dimensiones del tensor.
-    value_info calcIndex;       // Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor tratándolo como si fuera un vector.
+    value_info calcIndex;       // Variable sobre la que se van acumulando los cálculos parciales para acceder a la posición del tensor al tratarlo como si fuera un vector.
 	char *lexema;               // Nombre de la variable tensor.
 } tensor_info;
 

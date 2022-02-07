@@ -37,7 +37,7 @@ void emet(char *type, int nArgs, ...)
         var2 = strdup(va_arg(ap, char *));
         instruction = generateString("%s := %s",2, var1, var2);
     }
-    if (isSameType(type,INSTR_COPY_TO_TENSOR) || isSameType(type,INSTR_COPY_FROM_TENSOR))
+    else if (isSameType(type,INSTR_COPY_TO_TENSOR) || isSameType(type,INSTR_COPY_FROM_TENSOR))
     {
         char *var1, *var2, *index;
         var1 = strdup(va_arg(ap, char *));
@@ -313,7 +313,7 @@ int getAcumElemDim(int *elem_dim, int num_dim)
 	return acum;
 }
 
-value_info *addValueInfoBase(value_info *list, int numElem, value_info toAdd)
+value_info *addValueInfo(value_info *list, int numElem, value_info toAdd)
 {
     value_info *aux;
     if (numElem == 0)
@@ -328,7 +328,7 @@ value_info *addValueInfoBase(value_info *list, int numElem, value_info toAdd)
     return aux;
 }
 
-sym_value_type castValueInfoBaseToSymValueType(value_info v)
+sym_value_type castValueInfoToSymValueType(value_info v)
 {
     return createSymValueType(v.type,0,0,NULL,NULL,v.valueInfoType);
 }

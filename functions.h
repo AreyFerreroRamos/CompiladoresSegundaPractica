@@ -103,12 +103,12 @@ int getAcumElemDim(int *elem_dim, int num_dim);
  * Dada una lista de parametros, el numero de parametros que hay y un nuevo parametro a
  * añadir reserva el espacio necesario e introduce el nuevo elemento.
  */
-value_info *addValueInfoBase(value_info *list, int numElem, value_info toAdd);
+value_info *addValueInfo(value_info *list, int numElem, value_info toAdd);
 
 /**
  *
  */
-sym_value_type castValueInfoBaseToSymValueType(value_info v);
+sym_value_type castValueInfoToSymValueType(value_info v);
 
 /**
  * Dada la dimension actual, el cálculo del indice hasta ahora y el nuevo indice a introducir

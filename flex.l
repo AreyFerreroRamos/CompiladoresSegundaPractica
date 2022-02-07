@@ -219,7 +219,7 @@ id {lletra}({lletra}|{digit}|_({lletra}|{digit}))*
 {id}	{
             if (strlen(yytext) > ID_MAX_LENGTH)
             {
-                yyerror(generateString("ID -> %s demasiado largo.", 1, yytext));
+                yyerror(generateString("ID -> %s demasiado largo", 1, yytext));
             }
             if (inFunction == false && inMain == false)
             {
